@@ -1,0 +1,73 @@
+services:
+  # to test app build (if break in ci, don't need to use locally)
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '3000:3000'
+  #   environment:
+  #     DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+  #     REDIS_URL: redis://redis:6379
+  #   working_dir: /usr/src/app
+  #   command: ['start']
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: 'Asia/Bangkok'
+      PGTZ: 'Asia/Bangkok'
+    ports:
+      - 5432:5432
+    volumes:
+      - ./_docker_volumes/postgres:/var/lib/postgresql/data
+
+  # Enable this with EmailService
+  # mailhog:
+  #   image: mailhog/mailhog
+  #   container_name: mailhog
+  #   platform: linux/amd64
+  #   ports:
+  #     - '1025:1025' # SMTP port
+  #     - '8025:8025' # Web UI port
+  #   restart: unless-stopped
+
+  # Enable this to use redis caching
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    depends_on:
+      - postgres
+    volumes:
+      - ./_docker_volumes/redis:/data
+
+  bullboard:
+    image: nauverse/bull-board:latest
+    ports:
+      - '2999:3000' # UI at http://localhost:2999
+    environment:
+      REDIS_URL: redis://redis:6379
+      BULL_VERSION: BULLMQ
+      BULL_PREFIX: bull
+      USER_USERNAME: admin
+      USER_PASSWORD: admin
+    depends_on:
+      - redis
+
+  # Enable this to use file uploading to minio
+  # minio:
+  #   image: minio/minio
+  #   environment:
+  #     - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+  #     - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+  #   ports:
+  #     - 9000:9000
+  #     - 9001:9001
+  #   command: minio server --console-address ":9001" /data
+  #   volumes:
+  #     - ./_docker_volumes/minio:/data

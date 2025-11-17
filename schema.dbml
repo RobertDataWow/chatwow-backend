@@ -1,0 +1,60 @@
+Enum "users_status" {
+  "ACTIVE"
+  "INACTIVE"
+}
+
+Table "kysely_migration" {
+  "name" varchar(255) [pk, not null]
+  "timestamp" varchar(255) [not null]
+}
+
+Table "kysely_migration_lock" {
+  "id" varchar(255) [pk, not null]
+  "is_locked" int4 [not null, default: 0]
+}
+
+Table "users" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "email" varchar(250) [unique, not null]
+  "password" varchar(250) [not null]
+  "last_signed_in_at" timestamptz
+  "status" users_status [not null, default: 'ACTIVE']
+}
+
+Table "sessions" {
+  "id" uuid [pk, not null]
+  "created_by_id" uuid [not null]
+  "secret_hash" text [not null]
+  "device" text [not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "expired_at" timestamptz
+  "info" jsonb [not null]
+}
+
+Table "posts" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "title" varchar(250) [not null]
+  "details" text [not null, default: '']
+  "created_by_id" uuid [not null]
+}
+
+Table "comments" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "comment" text [not null, default: '']
+  "post_id" uuid [not null]
+  "created_by_id" uuid [not null]
+}
+
+Ref "comments_created_by_id_fkey":"users"."id" < "comments"."created_by_id" [delete: cascade]
+
+Ref "comments_post_id_fkey":"posts"."id" < "comments"."post_id" [delete: cascade]
+
+Ref "posts_created_by_id_fkey":"users"."id" < "posts"."created_by_id" [delete: cascade]
+
+Ref "sessions_created_by_id_fkey":"users"."id" < "sessions"."created_by_id" [delete: cascade]

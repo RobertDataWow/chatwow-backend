@@ -1,0 +1,22 @@
+meta {
+  name: update-user
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{url}}/v1/users/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 0198dcfe-4311-71db-9a42-9cd32b7bb08b
+}
+
+body:json {
+  {
+    "email": "tet34@example.com",
+    "password": "password"
+  }
+}

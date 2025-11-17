@@ -1,0 +1,22 @@
+meta {
+  name: sign-in
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/v1/auth/sign-in
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "superadmin@example.com",
+    "password": "password"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar('token',res.body?.meta?.token)
+}
