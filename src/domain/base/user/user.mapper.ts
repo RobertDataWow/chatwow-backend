@@ -1,5 +1,4 @@
 import { toDate, toResponseDate } from '@shared/common/common.transformer';
-import type { WithPgState } from '@shared/common/common.type';
 
 import type { UserJson, UserPg, UserPlain } from './types/user.domain.type';
 import { User } from './user.domain';
@@ -12,11 +11,10 @@ export class UserMapper {
       createdAt: toDate(pg.created_at),
       updatedAt: toDate(pg.updated_at),
       email: pg.email,
-      password: pg.password,
-      lastSignedInAt: pg.last_signed_in_at
-        ? new Date(pg.last_signed_in_at)
-        : null,
-      status: pg.status,
+      password: pg.password || null,
+      role: pg.role,
+      userStatus: pg.user_status,
+      lineUid: pg.line_uid || null,
     };
 
     return new User(plain);
@@ -33,8 +31,9 @@ export class UserMapper {
       updatedAt: plainData.updatedAt,
       email: plainData.email,
       password: plainData.password,
-      lastSignedInAt: plainData.lastSignedInAt,
-      status: plainData.status,
+      role: plainData.role,
+      userStatus: plainData.userStatus,
+      lineUid: plainData.lineUid,
     };
 
     return new User(plain);
@@ -47,8 +46,9 @@ export class UserMapper {
       updatedAt: toDate(json.updatedAt),
       email: json.email,
       password: json.password,
-      lastSignedInAt: json.lastSignedInAt ? toDate(json.lastSignedInAt) : null,
-      status: json.status,
+      role: json.role,
+      userStatus: json.userStatus,
+      lineUid: json.lineUid,
     };
 
     return new User(plain);
@@ -58,11 +58,12 @@ export class UserMapper {
     return {
       id: user.id,
       created_at: user.createdAt.toISOString(),
-      email: user.email,
-      last_signed_in_at: user.lastSignedInAt?.toISOString() || null,
-      password: user.password,
-      status: user.status,
       updated_at: user.updatedAt.toISOString(),
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      user_status: user.userStatus,
+      line_uid: user.lineUid,
     };
   }
 
@@ -70,11 +71,25 @@ export class UserMapper {
     return {
       id: user.id,
       createdAt: user.createdAt,
-      email: user.email,
-      lastSignedInAt: user.lastSignedInAt,
-      password: user.password,
-      status: user.status,
       updatedAt: user.updatedAt,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      userStatus: user.userStatus,
+      lineUid: user.lineUid,
+    };
+  }
+
+  static toJson(user: User): UserJson {
+    return {
+      id: user.id,
+      createdAt: toResponseDate(user.createdAt),
+      updatedAt: toResponseDate(user.updatedAt),
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      userStatus: user.userStatus,
+      lineUid: user.lineUid,
     };
   }
 
@@ -82,46 +97,11 @@ export class UserMapper {
     return {
       id: user.id,
       createdAt: toResponseDate(user.createdAt),
-      email: user.email,
-      lastSignedInAt: user.lastSignedInAt
-        ? toResponseDate(user.lastSignedInAt)
-        : null,
-      status: user.status,
       updatedAt: toResponseDate(user.updatedAt),
-    };
-  }
-
-  static pgToResponse(user: UserPg): UserResponse {
-    return {
-      id: user.id,
-      createdAt: toResponseDate(user.created_at),
       email: user.email,
-      lastSignedInAt: user.last_signed_in_at
-        ? toResponseDate(user.last_signed_in_at)
-        : null,
-      status: user.status,
-      updatedAt: toResponseDate(user.updated_at),
-    };
-  }
-
-  static toJson(user: User): UserJson {
-    return {
-      id: user.id,
-      createdAt: user.createdAt.toISOString(),
-      email: user.email,
-      lastSignedInAt: user.lastSignedInAt
-        ? user.lastSignedInAt.toISOString()
-        : null,
-      password: user.password,
-      status: user.status,
-      updatedAt: user.updatedAt.toISOString(),
-    };
-  }
-
-  static toJsonWithState(user: User): WithPgState<UserJson, UserPg> {
-    return {
-      state: user.pgState,
-      data: UserMapper.toJson(user),
+      role: user.role,
+      userStatus: user.userStatus,
+      lineUid: user.lineUid,
     };
   }
 }

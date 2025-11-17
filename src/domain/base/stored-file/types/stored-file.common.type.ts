@@ -1,0 +1,9 @@
+export type StoredFileSortKey = 'id';
+
+export type StoredFileQueryOptions = {
+  filter?: {
+    refName?: string;
+    ownerTable?: string;
+    ownerId?: string;
+  };
+};

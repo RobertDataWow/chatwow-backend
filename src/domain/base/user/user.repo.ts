@@ -1,13 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { WhereBuilder } from '@infra/db/db.common';
-import { sortQb } from '@infra/db/db.util';
-
-import { diff, getUniqueIds } from '@shared/common/common.func';
-import { getQueryPagination } from '@shared/common/common.pagintaion';
+import { diff } from '@shared/common/common.func';
 import { BaseRepo } from '@shared/common/common.repo';
 
-import { UserQueryOptions } from './types/user.common.type';
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
 
@@ -47,55 +42,14 @@ export class UserRepo extends BaseRepo {
     }
 
     const user = UserMapper.fromPgWithState(userPg);
-
     return user;
   }
 
-  async findOneByEmail(email: string): Promise<User | null> {
-    const userPg = await this.readDb
-      .selectFrom('users')
-      .selectAll()
-      .where('email', '=', email)
-      .executeTakeFirst();
-
-    if (!userPg) {
-      return null;
-    }
-
-    const user = UserMapper.fromPgWithState(userPg);
-
-    return user;
-  }
-
-  async findIds(opts?: UserQueryOptions) {
-    opts ??= {};
-
-    const { filter, sort, pagination } = opts;
-    const { limit, offset } = getQueryPagination(pagination);
-
-    const res = await this.readDb
-      .selectFrom('users')
-      .select('users.id')
-      .$if(!!limit, (q) => q.limit(limit!))
-      .$if(!!offset, (q) => q.offset(offset!))
-      .$if(!!sort?.length, (q) =>
-        sortQb(q, sort, { id: 'users.id', createdAt: 'users.created_at' }),
-      )
-      .where((eb) => {
-        const builder: WhereBuilder = [];
-
-        if (filter?.email) {
-          builder.push(eb('email', '=', filter.email!));
-        }
-
-        if (filter?.status) {
-          builder.push(eb('status', '=', filter.status));
-        }
-
-        return eb.and(builder);
-      })
+  async delete(id: string): Promise<void> {
+    await this.db
+      //
+      .deleteFrom('users')
+      .where('id', '=', id)
       .execute();
-
-    return getUniqueIds(res);
   }
 }

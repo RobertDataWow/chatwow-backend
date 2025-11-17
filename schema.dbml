@@ -1,6 +1,22 @@
-Enum "users_status" {
+Enum "document_status" {
   "ACTIVE"
   "INACTIVE"
+}
+
+Enum "project_status" {
+  "ACTIVE"
+  "INACTIVE"
+}
+
+Enum "user_role" {
+  "ADMIN"
+  "USER"
+}
+
+Enum "user_status" {
+  "ACTIVE"
+  "INACTIVE"
+  "PENDING_REGISTRATION"
 }
 
 Table "kysely_migration" {
@@ -15,46 +31,82 @@ Table "kysely_migration_lock" {
 
 Table "users" {
   "id" uuid [pk, not null]
+  "email" text [not null]
+  "password" text
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "email" varchar(250) [unique, not null]
-  "password" varchar(250) [not null]
-  "last_signed_in_at" timestamptz
-  "status" users_status [not null, default: 'ACTIVE']
+  "role" user_role [not null]
+  "user_status" user_status [not null]
+  "line_uid" text
 }
 
-Table "sessions" {
+Table "user_groups" {
   "id" uuid [pk, not null]
-  "created_by_id" uuid [not null]
-  "secret_hash" text [not null]
-  "device" text [not null]
+  "group_name" text [not null]
+  "description" text [not null, default: '']
+}
+
+Table "user_group_users" {
+  "id" uuid [pk, not null]
+  "user_id" uuid
+  "user_group_id" uuid
+}
+
+Table "projects" {
+  "id" uuid [pk, not null]
+  "project_name" text [not null]
+  "project_description" text [not null, default: '']
+  "project_guideline_md" text [not null, default: '']
+  "project_status" project_status [not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "expired_at" timestamptz
-  "info" jsonb [not null]
 }
 
-Table "posts" {
+Table "user_group_projects" {
   "id" uuid [pk, not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "title" varchar(250) [not null]
-  "details" text [not null, default: '']
-  "created_by_id" uuid [not null]
+  "project_id" uuid
+  "user_group_id" uuid
 }
 
-Table "comments" {
+Table "project_documents" {
   "id" uuid [pk, not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "comment" text [not null, default: '']
-  "post_id" uuid [not null]
-  "created_by_id" uuid [not null]
+  "document_status" document_status [not null]
+  "ai_summary_md" text [not null, default: '']
 }
 
-Ref "comments_created_by_id_fkey":"users"."id" < "comments"."created_by_id" [delete: cascade]
+Table "project_ai_summaries" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz
+  "ai_summary_md" text [not null, default: '']
+}
 
-Ref "comments_post_id_fkey":"posts"."id" < "comments"."post_id" [delete: cascade]
+Table "stored_files" {
+  "id" uuid [pk, not null]
+  "ref_name" text [not null]
+  "key_path" text [not null]
+  "owner_table" text [not null]
+  "owner_id" uuid [not null]
+  "filename" text [not null]
+  "filesize_byte" int8
+  "storage_name" text [default: 's3']
+  "presign_url" text
+  "is_public" bool [default: false]
+  "created_at" timestamptz
+  "updated_at" timestamptz
+  "mime_type" text
+  "extension" text
+  "checksum" text
+  "expire_at" timestamptz
 
-Ref "posts_created_by_id_fkey":"users"."id" < "posts"."created_by_id" [delete: cascade]
+  Indexes {
+    (ref_name, owner_table, owner_id) [type: btree, name: "stored_files_ref_owner_idx"]
+  }
+}
 
-Ref "sessions_created_by_id_fkey":"users"."id" < "sessions"."created_by_id" [delete: cascade]
+Ref "user_group_projects_project_id_fkey":"projects"."id" < "user_group_projects"."project_id" [delete: cascade]
+
+Ref "user_group_projects_user_group_id_fkey":"user_groups"."id" < "user_group_projects"."user_group_id" [delete: cascade]
+
+Ref "user_group_users_user_group_id_fkey":"user_groups"."id" < "user_group_users"."user_group_id" [delete: cascade]
+
+Ref "user_group_users_user_id_fkey":"users"."id" < "user_group_users"."user_id" [delete: cascade]

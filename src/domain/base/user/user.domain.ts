@@ -1,4 +1,4 @@
-import type { UsersStatus } from '@infra/db/db';
+import type { UserRole, UserStatus } from '@infra/db/db';
 
 import { hashString, uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
@@ -18,9 +18,10 @@ export class User extends DomainEntity<UserPg> {
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly email: string;
-  readonly password: string;
-  readonly lastSignedInAt: Date | null;
-  readonly status: UsersStatus;
+  readonly password: string | null;
+  readonly role: UserRole;
+  readonly userStatus: UserStatus;
+  readonly lineUid: string | null;
 
   constructor(plain: UserPlain) {
     super();
@@ -33,11 +34,13 @@ export class User extends DomainEntity<UserPg> {
       createdAt: myDayjs().toDate(),
       updatedAt: myDayjs().toDate(),
       email: data.email,
-      password: hashString(data.password),
-      lastSignedInAt: null,
-      status: data.status,
+      password: data.password ? hashString(data.password) : null,
+      role: data.role,
+      userStatus: data.userStatus,
+      lineUid: data.lineUid || null,
     });
   }
+
   static newBulk(data: UserNewData[]) {
     return data.map((d) => User.new(d));
   }
@@ -47,16 +50,17 @@ export class User extends DomainEntity<UserPg> {
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: myDayjs().toDate(),
-
-      // update able
       email: isDefined(data.email) ? data.email : this.email,
       password: isDefined(data.password)
-        ? hashString(data.password)
+        ? data.password
+          ? hashString(data.password)
+          : null
         : this.password,
-      lastSignedInAt: isDefined(data.lastSignedInAt)
-        ? data.lastSignedInAt
-        : this.lastSignedInAt,
-      status: isDefined(data.status) ? data.status : this.status,
+      role: isDefined(data.role) ? data.role : this.role,
+      userStatus: isDefined(data.userStatus)
+        ? data.userStatus
+        : this.userStatus,
+      lineUid: isDefined(data.lineUid) ? data.lineUid : this.lineUid,
     };
 
     Object.assign(this, plain);

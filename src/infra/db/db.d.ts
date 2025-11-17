@@ -5,65 +5,95 @@
 
 import type { ColumnType } from "kysely";
 
+export type DocumentStatus = "ACTIVE" | "INACTIVE";
+
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
-export type Json = JsonValue;
+export type ProjectStatus = "ACTIVE" | "INACTIVE";
 
-export type JsonArray = JsonValue[];
+export type UserRole = "ADMIN" | "USER";
 
-export type JsonObject = {
-  [x: string]: JsonValue | undefined;
-};
+export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 
-export type JsonPrimitive = boolean | number | string | null;
-
-export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
-
-export type UsersStatus = "ACTIVE" | "INACTIVE";
-
-export interface Comments {
-  comment: Generated<string>;
-  created_at: Generated<string>;
-  created_by_id: string;
+export interface ProjectAiSummaries {
+  ai_summary_md: Generated<string>;
+  created_at: string | null;
   id: string;
-  post_id: string;
 }
 
-export interface Posts {
-  created_at: Generated<string>;
-  created_by_id: string;
-  details: Generated<string>;
+export interface ProjectDocuments {
+  ai_summary_md: Generated<string>;
+  document_status: DocumentStatus;
   id: string;
-  title: string;
+}
+
+export interface Projects {
+  created_at: Generated<string>;
+  id: string;
+  project_description: Generated<string>;
+  project_guideline_md: Generated<string>;
+  project_name: string;
+  project_status: ProjectStatus;
   updated_at: Generated<string>;
 }
 
-export interface Sessions {
-  created_at: Generated<string>;
-  created_by_id: string;
-  device: string;
-  expired_at: string | null;
+export interface StoredFiles {
+  checksum: string | null;
+  created_at: string | null;
+  expire_at: string | null;
+  extension: string | null;
+  filename: string;
+  filesize_byte: string | null;
   id: string;
-  info: Json;
-  secret_hash: string;
-  updated_at: Generated<string>;
+  is_public: Generated<boolean | null>;
+  key_path: string;
+  mime_type: string | null;
+  owner_id: string;
+  owner_table: string;
+  presign_url: string | null;
+  ref_name: string;
+  storage_name: Generated<string | null>;
+  updated_at: string | null;
+}
+
+export interface UserGroupProjects {
+  id: string;
+  project_id: string | null;
+  user_group_id: string | null;
+}
+
+export interface UserGroups {
+  description: Generated<string>;
+  group_name: string;
+  id: string;
+}
+
+export interface UserGroupUsers {
+  id: string;
+  user_group_id: string | null;
+  user_id: string | null;
 }
 
 export interface Users {
   created_at: Generated<string>;
   email: string;
   id: string;
-  last_signed_in_at: string | null;
-  password: string;
-  status: Generated<UsersStatus>;
+  line_uid: string | null;
+  password: string | null;
+  role: UserRole;
   updated_at: Generated<string>;
+  user_status: UserStatus;
 }
 
 export interface DB {
-  comments: Comments;
-  posts: Posts;
-  sessions: Sessions;
+  project_ai_summaries: ProjectAiSummaries;
+  project_documents: ProjectDocuments;
+  projects: Projects;
+  stored_files: StoredFiles;
+  user_group_projects: UserGroupProjects;
+  user_group_users: UserGroupUsers;
+  user_groups: UserGroups;
   users: Users;
 }

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserQueryOptions } from './types/user.common.type';
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
 import { UserRepo } from './user.repo';
@@ -8,10 +7,6 @@ import { UserRepo } from './user.repo';
 @Injectable()
 export class UserService {
   constructor(private repo: UserRepo) {}
-
-  async findIds(opts?: UserQueryOptions) {
-    return this.repo.findIds(opts);
-  }
 
   async findOne(id: string) {
     return this.repo.findOne(id);
@@ -33,7 +28,11 @@ export class UserService {
     return Promise.all(users.map((u) => this.save(u)));
   }
 
+  async delete(id: string) {
+    return this.repo.delete(id);
+  }
+
   private _validate(_user: User) {
-    // no rule for now
+    // validation rules can be added here
   }
 }

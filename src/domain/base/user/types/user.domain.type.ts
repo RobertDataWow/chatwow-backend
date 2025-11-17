@@ -1,7 +1,7 @@
 import type { OverrideProperties } from 'type-fest';
 
-import type { Users, UsersStatus } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
+import type { UserRole, UserStatus, Users } from '@infra/db/db.d';
 
 import type { Plain } from '@shared/common/common.type';
 
@@ -15,18 +15,21 @@ export type UserJson = OverrideProperties<
   {
     createdAt: string;
     updatedAt: string;
-    lastSignedInAt: string | null;
   }
 >;
 
 export type UserNewData = {
   email: string;
-  password: string;
-  status: UsersStatus;
+  password?: string;
+  role: UserRole;
+  userStatus: UserStatus;
+  lineUid?: string;
 };
+
 export type UserUpdateData = {
   email?: string;
   password?: string;
-  status?: UsersStatus;
-  lastSignedInAt?: Date | null;
+  role?: UserRole;
+  userStatus?: UserStatus;
+  lineUid?: string;
 };

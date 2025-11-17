@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import type { UsersStatus } from '@infra/db/db';
+import type { UserRole, UserStatus } from '@infra/db/db.d';
 
 export class UserResponse {
   @ApiProperty({ example: '' })
@@ -12,12 +12,15 @@ export class UserResponse {
   @ApiProperty({ example: '' })
   updatedAt: string;
 
-  @ApiProperty({ example: 'rob@example.com' })
+  @ApiProperty({ example: 'user@example.com' })
   email: string;
 
-  @ApiProperty({ example: '' })
-  lastSignedInAt: string | null;
+  @ApiProperty({ example: 'USER' satisfies UserRole })
+  role: UserRole;
 
-  @ApiProperty({ example: 'ACTIVE' satisfies UsersStatus })
-  status: UsersStatus;
+  @ApiProperty({ example: 'ACTIVE' satisfies UserStatus })
+  userStatus: UserStatus;
+
+  @ApiProperty({ example: null, nullable: true })
+  lineUid: string | null;
 }
