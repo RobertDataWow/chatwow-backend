@@ -1,0 +1,1 @@
+export type LineAccountId = string;
