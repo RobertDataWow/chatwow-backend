@@ -52,6 +52,11 @@ function decodeJwt<T>(token: string, salt: string): DecodedJwt<T>['data'] {
   }
 }
 
+export function generateOTP() {
+  const nanoGen = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 10);
+  return nanoGen();
+}
+
 export function hashString(data: string) {
   const hashed = bcrypt.hashSync(data, 10);
   return hashed;

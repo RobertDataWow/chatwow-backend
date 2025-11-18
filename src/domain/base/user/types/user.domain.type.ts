@@ -15,7 +15,7 @@ export type UserNewData = {
   password?: string;
   role: UserRole;
   userStatus: UserStatus;
-  lineUid?: string;
+  lineAccountId?: string;
 };
 
 export type UserUpdateData = {
@@ -23,5 +23,6 @@ export type UserUpdateData = {
   password?: string;
   role?: UserRole;
   userStatus?: UserStatus;
-  lineUid?: string;
+  lineAccountId?: string;
+  lastSignedInAt?: Date | null;
 };

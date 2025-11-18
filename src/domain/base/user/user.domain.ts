@@ -21,7 +21,8 @@ export class User extends DomainEntity<UserPg> {
   readonly password: string | null;
   readonly role: UserRole;
   readonly userStatus: UserStatus;
-  readonly lineUid: string | null;
+  readonly lineAccountId: string | null;
+  readonly lastSignedInAt: Date | null;
 
   constructor(plain: UserPlain) {
     super();
@@ -37,7 +38,8 @@ export class User extends DomainEntity<UserPg> {
       password: data.password ? hashString(data.password) : null,
       role: data.role,
       userStatus: data.userStatus,
-      lineUid: data.lineUid || null,
+      lineAccountId: data.lineAccountId || null,
+      lastSignedInAt: null,
     });
   }
 
@@ -51,6 +53,9 @@ export class User extends DomainEntity<UserPg> {
       createdAt: this.createdAt,
       updatedAt: myDayjs().toDate(),
       email: isDefined(data.email) ? data.email : this.email,
+      lastSignedInAt: isDefined(data.lastSignedInAt)
+        ? data.lastSignedInAt
+        : this.lastSignedInAt,
       password: isDefined(data.password)
         ? data.password
           ? hashString(data.password)
@@ -60,7 +65,9 @@ export class User extends DomainEntity<UserPg> {
       userStatus: isDefined(data.userStatus)
         ? data.userStatus
         : this.userStatus,
-      lineUid: isDefined(data.lineUid) ? data.lineUid : this.lineUid,
+      lineAccountId: isDefined(data.lineAccountId)
+        ? data.lineAccountId
+        : this.lineAccountId,
     };
 
     Object.assign(this, plain);

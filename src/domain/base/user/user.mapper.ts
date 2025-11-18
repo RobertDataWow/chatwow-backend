@@ -1,4 +1,8 @@
-import { toDate, toResponseDate } from '@shared/common/common.transformer';
+import {
+  toDate,
+  toISO,
+  toResponseDate,
+} from '@shared/common/common.transformer';
 
 import type { UserJson, UserPg, UserPlain } from './types/user.domain.type';
 import { User } from './user.domain';
@@ -8,13 +12,14 @@ export class UserMapper {
   static fromPg(pg: UserPg): User {
     const plain: UserPlain = {
       id: pg.id,
+      lastSignedInAt: toDate(pg.last_signed_in_at),
       createdAt: toDate(pg.created_at),
       updatedAt: toDate(pg.updated_at),
       email: pg.email,
       password: pg.password || null,
       role: pg.role,
+      lineAccountId: pg.line_account_id,
       userStatus: pg.user_status,
-      lineUid: pg.line_uid || null,
     };
 
     return new User(plain);
@@ -27,13 +32,14 @@ export class UserMapper {
   static fromPlain(plainData: UserPlain): User {
     const plain: UserPlain = {
       id: plainData.id,
+      lastSignedInAt: plainData.lastSignedInAt,
       createdAt: plainData.createdAt,
       updatedAt: plainData.updatedAt,
       email: plainData.email,
       password: plainData.password,
       role: plainData.role,
       userStatus: plainData.userStatus,
-      lineUid: plainData.lineUid,
+      lineAccountId: plainData.lineAccountId,
     };
 
     return new User(plain);
@@ -44,11 +50,12 @@ export class UserMapper {
       id: json.id,
       createdAt: toDate(json.createdAt),
       updatedAt: toDate(json.updatedAt),
+      lastSignedInAt: toDate(json.lastSignedInAt),
       email: json.email,
       password: json.password,
       role: json.role,
       userStatus: json.userStatus,
-      lineUid: json.lineUid,
+      lineAccountId: json.lineAccountId,
     };
 
     return new User(plain);
@@ -57,13 +64,14 @@ export class UserMapper {
   static toPg(user: User): UserPg {
     return {
       id: user.id,
-      created_at: user.createdAt.toISOString(),
-      updated_at: user.updatedAt.toISOString(),
+      last_signed_in_at: toISO(user.lastSignedInAt),
+      created_at: toISO(user.createdAt),
+      updated_at: toISO(user.updatedAt),
       email: user.email,
       password: user.password,
       role: user.role,
       user_status: user.userStatus,
-      line_uid: user.lineUid,
+      line_account_id: user.lineAccountId,
     };
   }
 
@@ -72,24 +80,26 @@ export class UserMapper {
       id: user.id,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      lastSignedInAt: user.lastSignedInAt,
       email: user.email,
       password: user.password,
       role: user.role,
       userStatus: user.userStatus,
-      lineUid: user.lineUid,
+      lineAccountId: user.lineAccountId,
     };
   }
 
   static toJson(user: User): UserJson {
     return {
       id: user.id,
-      createdAt: toResponseDate(user.createdAt),
-      updatedAt: toResponseDate(user.updatedAt),
+      createdAt: toISO(user.createdAt),
+      updatedAt: toISO(user.updatedAt),
+      lastSignedInAt: toISO(user.updatedAt),
       email: user.email,
       password: user.password,
       role: user.role,
       userStatus: user.userStatus,
-      lineUid: user.lineUid,
+      lineAccountId: user.lineAccountId,
     };
   }
 
@@ -98,10 +108,11 @@ export class UserMapper {
       id: user.id,
       createdAt: toResponseDate(user.createdAt),
       updatedAt: toResponseDate(user.updatedAt),
+      lastSignedInAt: toResponseDate(user.lastSignedInAt),
       email: user.email,
       role: user.role,
       userStatus: user.userStatus,
-      lineUid: user.lineUid,
+      lineAccountId: user.lineAccountId,
     };
   }
 }

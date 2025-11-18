@@ -22,6 +22,20 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   //
+  // LINE_ACCOUNTS
+  //
+  await db.schema
+    .createTable('line_accounts')
+    .addColumn('id', 'text', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('role', sql`user_role`, (col) => col.notNull())
+    .addColumn('user_status', sql`user_status`, (col) => col.notNull())
+    .addColumn('line_uid', 'text')
+    .execute();
+
+  //
   // USERS
   //
   await db.schema
@@ -29,6 +43,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('id', 'uuid', (col) => col.primaryKey())
     .addColumn('email', 'text', (col) => col.notNull())
     .addColumn('password', 'text')
+    .addColumn('last_signed_in_at', 'timestamptz')
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
@@ -37,7 +52,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn('role', sql`user_role`, (col) => col.notNull())
     .addColumn('user_status', sql`user_status`, (col) => col.notNull())
-    .addColumn('line_uid', 'text')
+    .addColumn('line_account_id', 'text', (col) =>
+      col.references('line_accounts.id').onDelete('set null').unique(),
+    )
     .execute();
 
   //
@@ -57,7 +74,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   await db.schema
-    .createIndex('user_otps_otp')
+    .createIndex('user_otps_otp_idx')
     .on('user_otps')
     .column('otp')
     .execute();
@@ -103,8 +120,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
+    .addColumn('ai_summary_md', 'text', (col) => col.notNull().defaultTo(''))
     .execute();
 
+  //
+  // USER GROUP PROJECTS
+  //
   await db.schema
     .createTable('user_group_projects')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
@@ -117,20 +138,10 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   //
-  // PROJECT DOCUMENTS
+  // USERS MANAGE PROJECTS
   //
   await db.schema
-    .createTable('project_documents')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('document_status', sql`document_status`, (col) => col.notNull())
-    .addColumn('ai_summary_md', 'text', (col) => col.notNull().defaultTo(''))
-    .execute();
-
-  //
-  // PROJECT AI SUMMARIES
-  //
-  await db.schema
-    .createTable('project_ai_summaries')
+    .createTable('user_manage_projects')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -138,14 +149,22 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('project_id', 'uuid', (col) =>
       col.notNull().references('projects.id').onDelete('cascade'),
     )
-    .addColumn('ai_summary_md', 'text', (col) => col.notNull().defaultTo(''))
+    .addColumn('user_id', 'uuid', (col) =>
+      col.notNull().references('users.id').onDelete('cascade'),
+    )
     .execute();
 
+  //
+  // PROJECT DOCUMENTS
+  //
   await db.schema
-    .alterTable('projects')
-    .addColumn('current_project_ai_summary_id', 'uuid', (col) =>
-      col.references('project_ai_summaries.id').onDelete('set null'),
+    .createTable('project_documents')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('project_id', 'uuid', (col) =>
+      col.notNull().references('projects.id').onDelete('cascade'),
     )
+    .addColumn('document_status', sql`document_status`, (col) => col.notNull())
+    .addColumn('ai_summary_md', 'text', (col) => col.notNull().defaultTo(''))
     .execute();
 
   //
@@ -181,15 +200,98 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createIndex('stored_files_ref_owner_idx')
     .on('stored_files')
-    .columns(['ref_name', 'owner_table', 'owner_id'])
-    .unique()
+    .columns(['owner_table', 'owner_id'])
+    .execute();
+
+  //
+  // LINE SESSION
+  //
+  await db.schema
+    .createTable('line_sessions')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('updated_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('line_account_id', 'text', (col) =>
+      col.references('line_accounts.id').notNull().onDelete('cascade'),
+    )
+    .addColumn('project_id', 'uuid', (col) =>
+      col.references('projects.id').notNull().onDelete('cascade'),
+    )
+    .execute();
+
+  //
+  // CHAT LOGS
+  //
+  await db.schema
+    //
+    .createType('chat_sender')
+    .asEnum(['USER', 'BOT'])
+    .execute();
+
+  await db.schema
+    .createTable('line_chat_logs')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('line_session_id', 'uuid', (col) =>
+      col.references('line_sessions.id').notNull().onDelete('cascade'),
+    )
+    .addColumn('chat_sender', sql`chat_sender`, (col) => col.notNull())
+    .addColumn('message', 'text', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createIndex('line_chat_logs_line_session_id_idx')
+    .on('line_chat_logs')
+    .column('line_session_id')
+    .execute();
+
+  //
+  // AUDIT LOGS
+  //
+
+  await db.schema
+    //
+    .createType('actor_type')
+    .asEnum(['USER', 'SYSTEM'])
+    .execute();
+
+  await db.schema
+    //
+    .createType('action_type')
+    .asEnum(['CREATE', 'UPDATE', 'DELETE'])
+    .execute();
+
+  await db.schema
+    .createTable('audit_logs')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('actor_type', sql`actor_type`, (col) =>
+      col.notNull().defaultTo('SYSTEM'),
+    )
+    .addColumn('action_type', sql`action_type`, (col) =>
+      col.notNull().defaultTo('CREATE'),
+    )
+    .addColumn('action_detail', 'text', (col) => col.notNull().defaultTo(''))
+    .addColumn('created_by_id', 'uuid', (col) =>
+      col.references('users.id').notNull(),
+    )
+    .addColumn('owner_table', 'text', (col) => col.notNull())
+    .addColumn('owner_id', 'uuid', (col) => col.notNull())
+    .addColumn('raw_data', 'jsonb', (col) => col.notNull())
     .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropIndex('stored_files_ref_owner_idx').execute();
   await db.schema.dropTable('stored_files').execute();
-  await db.schema.dropTable('project_ai_summaries').execute();
   await db.schema.dropTable('project_documents').execute();
   await db.schema.dropTable('user_group_projects').execute();
   await db.schema.dropTable('projects').execute();

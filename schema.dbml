@@ -1,3 +1,19 @@
+Enum "action_type" {
+  "CREATE"
+  "UPDATE"
+  "DELETE"
+}
+
+Enum "actor_type" {
+  "USER"
+  "SYSTEM"
+}
+
+Enum "chat_sender" {
+  "USER"
+  "BOT"
+}
+
 Enum "document_status" {
   "ACTIVE"
   "INACTIVE"
@@ -29,15 +45,24 @@ Table "kysely_migration_lock" {
   "is_locked" int4 [not null, default: 0]
 }
 
+Table "line_accounts" {
+  "id" text [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "role" user_role [not null]
+  "user_status" user_status [not null]
+  "line_uid" text
+}
+
 Table "users" {
   "id" uuid [pk, not null]
   "email" text [not null]
   "password" text
+  "last_signed_in_at" timestamptz
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "role" user_role [not null]
   "user_status" user_status [not null]
-  "line_uid" text
+  "line_account_id" text [unique]
 }
 
 Table "user_otps" {
@@ -48,7 +73,7 @@ Table "user_otps" {
   "expire_at" timestamptz [not null]
 
   Indexes {
-    otp [type: btree, name: "user_otps_otp"]
+    otp [type: btree, name: "user_otps_otp_idx"]
   }
 }
 
@@ -72,7 +97,7 @@ Table "projects" {
   "project_status" project_status [not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "current_project_ai_summary_id" uuid
+  "ai_summary_md" text [not null, default: '']
 }
 
 Table "user_group_projects" {
@@ -81,16 +106,17 @@ Table "user_group_projects" {
   "user_group_id" uuid [not null]
 }
 
-Table "project_documents" {
-  "id" uuid [pk, not null]
-  "document_status" document_status [not null]
-  "ai_summary_md" text [not null, default: '']
-}
-
-Table "project_ai_summaries" {
+Table "user_manage_projects" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "project_id" uuid [not null]
+  "user_id" uuid [not null]
+}
+
+Table "project_documents" {
+  "id" uuid [pk, not null]
+  "project_id" uuid [not null]
+  "document_status" document_status [not null]
   "ai_summary_md" text [not null, default: '']
 }
 
@@ -113,13 +139,51 @@ Table "stored_files" {
   "expire_at" timestamptz
 
   Indexes {
-    (ref_name, owner_table, owner_id) [type: btree, name: "stored_files_ref_owner_idx"]
+    (owner_table, owner_id) [type: btree, name: "stored_files_ref_owner_idx"]
   }
 }
 
-Ref "project_ai_summaries_project_id_fkey":"projects"."id" < "project_ai_summaries"."project_id" [delete: cascade]
+Table "line_sessions" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "line_account_id" text [not null]
+  "project_id" uuid [not null]
+}
 
-Ref "projects_current_project_ai_summary_id_fkey":"project_ai_summaries"."id" < "projects"."current_project_ai_summary_id" [delete: set null]
+Table "line_chat_logs" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "line_session_id" uuid [not null]
+  "chat_sender" chat_sender [not null]
+  "message" text [not null]
+
+  Indexes {
+    line_session_id [type: btree, name: "line_chat_logs_line_session_id_idx"]
+  }
+}
+
+Table "audit_logs" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "actor_type" actor_type [not null, default: 'SYSTEM']
+  "action_type" action_type [not null, default: 'CREATE']
+  "action_detail" text [not null, default: '']
+  "created_by_id" uuid [not null]
+  "owner_table" text [not null]
+  "owner_id" uuid [not null]
+  "raw_data" jsonb [not null]
+}
+
+Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"
+
+Ref "line_chat_logs_line_session_id_fkey":"line_sessions"."id" < "line_chat_logs"."line_session_id" [delete: cascade]
+
+Ref "line_sessions_line_account_id_fkey":"line_accounts"."id" < "line_sessions"."line_account_id" [delete: cascade]
+
+Ref "line_sessions_project_id_fkey":"projects"."id" < "line_sessions"."project_id" [delete: cascade]
+
+Ref "project_documents_project_id_fkey":"projects"."id" < "project_documents"."project_id" [delete: cascade]
 
 Ref "user_group_projects_project_id_fkey":"projects"."id" < "user_group_projects"."project_id" [delete: cascade]
 
@@ -129,4 +193,10 @@ Ref "user_group_users_user_group_id_fkey":"user_groups"."id" < "user_group_users
 
 Ref "user_group_users_user_id_fkey":"users"."id" < "user_group_users"."user_id" [delete: cascade]
 
+Ref "user_manage_projects_project_id_fkey":"projects"."id" < "user_manage_projects"."project_id" [delete: cascade]
+
+Ref "user_manage_projects_user_id_fkey":"users"."id" < "user_manage_projects"."user_id" [delete: cascade]
+
 Ref "user_otps_user_id_fkey":"users"."id" < "user_otps"."user_id" [delete: cascade]
+
+Ref "users_line_account_id_fkey":"line_accounts"."id" < "users"."line_account_id" [delete: set null]

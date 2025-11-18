@@ -23,7 +23,7 @@ export class UserFactory {
         : hashString('password'),
       role: isDefined(data.role) ? data.role : 'USER',
       userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
-      lineUid: isDefined(data.lineUid) ? data.lineUid : null,
+      lineAccountId: isDefined(data.lineAccountId) ? data.lineAccountId : null,
     });
   }
 

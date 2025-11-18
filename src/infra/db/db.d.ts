@@ -5,11 +5,29 @@
 
 import type { ColumnType } from "kysely";
 
+export type ActionType = "CREATE" | "DELETE" | "UPDATE";
+
+export type ActorType = "SYSTEM" | "USER";
+
+export type ChatSender = "BOT" | "USER";
+
 export type DocumentStatus = "ACTIVE" | "INACTIVE";
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
+
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
 export type ProjectStatus = "ACTIVE" | "INACTIVE";
 
@@ -17,22 +35,52 @@ export type UserRole = "ADMIN" | "USER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 
-export interface ProjectAiSummaries {
-  ai_summary_md: Generated<string>;
+export interface AuditLogs {
+  action_detail: Generated<string>;
+  action_type: Generated<ActionType>;
+  actor_type: Generated<ActorType>;
+  created_at: Generated<string>;
+  created_by_id: string;
+  id: string;
+  owner_id: string;
+  owner_table: string;
+  raw_data: Json;
+}
+
+export interface LineAccounts {
   created_at: Generated<string>;
   id: string;
+  line_uid: string | null;
+  role: UserRole;
+  user_status: UserStatus;
+}
+
+export interface LineChatLogs {
+  chat_sender: ChatSender;
+  created_at: Generated<string>;
+  id: string;
+  line_session_id: string;
+  message: string;
+}
+
+export interface LineSessions {
+  created_at: Generated<string>;
+  id: string;
+  line_account_id: string;
   project_id: string;
+  updated_at: Generated<string>;
 }
 
 export interface ProjectDocuments {
   ai_summary_md: Generated<string>;
   document_status: DocumentStatus;
   id: string;
+  project_id: string;
 }
 
 export interface Projects {
+  ai_summary_md: Generated<string>;
   created_at: Generated<string>;
-  current_project_ai_summary_id: string | null;
   id: string;
   project_description: Generated<string>;
   project_guideline_md: Generated<string>;
@@ -78,6 +126,13 @@ export interface UserGroupUsers {
   user_id: string;
 }
 
+export interface UserManageProjects {
+  created_at: Generated<string>;
+  id: string;
+  project_id: string;
+  user_id: string;
+}
+
 export interface UserOtps {
   created_at: Generated<string>;
   expire_at: string;
@@ -90,7 +145,8 @@ export interface Users {
   created_at: Generated<string>;
   email: string;
   id: string;
-  line_uid: string | null;
+  last_signed_in_at: string | null;
+  line_account_id: string | null;
   password: string | null;
   role: UserRole;
   updated_at: Generated<string>;
@@ -98,13 +154,17 @@ export interface Users {
 }
 
 export interface DB {
-  project_ai_summaries: ProjectAiSummaries;
+  audit_logs: AuditLogs;
+  line_accounts: LineAccounts;
+  line_chat_logs: LineChatLogs;
+  line_sessions: LineSessions;
   project_documents: ProjectDocuments;
   projects: Projects;
   stored_files: StoredFiles;
   user_group_projects: UserGroupProjects;
   user_group_users: UserGroupUsers;
   user_groups: UserGroups;
+  user_manage_projects: UserManageProjects;
   user_otps: UserOtps;
   users: Users;
 }

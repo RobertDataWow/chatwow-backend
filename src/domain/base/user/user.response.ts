@@ -12,6 +12,9 @@ export class UserResponse {
   @ApiProperty({ example: '' })
   updatedAt: string;
 
+  @ApiProperty({ example: '' })
+  lastSignedInAt: string | null;
+
   @ApiProperty({ example: 'user@example.com' })
   email: string;
 
@@ -22,5 +25,5 @@ export class UserResponse {
   userStatus: UserStatus;
 
   @ApiProperty({ example: null, nullable: true })
-  lineUid: string | null;
+  lineAccountId: string | null;
 }

@@ -32,11 +32,21 @@ export function toOptionalBig(v?: string) {
   return toBig(v);
 }
 
-export function toDate(date: ConfigType) {
+export function toDate(date: ConfigType): Date;
+export function toDate(date: ConfigType | null) {
+  if (!date) {
+    return null;
+  }
+
   return myDayjs(date).toDate();
 }
 
-export function toISO(date: ConfigType) {
+export function toISO(date: ConfigType): string;
+export function toISO(date: ConfigType | null) {
+  if (!date) {
+    return null;
+  }
+
   return myDayjs(date).toISOString();
 }
 

@@ -3,8 +3,8 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { getStoredFilesIdFromKey } from '../../orchestration/stored-files/stored-file.util';
 import { StoredFileMapper } from './stored-file.mapper';
-import { getStoredFilesIdFromKey } from './stored-file.util';
 import type {
   StoredFileNewData,
   StoredFilePg,
