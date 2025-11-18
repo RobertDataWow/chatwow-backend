@@ -28,10 +28,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   }
 
   static newBulk(data: ProjectDocumentNewData[]) {
-    return data.map((d) => {
-      const plain: ProjectDocumentPlain = ProjectDocument.new(d);
-      return new ProjectDocument(plain);
-    });
+    return data.map((d) => ProjectDocument.new(d));
   }
 
   edit(data: ProjectDocumentUpdateData) {

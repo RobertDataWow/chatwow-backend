@@ -40,7 +40,7 @@ export interface AuditLogs {
   action_type: Generated<ActionType>;
   actor_type: Generated<ActorType>;
   created_at: Generated<string>;
-  created_by_id: string;
+  created_by_id: string | null;
   id: string;
   owner_id: string;
   owner_table: string;
@@ -50,9 +50,6 @@ export interface AuditLogs {
 export interface LineAccounts {
   created_at: Generated<string>;
   id: string;
-  line_uid: string | null;
-  role: UserRole;
-  user_status: UserStatus;
 }
 
 export interface LineChatLogs {

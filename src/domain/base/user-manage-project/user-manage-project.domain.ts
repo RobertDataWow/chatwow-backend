@@ -1,11 +1,13 @@
+import { uuidV7 } from '@shared/common/common.crypto';
+import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 
 import type {
   UserManageProjectNewData,
   UserManageProjectPg,
   UserManageProjectPlain,
-  UserManageProjectUpdateData,
 } from './types/user-manage-project.domain.type';
+import { UserManageProjectMapper } from './user-manage-project.mapper';
 
 export class UserManageProject extends DomainEntity<UserManageProjectPg> {
   readonly id: string;
@@ -18,15 +20,16 @@ export class UserManageProject extends DomainEntity<UserManageProjectPg> {
     Object.assign(this, plain);
   }
 
-  static new(data: UserManageProjectNewData): UserManageProject {
-    return new UserManageProject({
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
-      ...data,
+  static new(data: UserManageProjectNewData) {
+    return UserManageProjectMapper.fromPlain({
+      id: uuidV7(),
+      createdAt: myDayjs().toDate(),
+      projectId: data.projectId,
+      userId: data.userId,
     });
   }
 
-  edit(data: UserManageProjectUpdateData) {
-    Object.assign(this, data);
+  static newBulk(data: UserManageProjectNewData[]) {
+    return data.map((d) => UserManageProject.new(d));
   }
 }

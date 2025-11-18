@@ -6,7 +6,7 @@ import { UserGroupProjectRepo } from './user-group-project.repo';
 export class UserGroupProjectService {
   constructor(private repo: UserGroupProjectRepo) {}
 
-  async saveUserRelations(userGroupId: string, projectIds: string[]) {
+  async saveUserGroupRelations(userGroupId: string, projectIds: string[]) {
     return this.repo.saveUserGroupRelations(userGroupId, projectIds);
   }
 

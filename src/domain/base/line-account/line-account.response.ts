@@ -1,3 +1,9 @@
-import type { LineAccountPlain } from './types/line-account.domain.type';
+import { ApiProperty } from '@nestjs/swagger';
 
-export type LineAccountResponse = LineAccountPlain;
+export class LineAccountResponse {
+  @ApiProperty({ example: '' })
+  id: string;
+
+  @ApiProperty({ example: '' })
+  createdAt: string;
+}

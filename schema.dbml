@@ -48,9 +48,6 @@ Table "kysely_migration_lock" {
 Table "line_accounts" {
   "id" text [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "role" user_role [not null]
-  "user_status" user_status [not null]
-  "line_uid" text
 }
 
 Table "users" {
@@ -169,7 +166,7 @@ Table "audit_logs" {
   "actor_type" actor_type [not null, default: 'SYSTEM']
   "action_type" action_type [not null, default: 'CREATE']
   "action_detail" text [not null, default: '']
-  "created_by_id" uuid [not null]
+  "created_by_id" uuid
   "owner_table" text [not null]
   "owner_id" uuid [not null]
   "raw_data" jsonb [not null]

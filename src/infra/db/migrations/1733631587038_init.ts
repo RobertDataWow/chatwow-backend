@@ -30,9 +30,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn('role', sql`user_role`, (col) => col.notNull())
-    .addColumn('user_status', sql`user_status`, (col) => col.notNull())
-    .addColumn('line_uid', 'text')
     .execute();
 
   //
@@ -280,9 +277,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.notNull().defaultTo('CREATE'),
     )
     .addColumn('action_detail', 'text', (col) => col.notNull().defaultTo(''))
-    .addColumn('created_by_id', 'uuid', (col) =>
-      col.references('users.id').notNull(),
-    )
+    .addColumn('created_by_id', 'uuid', (col) => col.references('users.id'))
     .addColumn('owner_table', 'text', (col) => col.notNull())
     .addColumn('owner_id', 'uuid', (col) => col.notNull())
     .addColumn('raw_data', 'jsonb', (col) => col.notNull())

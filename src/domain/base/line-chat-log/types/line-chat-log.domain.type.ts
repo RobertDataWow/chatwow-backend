@@ -1,15 +1,17 @@
-export type LineChatLogPg = {
-  id: string;
-  createdAt: Date;
-  lineSessionId: string;
-  chatSender: 'USER' | 'BOT';
+import type { ChatSender, LineChatLogs } from '@infra/db/db';
+import type { DBModel } from '@infra/db/db.common';
+
+import type { Plain, Serialized } from '@shared/common/common.type';
+
+import type { LineChatLog } from '../line-chat-log.domain';
+
+export type LineChatLogPg = DBModel<LineChatLogs>;
+export type LineChatLogPlain = Plain<LineChatLog>;
+
+export type LineChatLogJson = Serialized<LineChatLogPlain>;
+
+export type LineChatLogNewData = {
   message: string;
+  lineSessionId: string;
+  chatSender: ChatSender;
 };
-
-export type LineChatLogPlain = LineChatLogPg;
-
-export type LineChatLogNewData = Omit<LineChatLogPg, 'id' | 'createdAt'>;
-
-export type LineChatLogUpdateData = Partial<
-  Omit<LineChatLogPg, 'id' | 'createdAt'>
->;

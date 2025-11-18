@@ -1,17 +1,21 @@
-export type AuditLogPg = {
-  id: string;
-  createdAt: Date;
-  actorType: 'USER' | 'SYSTEM';
-  actionType: 'CREATE' | 'UPDATE' | 'DELETE';
-  actionDetail: string;
-  createdById: string;
-  ownerTable: string;
+import type { ActionType, ActorType, AuditLogs } from '@infra/db/db';
+import type { DBModel } from '@infra/db/db.common';
+
+import type { Plain, Serialized } from '@shared/common/common.type';
+
+import type { AuditLog } from '../audit-log.domain';
+
+export type AuditLogPg = DBModel<AuditLogs>;
+export type AuditLogPlain = Plain<AuditLog>;
+
+export type AuditLogJson = Serialized<AuditLogPlain>;
+
+export type AuditLogNewData = {
   ownerId: string;
+  ownerTable: string;
   rawData: any;
+  createdById: string | null;
+  actionDetail?: string;
+  actionType: ActionType;
+  actorType: ActorType;
 };
-
-export type AuditLogPlain = AuditLogPg;
-
-export type AuditLogNewData = Omit<AuditLogPg, 'id' | 'createdAt'>;
-
-export type AuditLogUpdateData = Partial<Omit<AuditLogPg, 'id' | 'createdAt'>>;

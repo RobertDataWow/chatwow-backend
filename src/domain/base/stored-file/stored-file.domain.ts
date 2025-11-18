@@ -57,10 +57,7 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
   }
 
   static newBulk(data: StoredFileNewData[]) {
-    return data.map((d) => {
-      const plain: StoredFilePlain = StoredFile.new(d);
-      return new StoredFile(plain);
-    });
+    return data.map((d) => StoredFile.new(d));
   }
 
   edit(data: StoredFileUpdateData) {

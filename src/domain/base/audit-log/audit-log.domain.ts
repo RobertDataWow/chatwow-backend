@@ -1,12 +1,14 @@
 import type { ActionType, ActorType } from '@infra/db/db';
 
+import { uuidV7 } from '@shared/common/common.crypto';
+import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 
+import { AuditLogMapper } from './audit-log.mapper';
 import type {
   AuditLogNewData,
   AuditLogPg,
   AuditLogPlain,
-  AuditLogUpdateData,
 } from './types/audit-log.domain.type';
 
 export class AuditLog extends DomainEntity<AuditLogPg> {
@@ -15,7 +17,7 @@ export class AuditLog extends DomainEntity<AuditLogPg> {
   readonly actorType: ActorType;
   readonly actionType: ActionType;
   readonly actionDetail: string;
-  readonly createdById: string;
+  readonly createdById: string | null;
   readonly ownerTable: string;
   readonly ownerId: string;
   readonly rawData: any;
@@ -26,14 +28,16 @@ export class AuditLog extends DomainEntity<AuditLogPg> {
   }
 
   static new(data: AuditLogNewData): AuditLog {
-    return new AuditLog({
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
-      ...data,
+    return AuditLogMapper.fromPlain({
+      id: uuidV7(),
+      createdAt: myDayjs().toDate(),
+      actorType: data.actorType,
+      actionType: data.actionType,
+      actionDetail: data.actionDetail || '',
+      createdById: data.createdById,
+      ownerTable: data.ownerTable,
+      ownerId: data.ownerId,
+      rawData: data.rawData,
     });
-  }
-
-  edit(data: AuditLogUpdateData) {
-    Object.assign(this, data);
   }
 }

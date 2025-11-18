@@ -1,3 +1,17 @@
-import type { UserManageProjectPlain } from './types/user-manage-project.domain.type';
+import { ApiProperty } from '@nestjs/swagger';
 
-export type UserManageProjectResponse = UserManageProjectPlain;
+import { DATE_EXAMPLE, UUID_EXAMPLE } from '@shared/common/common.constant';
+
+export class UserManageProjectResponse {
+  @ApiProperty({ example: UUID_EXAMPLE })
+  id: string;
+
+  @ApiProperty({ example: DATE_EXAMPLE })
+  createdAt: string;
+
+  @ApiProperty({ example: UUID_EXAMPLE })
+  projectId: string;
+
+  @ApiProperty({ example: UUID_EXAMPLE })
+  userId: string;
+}

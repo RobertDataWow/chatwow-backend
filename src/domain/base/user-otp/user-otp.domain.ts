@@ -35,10 +35,7 @@ export class UserOtp extends DomainEntity<UserOtpPg> {
   }
 
   static newBulk(data: UserOtpNewData[]) {
-    return data.map((d) => {
-      const plain: UserOtpPlain = UserOtp.new(d);
-      return new UserOtp(plain);
-    });
+    return data.map((d) => UserOtp.new(d));
   }
 
   edit(data: UserOtpUpdateData) {

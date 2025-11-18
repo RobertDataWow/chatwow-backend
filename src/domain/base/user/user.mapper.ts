@@ -61,58 +61,58 @@ export class UserMapper {
     return new User(plain);
   }
 
-  static toPg(user: User): UserPg {
+  static toPg(domain: User): UserPg {
     return {
-      id: user.id,
-      last_signed_in_at: toISO(user.lastSignedInAt),
-      created_at: toISO(user.createdAt),
-      updated_at: toISO(user.updatedAt),
-      email: user.email,
-      password: user.password,
-      role: user.role,
-      user_status: user.userStatus,
-      line_account_id: user.lineAccountId,
+      id: domain.id,
+      last_signed_in_at: toISO(domain.lastSignedInAt),
+      created_at: toISO(domain.createdAt),
+      updated_at: toISO(domain.updatedAt),
+      email: domain.email,
+      password: domain.password,
+      role: domain.role,
+      user_status: domain.userStatus,
+      line_account_id: domain.lineAccountId,
     };
   }
 
-  static toPlain(user: User): UserPlain {
+  static toPlain(domain: User): UserPlain {
     return {
-      id: user.id,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      lastSignedInAt: user.lastSignedInAt,
-      email: user.email,
-      password: user.password,
-      role: user.role,
-      userStatus: user.userStatus,
-      lineAccountId: user.lineAccountId,
+      id: domain.id,
+      createdAt: domain.createdAt,
+      updatedAt: domain.updatedAt,
+      lastSignedInAt: domain.lastSignedInAt,
+      email: domain.email,
+      password: domain.password,
+      role: domain.role,
+      userStatus: domain.userStatus,
+      lineAccountId: domain.lineAccountId,
     };
   }
 
-  static toJson(user: User): UserJson {
+  static toJson(domain: User): UserJson {
     return {
-      id: user.id,
-      createdAt: toISO(user.createdAt),
-      updatedAt: toISO(user.updatedAt),
-      lastSignedInAt: toISO(user.updatedAt),
-      email: user.email,
-      password: user.password,
-      role: user.role,
-      userStatus: user.userStatus,
-      lineAccountId: user.lineAccountId,
+      id: domain.id,
+      createdAt: toISO(domain.createdAt),
+      updatedAt: toISO(domain.updatedAt),
+      lastSignedInAt: toISO(domain.updatedAt),
+      email: domain.email,
+      password: domain.password,
+      role: domain.role,
+      userStatus: domain.userStatus,
+      lineAccountId: domain.lineAccountId,
     };
   }
 
-  static toResponse(user: User): UserResponse {
+  static toResponse(domain: User): UserResponse {
     return {
-      id: user.id,
-      createdAt: toResponseDate(user.createdAt),
-      updatedAt: toResponseDate(user.updatedAt),
-      lastSignedInAt: toResponseDate(user.lastSignedInAt),
-      email: user.email,
-      role: user.role,
-      userStatus: user.userStatus,
-      lineAccountId: user.lineAccountId,
+      id: domain.id,
+      createdAt: toResponseDate(domain.createdAt),
+      updatedAt: toResponseDate(domain.updatedAt),
+      lastSignedInAt: toResponseDate(domain.lastSignedInAt),
+      email: domain.email,
+      role: domain.role,
+      userStatus: domain.userStatus,
+      lineAccountId: domain.lineAccountId,
     };
   }
 }

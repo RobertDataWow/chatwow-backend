@@ -28,10 +28,7 @@ export class UserGroupUser extends DomainEntity<UserGroupUserPg> {
   }
 
   static newBulk(data: UserGroupUserNewData[]) {
-    return data.map((d) => {
-      const plain: UserGroupUserPlain = UserGroupUser.new(d);
-      return new UserGroupUser(plain);
-    });
+    return data.map((d) => UserGroupUser.new(d));
   }
 
   edit(data: UserGroupUserUpdateData) {
