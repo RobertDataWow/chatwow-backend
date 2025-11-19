@@ -3,6 +3,7 @@ import {
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
+import type { WithPgState } from '@shared/common/common.type';
 
 import type { UserJson, UserPg, UserPlain } from './types/user.domain.type';
 import { User } from './user.domain';
@@ -13,6 +14,8 @@ export class UserMapper {
     const plain: UserPlain = {
       id: pg.id,
       lastSignedInAt: toDate(pg.last_signed_in_at),
+      firstName: pg.first_name,
+      lastName: pg.last_name,
       createdAt: toDate(pg.created_at),
       updatedAt: toDate(pg.updated_at),
       email: pg.email,
@@ -32,6 +35,8 @@ export class UserMapper {
   static fromPlain(plainData: UserPlain): User {
     const plain: UserPlain = {
       id: plainData.id,
+      firstName: plainData.firstName,
+      lastName: plainData.lastName,
       lastSignedInAt: plainData.lastSignedInAt,
       createdAt: plainData.createdAt,
       updatedAt: plainData.updatedAt,
@@ -48,6 +53,8 @@ export class UserMapper {
   static fromJson(json: UserJson): User {
     const plain: UserPlain = {
       id: json.id,
+      firstName: json.firstName,
+      lastName: json.lastName,
       createdAt: toDate(json.createdAt),
       updatedAt: toDate(json.updatedAt),
       lastSignedInAt: toDate(json.lastSignedInAt),
@@ -60,10 +67,18 @@ export class UserMapper {
 
     return new User(plain);
   }
+  static fromJsonState(jsonState: WithPgState<UserJson, UserPg>) {
+    const domain = UserMapper.fromJson(jsonState.data);
+    domain.setPgState(jsonState.state);
+
+    return domain;
+  }
 
   static toPg(domain: User): UserPg {
     return {
       id: domain.id,
+      first_name: domain.firstName,
+      last_name: domain.lastName,
       last_signed_in_at: toISO(domain.lastSignedInAt),
       created_at: toISO(domain.createdAt),
       updated_at: toISO(domain.updatedAt),
@@ -78,6 +93,8 @@ export class UserMapper {
   static toPlain(domain: User): UserPlain {
     return {
       id: domain.id,
+      firstName: domain.firstName,
+      lastName: domain.lastName,
       createdAt: domain.createdAt,
       updatedAt: domain.updatedAt,
       lastSignedInAt: domain.lastSignedInAt,
@@ -94,12 +111,20 @@ export class UserMapper {
       id: domain.id,
       createdAt: toISO(domain.createdAt),
       updatedAt: toISO(domain.updatedAt),
-      lastSignedInAt: toISO(domain.updatedAt),
+      firstName: domain.firstName,
+      lastName: domain.lastName,
+      lastSignedInAt: toISO(domain.lastSignedInAt),
       email: domain.email,
       password: domain.password,
       role: domain.role,
       userStatus: domain.userStatus,
       lineAccountId: domain.lineAccountId,
+    };
+  }
+  static toJsonState(domain: User): WithPgState<UserJson, UserPg> {
+    return {
+      state: domain.pgState,
+      data: UserMapper.toJson(domain),
     };
   }
 
@@ -109,6 +134,8 @@ export class UserMapper {
       createdAt: toResponseDate(domain.createdAt),
       updatedAt: toResponseDate(domain.updatedAt),
       lastSignedInAt: toResponseDate(domain.lastSignedInAt),
+      firstName: domain.firstName,
+      lastName: domain.lastName,
       email: domain.email,
       role: domain.role,
       userStatus: domain.userStatus,

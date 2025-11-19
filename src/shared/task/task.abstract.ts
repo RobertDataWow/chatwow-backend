@@ -120,6 +120,9 @@ export abstract class BaseTaskHandler {
     }
 
     // handle task
-    await (this as any)[methodName](job.data);
+    const method = (this as any)[methodName];
+    if (method && typeof method === 'function') {
+      await method.call(this, job.data);
+    }
   }
 }

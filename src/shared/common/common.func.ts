@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { render } from '@react-email/render';
 import * as path from 'path';
+import type React from 'react';
 import * as R from 'remeda';
 
 import { ApiException } from '../http/http.exception';
@@ -117,4 +119,8 @@ export function getUniqueIds(objs: { id: string }[]) {
   objs.forEach((o) => idSet.add(o.id));
 
   return Array.from(idSet.values());
+}
+
+export function renderHtml(template: React.JSX.Element) {
+  return render(template);
 }

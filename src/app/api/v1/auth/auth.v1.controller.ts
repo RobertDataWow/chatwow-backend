@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiOkResponse } from '@nestjs/swagger';
 
 import { UsePublic } from '@infra/middleware/jwt/jwt.common';
 
@@ -12,7 +12,7 @@ export class AuthV1Controller {
 
   @Post('sign-in')
   @UsePublic()
-  @ApiResponse({ type: SignInResponse })
+  @ApiOkResponse({ type: SignInResponse })
   async signIn(@Body() body: SignInDto): Promise<SignInResponse> {
     return this.signInCommand.exec(body);
   }

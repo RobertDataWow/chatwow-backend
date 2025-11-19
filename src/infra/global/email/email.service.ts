@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { render } from '@react-email/render';
 import Mail from 'nodemailer/lib/mailer';
 
 import { AppConfig } from '@infra/config';
@@ -17,13 +16,9 @@ export class EmailService {
     private configService: ConfigService,
   ) {}
 
-  async send(
-    email: string,
-    subject: string,
-    template: React.JSX.Element,
-  ): Promise<void> {
+  async send(email: string, subject: string, html: string): Promise<void> {
     try {
-      await this._sendMail(email, subject, template);
+      await this._sendMail(email, subject, html);
     } catch (error) {
       throw new ApiException(500, 'failSendingEmail', { error });
     }
@@ -32,24 +27,19 @@ export class EmailService {
   async sendMany(
     emails: string[],
     subject: string,
-    template: React.JSX.Element,
+    html: string,
   ): Promise<void> {
     await Promise.all(
-      emails.map((email) => this._sendMail(email, subject, template)),
+      emails.map((email) => this._sendMail(email, subject, html)),
     );
   }
 
   // Volatile function will raise error
-  private async _sendMail(
-    email: string,
-    subject: string,
-    template: React.JSX.Element,
-  ) {
-    const emailHtml = await render(template);
+  private async _sendMail(email: string, subject: string, html: string) {
     return this.mail.sendMail({
       from: this._getFrom(),
       to: email,
-      html: emailHtml,
+      html,
       subject,
     });
   }

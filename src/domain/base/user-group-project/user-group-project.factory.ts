@@ -7,7 +7,6 @@ import { UserGroupProjectMapper } from './user-group-project.mapper';
 export class UserGroupProjectFactory {
   static mock(data: Partial<UserGroupProjectPlain>) {
     return UserGroupProjectMapper.fromPlain({
-      id: isDefined(data.id) ? data.id : uuidV7(),
       projectId: isDefined(data.projectId) ? data.projectId : uuidV7(),
       userGroupId: isDefined(data.userGroupId) ? data.userGroupId : uuidV7(),
     });

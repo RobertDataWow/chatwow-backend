@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { uuidV7 } from '@shared/common/common.crypto';
 import { BaseRepo } from '@shared/common/common.repo';
 
 import { UserGroupUserMapper } from './user-group-user.mapper';
@@ -15,7 +14,6 @@ export class UserGroupUserRepo extends BaseRepo {
 
     const insertData = userGroupIds.map((userGroupId) =>
       UserGroupUserMapper.toPg({
-        id: uuidV7(),
         userGroupId,
         userId,
       }),
@@ -27,7 +25,7 @@ export class UserGroupUserRepo extends BaseRepo {
       .execute();
   }
 
-  async saveProjectRelations(userGroupId: string, userIds: string[]) {
+  async saveUserGroupRelations(userGroupId: string, userIds: string[]) {
     await this.db
       .deleteFrom('user_group_users')
       .where('user_group_users.user_group_id', '=', userGroupId)
@@ -35,7 +33,6 @@ export class UserGroupUserRepo extends BaseRepo {
 
     const insertData = userIds.map((userId) =>
       UserGroupUserMapper.toPg({
-        id: uuidV7(),
         userGroupId,
         userId,
       }),

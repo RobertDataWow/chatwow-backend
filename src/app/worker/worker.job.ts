@@ -1,5 +1,5 @@
 export const DOMAIN_EVENT_JOBS = {
-  SAMPLE: 'SAMPLE',
+  SEND_OTP: 'SEND_OTP',
 } as const;
 
 export const CRON_JOBS = {

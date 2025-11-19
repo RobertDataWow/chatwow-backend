@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { uuidV7 } from '@shared/common/common.crypto';
 import { BaseRepo } from '@shared/common/common.repo';
 
 import { UserGroupProjectMapper } from './user-group-project.mapper';
@@ -15,7 +14,6 @@ export class UserGroupProjectRepo extends BaseRepo {
 
     const insertData = projectIds.map((projectId) =>
       UserGroupProjectMapper.toPg({
-        id: uuidV7(),
         userGroupId,
         projectId,
       }),
@@ -34,7 +32,6 @@ export class UserGroupProjectRepo extends BaseRepo {
 
     const insertData = userGroupIds.map((userGroupId) =>
       UserGroupProjectMapper.toPg({
-        id: uuidV7(),
         userGroupId,
         projectId,
       }),

@@ -6,11 +6,11 @@ import { UserGroupUserRepo } from './user-group-user.repo';
 export class UserGroupUserService {
   constructor(private repo: UserGroupUserRepo) {}
 
-  async saveUserRelations(userGroupId: string, projectIds: string[]) {
-    return this.repo.saveUserRelations(userGroupId, projectIds);
+  async saveUserRelations(userId: string, userGroupIds: string[]) {
+    return this.repo.saveUserRelations(userId, userGroupIds);
   }
 
-  async saveProjectRelations(projectId: string, userGroupIds: string[]) {
-    return this.repo.saveProjectRelations(projectId, userGroupIds);
+  async saveUserGroupRelations(userGroupId: string, userIds: string[]) {
+    return this.repo.saveUserGroupRelations(userGroupId, userIds);
   }
 }

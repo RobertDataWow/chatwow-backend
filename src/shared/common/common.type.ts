@@ -58,3 +58,13 @@ export type Serialized<T> = {
 };
 
 export type DayjsDuration = duration.DurationUnitsObjectType;
+
+export type IDomainData = {
+  attributes: object;
+  relations?: Record<string, any>;
+};
+
+export type UnionArray<
+  TUnion,
+  TTuple extends readonly TUnion[],
+> = TUnion extends TTuple[number] ? TTuple : never;

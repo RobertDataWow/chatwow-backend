@@ -4,11 +4,11 @@ import type {
   UserGroupUserPlain,
 } from './types/user-group-user.domain.type';
 import { UserGroupUser } from './user-group-user.domain';
+import type { UserGroupUserResponse } from './user-group-user.response';
 
 export class UserGroupUserMapper {
   static fromPg(pg: UserGroupUserPg): UserGroupUser {
     const plain: UserGroupUserPlain = {
-      id: pg.id,
       userId: pg.user_id,
       userGroupId: pg.user_group_id,
     };
@@ -22,7 +22,6 @@ export class UserGroupUserMapper {
 
   static fromPlain(plainData: UserGroupUserPlain): UserGroupUser {
     const plain: UserGroupUserPlain = {
-      id: plainData.id,
       userId: plainData.userId,
       userGroupId: plainData.userGroupId,
     };
@@ -32,7 +31,6 @@ export class UserGroupUserMapper {
 
   static fromJson(json: UserGroupUserJson): UserGroupUser {
     const plain: UserGroupUserPlain = {
-      id: json.id,
       userId: json.userId,
       userGroupId: json.userGroupId,
     };
@@ -42,7 +40,6 @@ export class UserGroupUserMapper {
 
   static toPg(userGroupUser: UserGroupUserPlain): UserGroupUserPg {
     return {
-      id: userGroupUser.id,
       user_id: userGroupUser.userId,
       user_group_id: userGroupUser.userGroupId,
     };
@@ -50,7 +47,6 @@ export class UserGroupUserMapper {
 
   static toPlain(userGroupUser: UserGroupUser): UserGroupUserPlain {
     return {
-      id: userGroupUser.id,
       userId: userGroupUser.userId,
       userGroupId: userGroupUser.userGroupId,
     };
@@ -58,15 +54,13 @@ export class UserGroupUserMapper {
 
   static toJson(userGroupUser: UserGroupUser): UserGroupUserJson {
     return {
-      id: userGroupUser.id,
       userId: userGroupUser.userId,
       userGroupId: userGroupUser.userGroupId,
     };
   }
 
-  static toResponse(userGroupUser: UserGroupUser) {
+  static toResponse(userGroupUser: UserGroupUser): UserGroupUserResponse {
     return {
-      id: userGroupUser.id,
       userId: userGroupUser.userId,
       userGroupId: userGroupUser.userGroupId,
     };

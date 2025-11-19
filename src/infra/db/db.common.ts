@@ -13,6 +13,7 @@ import { FileMigrationProvider, Migrator } from 'kysely';
 import type { InsertObject } from 'kysely/dist/cjs/parser/insert-values-parser';
 import type { UpdateObject } from 'kysely/dist/cjs/parser/update-set-parser';
 import * as path from 'path';
+import type { DatabaseError } from 'pg';
 
 import type { DB } from './db';
 
@@ -56,4 +57,15 @@ export async function runMigrations(db: CoreDB) {
   });
 
   return migrator.migrateToLatest();
+}
+
+export function getErrorKey(e: DatabaseError) {
+  switch (e.code) {
+    case '23505': // unique_violation
+      return 'exists';
+    case '23503': // foreign_key_violation
+      return 'invalidRef';
+    default:
+      return 'internal';
+  }
 }

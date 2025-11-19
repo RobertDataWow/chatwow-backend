@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserOtp } from './user-otp.domain';
+import { EmailService } from '@infra/global/email/email.service';
+import TemplateSendOtp from '@infra/global/email/template/template.send-otp';
+
+import { renderHtml } from '@shared/common/common.func';
+
+import type { User } from '../user/user.domain';
+import type { UserOtp } from './user-otp.domain';
 import { UserOtpMapper } from './user-otp.mapper';
 import { UserOtpRepo } from './user-otp.repo';
 
 @Injectable()
 export class UserOtpService {
-  constructor(private repo: UserOtpRepo) {}
+  constructor(
+    private repo: UserOtpRepo,
+    private emailService: EmailService,
+  ) {}
 
   async findOne(id: string) {
     return this.repo.findOne(id);
@@ -30,6 +39,13 @@ export class UserOtpService {
 
   async delete(id: string) {
     return this.repo.delete(id);
+  }
+
+  async sendOtpMail(user: User, userOtp: UserOtp) {
+    const html = await renderHtml(TemplateSendOtp({ userOtp }));
+    await this.emailService.send(user.email, 'รหัส Otp', html);
+
+    return userOtp;
   }
 
   private _validate(_userOtp: UserOtp) {

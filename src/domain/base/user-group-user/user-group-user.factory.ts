@@ -7,7 +7,6 @@ import { UserGroupUserMapper } from './user-group-user.mapper';
 export class UserGroupUserFactory {
   static mock(data: Partial<UserGroupUserPlain>) {
     return UserGroupUserMapper.fromPlain({
-      id: isDefined(data.id) ? data.id : uuidV7(),
       userId: isDefined(data.userId) ? data.userId : uuidV7(),
       userGroupId: isDefined(data.userGroupId) ? data.userGroupId : uuidV7(),
     });

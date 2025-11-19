@@ -119,7 +119,6 @@ export interface StoredFiles {
 }
 
 export interface UserGroupProjects {
-  id: string;
   project_id: string;
   user_group_id: string;
 }
@@ -131,14 +130,12 @@ export interface UserGroups {
 }
 
 export interface UserGroupUsers {
-  id: string;
   user_group_id: string;
   user_id: string;
 }
 
 export interface UserManageProjects {
   created_at: Generated<string>;
-  id: string;
   project_id: string;
   user_id: string;
 }
@@ -153,7 +150,9 @@ export interface UserOtps {
 export interface Users {
   created_at: Generated<string>;
   email: string;
+  first_name: string;
   id: string;
+  last_name: string;
   last_signed_in_at: string | null;
   line_account_id: string | null;
   password: string | null;

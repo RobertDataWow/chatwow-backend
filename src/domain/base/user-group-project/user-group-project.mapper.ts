@@ -8,7 +8,6 @@ import { UserGroupProject } from './user-group-project.domain';
 export class UserGroupProjectMapper {
   static fromPg(pg: UserGroupProjectPg): UserGroupProject {
     const plain: UserGroupProjectPlain = {
-      id: pg.id,
       projectId: pg.project_id,
       userGroupId: pg.user_group_id,
     };
@@ -22,7 +21,6 @@ export class UserGroupProjectMapper {
 
   static fromPlain(plainData: UserGroupProjectPlain): UserGroupProject {
     const plain: UserGroupProjectPlain = {
-      id: plainData.id,
       projectId: plainData.projectId,
       userGroupId: plainData.userGroupId,
     };
@@ -32,7 +30,6 @@ export class UserGroupProjectMapper {
 
   static fromJson(json: UserGroupProjectJson): UserGroupProject {
     const plain: UserGroupProjectPlain = {
-      id: json.id,
       projectId: json.projectId,
       userGroupId: json.userGroupId,
     };
@@ -42,7 +39,6 @@ export class UserGroupProjectMapper {
 
   static toPg(userGroupProject: UserGroupProjectPlain): UserGroupProjectPg {
     return {
-      id: userGroupProject.id,
       project_id: userGroupProject.projectId,
       user_group_id: userGroupProject.userGroupId,
     };
@@ -50,7 +46,6 @@ export class UserGroupProjectMapper {
 
   static toPlain(userGroupProject: UserGroupProject): UserGroupProjectPlain {
     return {
-      id: userGroupProject.id,
       projectId: userGroupProject.projectId,
       userGroupId: userGroupProject.userGroupId,
     };
@@ -58,7 +53,6 @@ export class UserGroupProjectMapper {
 
   static toJson(userGroupProject: UserGroupProject): UserGroupProjectJson {
     return {
-      id: userGroupProject.id,
       projectId: userGroupProject.projectId,
       userGroupId: userGroupProject.userGroupId,
     };

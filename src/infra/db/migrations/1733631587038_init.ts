@@ -44,7 +44,9 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('users')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('email', 'text', (col) => col.notNull())
+    .addColumn('email', 'text', (col) => col.notNull().unique())
+    .addColumn('first_name', 'text', (col) => col.notNull())
+    .addColumn('last_name', 'text', (col) => col.notNull())
     .addColumn('password', 'text')
     .addColumn('last_signed_in_at', 'timestamptz')
     .addColumn('created_at', 'timestamptz', (col) =>
@@ -87,13 +89,16 @@ export async function up(db: Kysely<any>): Promise<void> {
 
   await db.schema
     .createTable('user_group_users')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
     .addColumn('user_id', 'uuid', (col) =>
       col.notNull().references('users.id').onDelete('cascade'),
     )
     .addColumn('user_group_id', 'uuid', (col) =>
       col.notNull().references('user_groups.id').onDelete('cascade'),
     )
+    .addPrimaryKeyConstraint('pk_user_group_users', [
+      'user_id',
+      'user_group_id',
+    ])
     .execute();
 
   //
@@ -146,13 +151,16 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   await db.schema
     .createTable('user_group_projects')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
     .addColumn('project_id', 'uuid', (col) =>
       col.notNull().references('projects.id').onDelete('cascade'),
     )
     .addColumn('user_group_id', 'uuid', (col) =>
       col.notNull().references('user_groups.id').onDelete('cascade'),
     )
+    .addPrimaryKeyConstraint('pk_user_group_projects', [
+      'project_id',
+      'user_group_id',
+    ])
     .execute();
 
   //
@@ -160,7 +168,6 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   await db.schema
     .createTable('user_manage_projects')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
@@ -170,6 +177,10 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('user_id', 'uuid', (col) =>
       col.notNull().references('users.id').onDelete('cascade'),
     )
+    .addPrimaryKeyConstraint('pk_user_manage_projects', [
+      'project_id',
+      'user_id',
+    ])
     .execute();
 
   //

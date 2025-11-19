@@ -19,6 +19,8 @@ export class User extends DomainEntity<UserPg> {
   readonly updatedAt: Date;
   readonly email: string;
   readonly password: string | null;
+  readonly firstName: string;
+  readonly lastName: string;
   readonly role: UserRole;
   readonly userStatus: UserStatus;
   readonly lineAccountId: string | null;
@@ -32,6 +34,8 @@ export class User extends DomainEntity<UserPg> {
   static new(data: UserNewData): User {
     return UserMapper.fromPlain({
       id: uuidV7(),
+      firstName: data.firstName,
+      lastName: data.lastName,
       createdAt: myDayjs().toDate(),
       updatedAt: myDayjs().toDate(),
       email: data.email,
@@ -68,6 +72,9 @@ export class User extends DomainEntity<UserPg> {
       lineAccountId: isDefined(data.lineAccountId)
         ? data.lineAccountId
         : this.lineAccountId,
+
+      firstName: isDefined(data.firstName) ? data.firstName : this.firstName,
+      lastName: isDefined(data.lastName) ? data.lastName : this.lastName,
     };
 
     Object.assign(this, plain);

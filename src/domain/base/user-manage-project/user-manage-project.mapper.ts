@@ -10,7 +10,6 @@ import type { UserManageProjectResponse } from './user-manage-project.response';
 export class UserManageProjectMapper {
   static fromPg(pg: UserManageProjectPg): UserManageProject {
     const plain: UserManageProjectPlain = {
-      id: pg.id,
       createdAt: toDate(pg.created_at),
       projectId: pg.project_id,
       userId: pg.user_id,
@@ -25,7 +24,6 @@ export class UserManageProjectMapper {
 
   static fromPlain(plain: UserManageProjectPlain): UserManageProject {
     return new UserManageProject({
-      id: plain.id,
       createdAt: plain.createdAt,
       projectId: plain.projectId,
       userId: plain.userId,
@@ -34,7 +32,6 @@ export class UserManageProjectMapper {
 
   static toPg(domain: UserManageProjectPlain): UserManageProjectPg {
     return {
-      id: domain.id,
       created_at: toISO(domain.createdAt),
       project_id: domain.projectId,
       user_id: domain.userId,
@@ -43,7 +40,6 @@ export class UserManageProjectMapper {
 
   static toPlain(domain: UserManageProject): UserManageProjectPlain {
     return {
-      id: domain.id,
       createdAt: domain.createdAt,
       projectId: domain.projectId,
       userId: domain.userId,
@@ -52,7 +48,6 @@ export class UserManageProjectMapper {
 
   static toResponse(domain: UserManageProject): UserManageProjectResponse {
     return {
-      id: domain.id,
       createdAt: toISO(domain.createdAt),
       projectId: domain.projectId,
       userId: domain.userId,

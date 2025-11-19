@@ -53,7 +53,9 @@ Table "line_accounts" {
 
 Table "users" {
   "id" uuid [pk, not null]
-  "email" text [not null]
+  "email" text [unique, not null]
+  "first_name" text [not null]
+  "last_name" text [not null]
   "password" text
   "last_signed_in_at" timestamptz
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
@@ -77,9 +79,12 @@ Table "user_groups" {
 }
 
 Table "user_group_users" {
-  "id" uuid [pk, not null]
   "user_id" uuid [not null]
   "user_group_id" uuid [not null]
+
+  Indexes {
+    (user_id, user_group_id) [type: btree, name: "pk_user_group_users"]
+  }
 }
 
 Table "projects" {
@@ -104,16 +109,22 @@ Table "project_chats" {
 }
 
 Table "user_group_projects" {
-  "id" uuid [pk, not null]
   "project_id" uuid [not null]
   "user_group_id" uuid [not null]
+
+  Indexes {
+    (project_id, user_group_id) [type: btree, name: "pk_user_group_projects"]
+  }
 }
 
 Table "user_manage_projects" {
-  "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "project_id" uuid [not null]
   "user_id" uuid [not null]
+
+  Indexes {
+    (project_id, user_id) [type: btree, name: "pk_user_manage_projects"]
+  }
 }
 
 Table "project_documents" {

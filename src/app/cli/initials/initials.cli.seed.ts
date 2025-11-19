@@ -31,6 +31,8 @@ export class InitialsCliSeed extends CommandRunner {
       email: 'superadmin@example.com',
       password: 'password',
       role: 'ADMIN',
+      firstName: 'superadmin',
+      lastName: 'superadmin',
     });
 
     await this.userService.save(superAdmin);

@@ -27,6 +27,9 @@ export class UserFactory {
       lastSignedInAt: isDefined(data.lastSignedInAt)
         ? data.lastSignedInAt
         : null,
+
+      firstName: isDefined(data.firstName) ? data.firstName : 'firstname',
+      lastName: isDefined(data.lastName) ? data.lastName : 'lastname',
     });
   }
 

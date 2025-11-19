@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
+import { getErrorKey } from '@infra/db/db.common';
+
 import { diff } from '@shared/common/common.func';
 import { BaseRepo } from '@shared/common/common.repo';
+import { ApiException } from '@shared/http/http.exception';
 
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
@@ -10,11 +13,13 @@ import { usersTableFilter } from './user.util';
 @Injectable()
 export class UserRepo extends BaseRepo {
   async create(user: User): Promise<void> {
-    await this.db
-      //
-      .insertInto('users')
-      .values(UserMapper.toPg(user))
-      .execute();
+    await this._tryWrite(async () =>
+      this.db
+        //
+        .insertInto('users')
+        .values(UserMapper.toPg(user))
+        .execute(),
+    );
   }
 
   async update(id: string, user: User): Promise<void> {
@@ -23,12 +28,14 @@ export class UserRepo extends BaseRepo {
       return;
     }
 
-    await this.db
-      //
-      .updateTable('users')
-      .set(data)
-      .where('id', '=', id)
-      .execute();
+    await this._tryWrite(async () =>
+      this.db
+        //
+        .updateTable('users')
+        .set(data)
+        .where('id', '=', id)
+        .execute(),
+    );
   }
 
   async findOne(id: string): Promise<User | null> {
@@ -53,5 +60,19 @@ export class UserRepo extends BaseRepo {
       .deleteFrom('users')
       .where('id', '=', id)
       .execute();
+  }
+
+  private async _tryWrite<T>(cb: () => Promise<T>) {
+    try {
+      const data = await cb();
+      return data;
+    } catch (e: any) {
+      const errKey = getErrorKey(e);
+      if (errKey === 'exists') {
+        throw new ApiException(409, 'emailExists');
+      }
+
+      throw new ApiException(500, 'internal');
+    }
   }
 }

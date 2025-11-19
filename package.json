@@ -25,6 +25,7 @@
     "dev:app": "npx nest start --watch",
     "dev:worker": "nodemon --exec 'ts-node -r tsconfig-paths/register ./src/worker.ts'",
     "debug": "nest start --debug --watch",
+    "debug:worker": "nodemon --exec 'node --inspect=0.0.0.0:9229 ./dist/worker.js'",
     "dev:email": "email dev --dir ./src/infra/global/email/template --port 3001",
     "repl": "./cmd.sh repl",
     "lang": "npx typesafe-i18n --no-watch",

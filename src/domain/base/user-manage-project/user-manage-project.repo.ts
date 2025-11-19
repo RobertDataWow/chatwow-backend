@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { BaseRepo } from '@shared/common/common.repo';
 
@@ -16,7 +15,6 @@ export class UserManageProjectRepo extends BaseRepo {
 
     const insertData = projectIds.map((projectId) =>
       UserManageProjectMapper.toPg({
-        id: uuidV7(),
         createdAt: myDayjs().toDate(),
         userId,
         projectId,
@@ -36,7 +34,6 @@ export class UserManageProjectRepo extends BaseRepo {
 
     const insertData = userIds.map((userId) =>
       UserManageProjectMapper.toPg({
-        id: uuidV7(),
         createdAt: myDayjs().toDate(),
         userId,
         projectId,

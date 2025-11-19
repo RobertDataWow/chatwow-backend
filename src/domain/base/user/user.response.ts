@@ -14,6 +14,12 @@ export class UserResponse {
   @ApiProperty({ example: DATE_EXAMPLE })
   updatedAt: string;
 
+  @ApiProperty({ example: 'firstname' })
+  firstName: string;
+
+  @ApiProperty({ example: 'lastname' })
+  lastName: string;
+
   @ApiProperty({ example: DATE_EXAMPLE })
   lastSignedInAt: string | null;
 
@@ -26,6 +32,6 @@ export class UserResponse {
   @ApiProperty({ example: 'ACTIVE' satisfies UserStatus })
   userStatus: UserStatus;
 
-  @ApiProperty({ example: UUID_EXAMPLE, nullable: true })
+  @ApiProperty({ example: '1xq2sqwe12', nullable: true })
   lineAccountId: string | null;
 }
