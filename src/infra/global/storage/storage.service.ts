@@ -139,6 +139,10 @@ export class StorageService implements OnModuleInit {
     key: string,
     opts?: StorageOptions & { expiresIn?: DayjsDuration; mimetype?: string },
   ) {
+    if (!this.enable) {
+      throw new ApiException(500, 'storageDisable');
+    }
+
     const command = new PutObjectCommand({
       Bucket: opts?.bucket || this.defaultBucket,
       Key: key,

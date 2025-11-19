@@ -1,0 +1,37 @@
+meta {
+  name: s3-upload
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:9000/app/stored-files/project_documents/019a9cf4-2641-722a-832f-f825d92b50a1/019a9cf4-2641-722a-832f-fcdc74282847?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=admin%2F20251119%2Fminio%2Fs3%2Faws4_request&X-Amz-Date=20251119T163037Z&X-Amz-Expires=3600&X-Amz-Signature=759d7d12e15bc57cfe1f8dc98fec065a486e87ce3a20565bd69b5c19d61019d5&X-Amz-SignedHeaders=host&x-amz-checksum-crc32=AAAAAA%3D%3D&x-amz-sdk-checksum-algorithm=CRC32&x-id=PutObject
+  body: file
+  auth: none
+}
+
+params:query {
+  X-Amz-Algorithm: AWS4-HMAC-SHA256
+  X-Amz-Content-Sha256: UNSIGNED-PAYLOAD
+  X-Amz-Credential: admin%2F20251119%2Fminio%2Fs3%2Faws4_request
+  X-Amz-Date: 20251119T163037Z
+  X-Amz-Expires: 3600
+  X-Amz-Signature: 759d7d12e15bc57cfe1f8dc98fec065a486e87ce3a20565bd69b5c19d61019d5
+  X-Amz-SignedHeaders: host
+  x-amz-checksum-crc32: AAAAAA%3D%3D
+  x-amz-sdk-checksum-algorithm: CRC32
+  x-id: PutObject
+}
+
+headers {
+  Content-Type: application/octet-stream
+}
+
+body:file {
+  file: @file(/Users/khunakorn.j/Downloads/20251113-JZM-export-PM112500020005.csv) @contentType(text/csv; charset=utf-8)
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

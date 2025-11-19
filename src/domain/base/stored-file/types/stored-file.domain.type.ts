@@ -3,6 +3,7 @@ import type { StoredFiles } from '@infra/db/db.d';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
+import type { STORED_FILE_OWNER_TABLE } from '../stored-file.constant';
 import type { StoredFile } from '../stored-file.domain';
 
 export type StoredFilePg = DBModel<StoredFiles>;
@@ -11,11 +12,11 @@ export type StoredFilePlain = Plain<StoredFile>;
 export type StoredFileJson = Serialized<StoredFilePlain>;
 
 export type StoredFileNewData = {
-  ownerTable: string;
+  id: string;
+  ownerTable: STORED_FILE_OWNER_TABLE;
   ownerId: string;
   filename: string;
-  filesizeByte: number;
-  keyPath: string;
+  filesizeByte?: number;
   refName?: string;
   storageName?: string;
   isPublic?: boolean;

@@ -10,6 +10,7 @@ import { DayjsDuration } from '@shared/common/common.type';
 import { StoredFile } from './stored-file.domain';
 import { StoredFileMapper } from './stored-file.mapper';
 import { StoredFileRepo } from './stored-file.repo';
+import { getStoredFileKey } from './stored-file.util';
 import { GetPresignUploadUrlOpts } from './types/stored-file.common.type';
 
 @Injectable()
@@ -48,14 +49,32 @@ export class StoredFileService {
     // validation rules can be added here
   }
 
-  async getPresignUploadUrl(opts: GetPresignUploadUrlOpts) {
-    const key = `stored-files/${opts.ownerTable}/${opts.ownerId}/${uuidV7()}`;
+  async getPresignUploadUrlBulk(amount: number, opts: GetPresignUploadUrlOpts) {
+    const amountArray = Array.from({ length: amount }).fill(0);
 
-    const url = await this.storageService.createUploadPresign(key);
+    return Promise.all(
+      amountArray.map(async () =>
+        this.getPresignUploadUrl({
+          ownerTable: opts.ownerTable,
+          isPublic: opts.isPublic,
+        }),
+      ),
+    );
+  }
+
+  async getPresignUploadUrl(opts: GetPresignUploadUrlOpts) {
+    const id = uuidV7();
+
+    const key = getStoredFileKey({
+      id,
+      ownerTable: opts.ownerTable,
+      isPublic: opts.isPublic,
+    });
+    const presignUrl = await this.storageService.createUploadPresign(key);
 
     return {
-      url,
-      key,
+      id,
+      presignUrl,
     };
   }
 

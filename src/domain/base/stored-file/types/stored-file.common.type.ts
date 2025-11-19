@@ -10,5 +10,5 @@ export type StoredFileQueryOptions = {
 
 export type GetPresignUploadUrlOpts = {
   ownerTable: string;
-  ownerId: string;
+  isPublic: boolean;
 };

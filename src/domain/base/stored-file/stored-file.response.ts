@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { UUID_EXAMPLE } from '@shared/common/common.constant';
+
 export class StoredFileResponse {
   @ApiProperty({ example: '' })
   id: string;
@@ -24,4 +26,12 @@ export class StoredFileResponse {
 
   @ApiProperty({ example: 'pdf', nullable: true })
   extension: string | null;
+}
+
+export class PresignUploadResponse {
+  @ApiProperty({ example: UUID_EXAMPLE })
+  id: string;
+
+  @ApiProperty({ example: 'https://presigned-upload-url' })
+  presignUrl: string;
 }

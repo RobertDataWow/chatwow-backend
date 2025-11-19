@@ -3,8 +3,8 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { getStoredFilesIdFromKey } from '../../orchestration/stored-files/stored-file.util';
 import { StoredFileMapper } from './stored-file.mapper';
+import { getStoredFileKey } from './stored-file.util';
 import type {
   StoredFileNewData,
   StoredFilePg,
@@ -37,12 +37,12 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
 
   static new(data: StoredFileNewData) {
     return StoredFileMapper.fromPlain({
-      id: getStoredFilesIdFromKey(data.keyPath),
+      id: data.id,
       refName: data.refName || 'DEFAULT',
       ownerTable: data.ownerTable,
       ownerId: data.ownerId,
       filename: data.filename,
-      filesizeByte: data.filesizeByte,
+      filesizeByte: data.filesizeByte || 0,
       storageName: data.storageName || 's3',
       isPublic: data.isPublic || false,
       createdAt: new Date(),
@@ -50,7 +50,10 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
       extension: getFileExtension(data.filename),
       checksum: null,
       expireAt: data.expireAt || null,
-      keyPath: data.keyPath,
+      keyPath: getStoredFileKey({
+        id: data.id,
+        ownerTable: data.ownerTable,
+      }),
       presignUrl: null,
       mimeType: null,
     });

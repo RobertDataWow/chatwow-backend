@@ -1,0 +1,30 @@
+meta {
+  name: create-projects
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/v1/projects
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "project": {
+      "projectName": "test proj",
+      "projectDescription": "this is a test"
+    },
+    "storedFiles": [
+      {
+        "id": "019a9cf8-7cc2-72ab-9f5e-6d5a09658d67",
+        "filename": "payment-summary-2.csv",
+        "filesizeByte": 0
+      }
+    ],
+    "userGroupIds": [
+      "019a9acd-c918-707e-a4bb-def5152c5ff0"
+    ]
+  }
+}

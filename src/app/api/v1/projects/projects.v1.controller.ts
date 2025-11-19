@@ -1,6 +1,23 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.constant';
+import { PresignUploadResponse } from '@domain/base/stored-file/stored-file.response';
+import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
+import { GetPresignUploadUrlDto } from '@domain/base/stored-file/stored-file.zod';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
+import { CreateProjectCommand } from './create-project/create-project.command';
+import {
+  CreateProjectDto,
+  CreateProjectResponse,
+} from './create-project/create-project.dto';
 import {
   GetProjectDto,
   GetProjectResponse,
@@ -17,7 +34,17 @@ export class ProjectsV1Controller {
   constructor(
     private listProjectsQuery: ListProjectsQuery,
     private getProjectsQuery: GetProjectQuery,
+    private createProjectCommand: CreateProjectCommand,
+    private storedFileService: StoredFileService,
   ) {}
+
+  @Post()
+  @ApiResponse({
+    type: () => CreateProjectResponse,
+  })
+  async createProject(@Body() body: CreateProjectDto) {
+    return this.createProjectCommand.exec(body);
+  }
 
   @Get()
   @ApiResponse({
@@ -25,6 +52,17 @@ export class ProjectsV1Controller {
   })
   async listUsers(@Query() query: ListProjectsDto) {
     return this.listProjectsQuery.exec(query);
+  }
+
+  @Get('presign-upload')
+  @ApiResponse({
+    type: () => PresignUploadResponse,
+  })
+  async getPresignUploadUrl(@Query() query: GetPresignUploadUrlDto) {
+    return this.storedFileService.getPresignUploadUrlBulk(query.amount, {
+      ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
+      isPublic: false,
+    });
   }
 
   @Get(':id')
