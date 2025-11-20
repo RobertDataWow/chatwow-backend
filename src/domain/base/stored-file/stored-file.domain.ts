@@ -66,9 +66,8 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
 
   edit(data: StoredFileUpdateData) {
     const plain: StoredFilePlain = {
-      id: this.id,
+      keyPath: this.keyPath,
       ownerTable: this.ownerTable,
-      ownerId: this.ownerId,
       storageName: this.storageName,
       presignUrl: this.presignUrl,
       createdAt: this.createdAt,
@@ -78,12 +77,13 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
       filesizeByte: this.filesizeByte,
 
       // dependency update
+      id: isDefined(data.id) ? data.id : this.id,
       extension: isDefined(data.filename)
         ? getFileExtension(data.filename)
         : this.extension,
 
       // updated fields
-      keyPath: isDefined(data.keyPath) ? data.keyPath : this.keyPath,
+      ownerId: isDefined(data.ownerId) ? data.ownerId : this.ownerId,
       filename: isDefined(data.filename) ? data.filename : this.filename,
       refName: isDefined(data.refName) ? data.refName : this.refName,
       expireAt: isDefined(data.expireAt) ? data.expireAt : this.expireAt,

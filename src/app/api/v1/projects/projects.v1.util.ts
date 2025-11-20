@@ -1,4 +1,4 @@
-import { jsonArrayFrom } from 'kysely/helpers/postgres';
+import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import type z from 'zod';
 
 import type { SelectQB } from '@infra/db/db.common';
@@ -7,6 +7,7 @@ import { getIncludesZod } from '@shared/zod/zod.util';
 
 export const projectsV1IncludesZod = getIncludesZod([
   'projectDocuments',
+  'projectDocuments.storedFile',
   'userGroups',
   'manageUsers',
 ]);
@@ -32,7 +33,21 @@ export function projectsV1InclusionQb(
           eb
             .selectFrom('project_documents')
             .whereRef('project_documents.project_id', '=', 'projects.id')
-            .selectAll('project_documents'),
+            .selectAll('project_documents')
+            .$if(includes.has('projectDocuments.storedFile'), (q) =>
+              q.select((eb) => [
+                jsonObjectFrom(
+                  eb
+                    .selectFrom('stored_files')
+                    .selectAll()
+                    .whereRef(
+                      'stored_files.owner_id',
+                      '=',
+                      'project_documents.id',
+                    ),
+                ).as('storedFile'),
+              ]),
+            ),
         ).as('projectDocuments'),
       ),
     )

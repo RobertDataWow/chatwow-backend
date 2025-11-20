@@ -45,6 +45,17 @@ export class StoredFileService {
     return this.repo.delete(id);
   }
 
+  async deleteRelated(storedFile: StoredFile) {
+    await this.repo.deleteRelated(storedFile.ownerId);
+    await this.storageService.remove(storedFile.keyPath);
+  }
+
+  async deleteRelatedBulk(storedFiles: StoredFile[]) {
+    await Promise.all(
+      storedFiles.map((storedFile) => this.deleteRelated(storedFile)),
+    );
+  }
+
   private _validate(_storedFile: StoredFile) {
     // validation rules can be added here
   }

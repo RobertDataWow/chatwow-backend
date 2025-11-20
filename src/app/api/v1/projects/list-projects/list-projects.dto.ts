@@ -4,6 +4,7 @@ import {
   projectFilterZod,
   projectSortZod,
 } from '@domain/base/project/project.zod';
+import { StoredFileResponse } from '@domain/base/stored-file/stored-file.response';
 import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
 import { UserResponse } from '@domain/base/user/user.response';
 import { ApiProperty } from '@nestjs/swagger';
@@ -41,9 +42,26 @@ export class ListProjectsProjectsManageUsers implements IDomainData {
   attributes: UserResponse;
 }
 
+export class ListProjectsProjectsDocumentsRelationsStoredFile
+  implements IDomainData
+{
+  @ApiProperty({ type: () => StoredFileResponse })
+  attributes: StoredFileResponse;
+}
+
+export class ListProjectsProjectsDocumentsRelations {
+  @ApiProperty({
+    type: () => ListProjectsProjectsDocumentsRelationsStoredFile,
+  })
+  storedFile?: ListProjectsProjectsDocumentsRelationsStoredFile;
+}
+
 export class ListProjectsProjectsProjectDocuments implements IDomainData {
   @ApiProperty({ type: () => ProjectDocumentResponse })
   attributes: ProjectDocumentResponse;
+
+  @ApiProperty({ type: () => ListProjectsProjectsDocumentsRelations })
+  relations?: ListProjectsProjectsDocumentsRelations;
 }
 
 export class ListProjectsProjectsRelations {

@@ -1,4 +1,4 @@
-import { toDate } from '@shared/common/common.transformer';
+import { toDate, toResponseDate } from '@shared/common/common.transformer';
 import { ApiException } from '@shared/http/http.exception';
 
 import { StoredFile } from './stored-file.domain';
@@ -163,6 +163,19 @@ export class StoredFileMapper {
       updatedAt: storedFile.updatedAt.toISOString(),
       mimeType: storedFile.mimeType,
       extension: storedFile.extension,
+    };
+  }
+
+  static pgToResponse(pg: StoredFilePg): StoredFileResponse {
+    return {
+      id: pg.id,
+      filename: pg.filename,
+      filesizeByte: Number(pg.filesize_byte),
+      presignUrl: pg.presign_url,
+      createdAt: toResponseDate(pg.created_at),
+      updatedAt: toResponseDate(pg.updated_at),
+      mimeType: pg.mime_type,
+      extension: pg.extension,
     };
   }
 }

@@ -1,5 +1,6 @@
 import { ProjectDocumentResponse } from '@domain/base/project-document/project-document.response';
 import { ProjectResponse } from '@domain/base/project/project.response';
+import { StoredFileResponse } from '@domain/base/stored-file/stored-file.response';
 import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
 import { UserResponse } from '@domain/base/user/user.response';
 import { ApiProperty } from '@nestjs/swagger';
@@ -31,9 +32,26 @@ export class GetProjectProjectManageUsers implements IDomainData {
   attributes: UserResponse;
 }
 
+export class GetProjectProjectProjectDocumentsRelationsStoredFile
+  implements IDomainData
+{
+  @ApiProperty({ type: () => StoredFileResponse })
+  attributes: StoredFileResponse;
+}
+
+export class GetProjectProjectProjectDocumentsRelations {
+  @ApiProperty({
+    type: () => GetProjectProjectProjectDocumentsRelationsStoredFile,
+  })
+  storedFile?: GetProjectProjectProjectDocumentsRelationsStoredFile;
+}
+
 export class GetProjectProjectProjectDocuments implements IDomainData {
   @ApiProperty({ type: () => ProjectDocumentResponse })
   attributes: ProjectDocumentResponse;
+
+  @ApiProperty({ type: () => GetProjectProjectProjectDocumentsRelations })
+  relations?: GetProjectProjectProjectDocumentsRelations;
 }
 
 export class GetProjectProjectRelations {

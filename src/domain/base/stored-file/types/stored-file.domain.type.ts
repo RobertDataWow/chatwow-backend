@@ -24,7 +24,9 @@ export type StoredFileNewData = {
 };
 
 export type StoredFileUpdateData = {
+  id?: string;
   filename?: string;
+  ownerId?: string;
   refName?: string;
   expireAt?: Date;
   isPublic?: boolean;

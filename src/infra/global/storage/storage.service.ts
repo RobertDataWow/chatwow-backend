@@ -209,7 +209,7 @@ export class StorageService implements OnModuleInit {
       );
     } catch (e: any) {
       this.loggerService.error(e);
-      throw new ApiException(502, 'removeFail');
+      return;
     }
   }
 

@@ -32,6 +32,10 @@ export class ProjectDocumentService {
     return this.repo.delete(id);
   }
 
+  async deleteBulk(ids: string[]) {
+    await Promise.all(ids.map((id) => this.delete(id)));
+  }
+
   private _validate(_projectDocument: ProjectDocument) {
     // validation rules can be added here
   }

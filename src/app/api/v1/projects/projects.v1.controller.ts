@@ -8,6 +8,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -18,6 +19,11 @@ import {
   CreateProjectDto,
   CreateProjectResponse,
 } from './create-project/create-project.dto';
+import { EditProjectCommand } from './edit-project/edit-project.command';
+import {
+  EditProjectDto,
+  EditProjectResponse,
+} from './edit-project/edit-project.dto';
 import {
   GetProjectDto,
   GetProjectResponse,
@@ -36,6 +42,7 @@ export class ProjectsV1Controller {
     private getProjectsQuery: GetProjectQuery,
     private createProjectCommand: CreateProjectCommand,
     private storedFileService: StoredFileService,
+    private editProjectCommand: EditProjectCommand,
   ) {}
 
   @Post()
@@ -44,6 +51,17 @@ export class ProjectsV1Controller {
   })
   async createProject(@Body() body: CreateProjectDto) {
     return this.createProjectCommand.exec(body);
+  }
+
+  @Patch(':id')
+  @ApiResponse({
+    type: () => EditProjectResponse,
+  })
+  async editProject(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: EditProjectDto,
+  ) {
+    return this.editProjectCommand.exec(id, body);
   }
 
   @Get()

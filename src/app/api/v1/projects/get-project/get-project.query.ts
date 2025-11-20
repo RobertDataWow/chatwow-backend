@@ -1,6 +1,7 @@
 import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
+import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { Inject, Injectable } from '@nestjs/common';
@@ -39,6 +40,15 @@ export class GetProjectQuery implements QueryInterface {
               project.projectDocuments &&
               project.projectDocuments.map((doc) => ({
                 attributes: ProjectDocumentMapper.pgToResponse(doc),
+                relations: {
+                  storedFile: doc.storedFile
+                    ? {
+                        attributes: StoredFileMapper.pgToResponse(
+                          doc.storedFile,
+                        ),
+                      }
+                    : undefined,
+                },
               })),
             userGroups:
               project.userGroups &&
