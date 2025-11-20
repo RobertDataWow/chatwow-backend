@@ -1,15 +1,31 @@
-import type { UserRole, UserStatus } from '@infra/db/db';
+import z from 'zod';
 
 import type { PaginationQuery } from '@shared/common/common.pagintaion';
-import type { ParsedSort } from '@shared/common/common.type';
+import { getSortZod } from '@shared/zod/zod.util';
 
-export type UserSortKey = 'id' | 'createdAt' | 'email';
+import { USER_ROLE, USER_STATUS } from './user.constant';
+
+export const userFilterZod = z
+  .object({
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    email: z.string().optional(),
+    role: z.enum(USER_ROLE).optional(),
+    userStatus: z.enum(USER_STATUS).optional(),
+    search: z.string().optional(),
+  })
+  .optional();
+export const userSortZod = getSortZod([
+  'id',
+  'firstName',
+  'lastName',
+  'email',
+  'createdAt',
+  'lastSignedInAt',
+]);
+
 export type UserQueryOptions = {
-  filter?: {
-    email?: string;
-    role?: UserRole;
-    userStatus?: UserStatus;
-  };
-  sort?: ParsedSort<UserSortKey>;
+  filter?: z.infer<typeof userFilterZod>;
+  sort?: z.infer<typeof userSortZod>;
   pagination?: PaginationQuery;
 };

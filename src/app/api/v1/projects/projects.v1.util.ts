@@ -1,3 +1,5 @@
+import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
+import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import type z from 'zod';
 
@@ -33,6 +35,7 @@ export function projectsV1InclusionQb(
           eb
             .selectFrom('project_documents')
             .whereRef('project_documents.project_id', '=', 'projects.id')
+            .where(projectDocumentsTableFilter)
             .selectAll('project_documents')
             .$if(includes.has('projectDocuments.storedFile'), (q) =>
               q.select((eb) => [
@@ -62,6 +65,7 @@ export function projectsV1InclusionQb(
               'user_group_projects.user_group_id',
             )
             .whereRef('user_group_projects.project_id', '=', 'projects.id')
+            .where(userGroupsTableFilter)
             .selectAll('user_groups'),
         ).as('userGroups'),
       ),

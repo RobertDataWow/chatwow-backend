@@ -1,5 +1,5 @@
 import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
-import { USER_ROLE_TUPLE } from '@domain/base/user/user.constant';
+import { USER_ROLE } from '@domain/base/user/user.constant';
 import { UserResponse } from '@domain/base/user/user.response';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
@@ -15,7 +15,7 @@ const zod = z.object({
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    role: z.enum(USER_ROLE_TUPLE),
+    role: z.enum(USER_ROLE),
   }),
   userGroupIds: z.array(z.string().uuid()),
 });

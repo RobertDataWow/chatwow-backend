@@ -3,10 +3,19 @@ import { Injectable } from '@nestjs/common';
 import { ProjectDocument } from './project-document.domain';
 import { ProjectDocumentMapper } from './project-document.mapper';
 import { ProjectDocumentRepo } from './project-document.repo';
+import { ProjectDocumentQueryOptions } from './project-document.zod';
 
 @Injectable()
 export class ProjectDocumentService {
   constructor(private repo: ProjectDocumentRepo) {}
+
+  async getIds(opts?: ProjectDocumentQueryOptions) {
+    return this.repo.getIds(opts);
+  }
+
+  async getCount(opts?: ProjectDocumentQueryOptions) {
+    return this.repo.getCount(opts);
+  }
 
   async findOne(id: string) {
     return this.repo.findOne(id);

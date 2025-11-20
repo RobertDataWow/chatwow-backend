@@ -1,4 +1,7 @@
+import type { DocumentStatus } from '@infra/db/db';
+
 import { uuidV7 } from '@shared/common/common.crypto';
+import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
@@ -12,10 +15,11 @@ import type {
 
 export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly id: string;
-  readonly documentStatus: 'ACTIVE' | 'INACTIVE';
+  readonly documentStatus: DocumentStatus;
   readonly documentDetails: string;
   readonly aiSummaryMd: string;
   readonly projectId: string;
+  readonly createdAt: Date;
 
   constructor(plain: ProjectDocumentPlain) {
     super();
@@ -25,9 +29,10 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   static new(data: ProjectDocumentNewData) {
     return ProjectDocumentMapper.fromPlain({
       id: uuidV7(),
+      createdAt: myDayjs().toDate(),
       projectId: data.projectId,
       documentDetails: data.documentDetails || '',
-      documentStatus: data.documentStatus,
+      documentStatus: data.documentStatus || 'ACTIVE',
       aiSummaryMd: data.aiSummaryMd || '',
     });
   }
@@ -39,6 +44,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   edit(data: ProjectDocumentUpdateData) {
     const plain: ProjectDocumentPlain = {
       id: this.id,
+      createdAt: this.createdAt,
       documentDetails: isDefined(data.documentDetails)
         ? data.documentDetails
         : this.documentDetails,

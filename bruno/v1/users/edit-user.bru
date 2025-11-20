@@ -1,13 +1,17 @@
 meta {
-  name: create-user
+  name: edit-user
   type: http
-  seq: 4
+  seq: 5
 }
 
-post {
-  url: {{url}}/v1/users
+patch {
+  url: {{url}}/v1/users/:id
   body: json
   auth: inherit
+}
+
+params:path {
+  id: 
 }
 
 body:json {

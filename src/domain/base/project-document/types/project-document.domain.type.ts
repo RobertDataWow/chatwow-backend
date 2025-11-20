@@ -11,7 +11,7 @@ export type ProjectDocumentPlain = Plain<ProjectDocument>;
 export type ProjectDocumentJson = Serialized<ProjectDocumentPlain>;
 
 export type ProjectDocumentNewData = {
-  documentStatus: DocumentStatus;
+  documentStatus?: DocumentStatus;
   projectId: string;
   aiSummaryMd?: string;
   documentDetails?: string;

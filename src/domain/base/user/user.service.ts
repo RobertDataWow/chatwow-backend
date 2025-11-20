@@ -3,10 +3,19 @@ import { Injectable } from '@nestjs/common';
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
 import { UserRepo } from './user.repo';
+import { UserQueryOptions } from './user.zod';
 
 @Injectable()
 export class UserService {
   constructor(private repo: UserRepo) {}
+
+  async getIds(query?: UserQueryOptions) {
+    return this.repo.getIds(query);
+  }
+
+  async getCount(query?: UserQueryOptions) {
+    return this.repo.getCount(query);
+  }
 
   async findOne(id: string) {
     return this.repo.findOne(id);

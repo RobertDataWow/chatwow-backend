@@ -68,6 +68,7 @@ export class ProjectRepo extends BaseRepo {
     const projectPg = await this.readDb
       .selectFrom('projects')
       .selectAll()
+      .where(projectsTableFilter)
       .where('id', '=', id)
       .executeTakeFirst();
 

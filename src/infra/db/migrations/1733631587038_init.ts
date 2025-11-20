@@ -189,6 +189,9 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('project_documents')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
     .addColumn('project_id', 'uuid', (col) =>
       col.notNull().references('projects.id').onDelete('cascade'),
     )

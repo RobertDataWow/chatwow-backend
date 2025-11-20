@@ -1,6 +1,7 @@
 import type { SetRequired } from 'type-fest';
 
 import { uuidV7 } from '@shared/common/common.crypto';
+import myDayjs from '@shared/common/common.dayjs';
 import { isDefined } from '@shared/common/common.validator';
 
 import { ProjectDocumentMapper } from './project-document.mapper';
@@ -17,6 +18,9 @@ export class ProjectDocumentFactory {
         ? data.documentDetails
         : '',
       projectId: data.projectId,
+      createdAt: isDefined(data.createdAt)
+        ? data.createdAt
+        : myDayjs().toDate(),
       aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
     });
   }

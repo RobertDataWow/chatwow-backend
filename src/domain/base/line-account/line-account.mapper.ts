@@ -51,4 +51,11 @@ export class LineAccountMapper {
       createdAt: toISO(lineAccount.createdAt),
     };
   }
+
+  static pgToResponse(pg: LineAccountPg): LineAccountResponse {
+    return {
+      id: pg.id,
+      createdAt: toISO(pg.created_at),
+    };
+  }
 }

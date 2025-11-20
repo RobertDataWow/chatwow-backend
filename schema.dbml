@@ -129,6 +129,7 @@ Table "user_manage_projects" {
 
 Table "project_documents" {
   "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "project_id" uuid [not null]
   "document_details" text [not null, default: '']
   "document_status" document_status [not null]
@@ -154,7 +155,7 @@ Table "stored_files" {
   "expire_at" timestamptz
 
   Indexes {
-    (owner_table, owner_id) [type: btree, name: "stored_files_ref_owner_idx"]
+    owner_id [type: btree, name: "stored_files_owner_id_idx"]
   }
 }
 

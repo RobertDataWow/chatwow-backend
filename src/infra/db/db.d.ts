@@ -83,6 +83,7 @@ export interface ProjectChats {
 
 export interface ProjectDocuments {
   ai_summary_md: Generated<string>;
+  created_at: Generated<string>;
   document_details: Generated<string>;
   document_status: DocumentStatus;
   id: string;
