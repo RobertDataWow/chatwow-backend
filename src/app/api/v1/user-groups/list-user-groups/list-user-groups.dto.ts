@@ -64,10 +64,15 @@ export class ListUserGroupsResponseDataUserGroups implements IDomainData {
 }
 
 export class ListUserGroupsResponseData {
+  @ApiProperty({
+    type: () => ListUserGroupsResponseDataUserGroups,
+    isArray: true,
+  })
   userGroups: ListUserGroupsResponseDataUserGroups[];
 }
 
 export class ListUserGroupsResponse extends StandardResponse {
+  @ApiProperty({ type: () => ListUserGroupsResponseData })
   data: ListUserGroupsResponseData;
 
   @ApiProperty({ type: () => PaginationMetaResponse })

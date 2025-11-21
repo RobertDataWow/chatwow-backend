@@ -12,6 +12,7 @@ import { UserGroupModule } from './base/user-group/user-group.module';
 import { UserManageProjectModule } from './base/user-manage-project/user-manage-project.module';
 import { UserOtpModule } from './base/user-otp/user-otp.module';
 import { UserModule } from './base/user/user.module';
+import { PgModule } from './orchestration/pg/pg.module';
 import { QueueModule } from './orchestration/queue/queue.module';
 
 export const DOMAIN_PROVIDER = [
@@ -32,4 +33,5 @@ export const DOMAIN_PROVIDER = [
   ProjectChatModule,
 
   QueueModule,
+  PgModule,
 ];

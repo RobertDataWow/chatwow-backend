@@ -7,16 +7,30 @@ import {
 } from './http.standard';
 
 class PaginationResponseSchema implements IPaginationSchema {
+  @ApiProperty({ example: 1 })
   page: number;
+
+  @ApiProperty({ example: 10 })
   nextPage: number;
+
+  @ApiProperty({ example: 0 })
   previousPage: number;
+
+  @ApiProperty({ example: 10 })
   perPage: number;
+
+  @ApiProperty({ example: 100 })
   totalItems: number;
+
+  @ApiProperty({ example: 10 })
   currentPageItems: number;
+
+  @ApiProperty({ example: 10 })
   totalPages: number;
 }
 
 export class PaginationMetaResponse implements IPaginationMeta {
+  @ApiProperty({ type: () => PaginationResponseSchema })
   pagination: PaginationResponseSchema;
 }
 

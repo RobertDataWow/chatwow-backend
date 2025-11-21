@@ -158,10 +158,10 @@ export class StoredFileMapper {
       id: storedFile.id,
       filename: storedFile.filename,
       filesizeByte: storedFile.filesizeByte,
-      presignUrl: storedFile.presignUrl,
+      presignUrl: storedFile.presignUrl || '',
       createdAt: storedFile.createdAt.toISOString(),
       updatedAt: storedFile.updatedAt.toISOString(),
-      mimeType: storedFile.mimeType,
+      mimeType: storedFile.mimeType || '',
       extension: storedFile.extension,
     };
   }

@@ -1,31 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { UUID_EXAMPLE } from '@shared/common/common.constant';
+import { DATE_EXAMPLE, UUID_EXAMPLE } from '@shared/common/common.constant';
 
 export class StoredFileResponse {
-  @ApiProperty({ example: '' })
+  @ApiProperty({ example: UUID_EXAMPLE })
   id: string;
 
   @ApiProperty({ example: 'document.pdf' })
   filename: string;
 
   @ApiProperty({ example: 1024, nullable: true })
-  filesizeByte: number | null;
+  filesizeByte: number;
 
-  @ApiProperty({ example: null, nullable: true })
-  presignUrl: string | null;
+  @ApiProperty({ example: 'https://presigned-url', nullable: true })
+  presignUrl: string;
 
-  @ApiProperty({ example: '', nullable: true })
-  createdAt: string | null;
+  @ApiProperty({ example: DATE_EXAMPLE, nullable: true })
+  createdAt: string;
 
-  @ApiProperty({ example: '', nullable: true })
-  updatedAt: string | null;
+  @ApiProperty({ example: DATE_EXAMPLE, nullable: true })
+  updatedAt: string;
 
   @ApiProperty({ example: 'application/pdf', nullable: true })
-  mimeType: string | null;
+  mimeType: string;
 
   @ApiProperty({ example: 'pdf', nullable: true })
-  extension: string | null;
+  extension: string;
 }
 
 export class PresignUploadResponse {

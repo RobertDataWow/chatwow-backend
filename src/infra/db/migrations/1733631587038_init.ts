@@ -27,6 +27,18 @@ export async function up(db: Kysely<any>): Promise<void> {
     .asEnum(['USER', 'BOT'])
     .execute();
 
+  await db.schema
+    //
+    .createType('actor_type')
+    .asEnum(['USER', 'SYSTEM'])
+    .execute();
+
+  await db.schema
+    //
+    .createType('action_type')
+    .asEnum(['CREATE', 'UPDATE', 'DELETE'])
+    .execute();
+
   //
   // LINE_ACCOUNTS
   //
@@ -306,18 +318,6 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   // AUDIT LOGS
   //
-
-  await db.schema
-    //
-    .createType('actor_type')
-    .asEnum(['USER', 'SYSTEM'])
-    .execute();
-
-  await db.schema
-    //
-    .createType('action_type')
-    .asEnum(['CREATE', 'UPDATE', 'DELETE'])
-    .execute();
 
   await db.schema
     .createTable('audit_logs')
