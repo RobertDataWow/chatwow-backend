@@ -31,6 +31,7 @@ export class LineSessionRepo extends BaseRepo {
       .selectFrom('line_sessions')
       .selectAll()
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!lineSessionPg) {

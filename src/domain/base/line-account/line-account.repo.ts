@@ -30,6 +30,7 @@ export class LineAccountRepo extends BaseRepo {
       .selectFrom('line_accounts')
       .selectAll()
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!lineAccountPg) return null;

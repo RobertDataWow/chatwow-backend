@@ -44,8 +44,11 @@ export class UserGroupsV1Controller {
 
   @Get()
   @ApiResponse({ type: () => ListUserGroupsResponse })
-  async listUserGroups(@Query() query: ListUserGroupsDto) {
-    return this.listUserGroupsQuery.exec(query);
+  async listUserGroups(
+    @UserClaims() claims: UserClaims,
+    @Query() query: ListUserGroupsDto,
+  ) {
+    return this.listUserGroupsQuery.exec(claims, query);
   }
 
   @Post()
@@ -60,10 +63,11 @@ export class UserGroupsV1Controller {
   @Get(':id')
   @ApiResponse({ type: () => GetUserGroupResponse })
   async getUserGroup(
+    @UserClaims() claims: UserClaims,
     @Param('id', ParseUUIDPipe) id: string,
     @Query() query: GetUserGroupDto,
   ) {
-    return this.getUserGroupQuery.exec(id, query);
+    return this.getUserGroupQuery.exec(claims, id, query);
   }
 
   @Patch(':id')

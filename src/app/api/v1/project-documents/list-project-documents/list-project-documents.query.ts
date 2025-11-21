@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { filterQbIds } from '@infra/db/db.util';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { getPagination } from '@shared/common/common.pagintaion';
 import { QueryInterface } from '@shared/common/common.type';
@@ -26,9 +27,10 @@ export class ListProjectDocumentsQuery implements QueryInterface {
   ) {}
 
   async exec(
+    claims: UserClaims,
     query: ListProjectDocumentsDto,
   ): Promise<ListProjectDocumentsResponse> {
-    const { result, totalCount } = await this.getRaw(query);
+    const { result, totalCount } = await this.getRaw(claims, query);
 
     return {
       success: true,
@@ -74,11 +76,14 @@ export class ListProjectDocumentsQuery implements QueryInterface {
     };
   }
 
-  async getRaw(query: ListProjectDocumentsDto) {
+  async getRaw(actor: UserClaims, query: ListProjectDocumentsDto) {
     const ids = await this.projectsDocumentService.getIds({
-      filter: query.filter,
-      sort: query.sort,
-      pagination: query.pagination,
+      actor,
+      options: {
+        filter: query.filter,
+        sort: query.sort,
+        pagination: query.pagination,
+      },
     });
     if (!ids) {
       return {

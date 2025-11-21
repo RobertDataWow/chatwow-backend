@@ -4,7 +4,7 @@ import { ProjectDocument } from './project-document.domain';
 import { ProjectDocumentMapper } from './project-document.mapper';
 import { ProjectDocumentRepo } from './project-document.repo';
 import {
-  ProjectDocumentCountQueryOptions,
+  ProjectDocumentFilterOptions,
   ProjectDocumentQueryOptions,
 } from './project-document.zod';
 
@@ -16,7 +16,7 @@ export class ProjectDocumentService {
     return this.repo.getIds(opts);
   }
 
-  async getCount(opts?: ProjectDocumentCountQueryOptions) {
+  async getCount(opts?: ProjectDocumentFilterOptions) {
     return this.repo.getCount(opts);
   }
 

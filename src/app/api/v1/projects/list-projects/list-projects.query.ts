@@ -8,6 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { filterQbIds } from '@infra/db/db.util';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { getPagination } from '@shared/common/common.pagintaion';
 import { QueryInterface } from '@shared/common/common.type';
@@ -23,8 +24,11 @@ export class ListProjectsQuery implements QueryInterface {
     private projectsService: ProjectService,
   ) {}
 
-  async exec(query: ListProjectsDto): Promise<ListProjectsResponse> {
-    const { result, totalCount } = await this.getRaw(query);
+  async exec(
+    claims: UserClaims,
+    query: ListProjectsDto,
+  ): Promise<ListProjectsResponse> {
+    const { result, totalCount } = await this.getRaw(claims, query);
 
     return {
       success: true,
@@ -86,11 +90,14 @@ export class ListProjectsQuery implements QueryInterface {
     };
   }
 
-  async getRaw(query: ListProjectsDto) {
+  async getRaw(actor: UserClaims, query: ListProjectsDto) {
     const ids = await this.projectsService.getIds({
-      filter: query.filter,
-      sort: query.sort,
-      pagination: query.pagination,
+      actor,
+      options: {
+        filter: query.filter,
+        sort: query.sort,
+        pagination: query.pagination,
+      },
     });
     if (!ids) {
       return {
@@ -101,13 +108,14 @@ export class ListProjectsQuery implements QueryInterface {
 
     const result = await this.readDb
       .selectFrom('projects')
-      .$call((q) => projectsV1InclusionQb(q, query.includes))
+      .$call((q) => projectsV1InclusionQb(q, query.includes, actor))
       .selectAll()
       .$call((q) => filterQbIds(ids, q, 'projects.id'))
       .execute();
 
     const totalCount = await this.projectsService.getCount({
       filter: query.countFilter,
+      actor,
     });
 
     return {

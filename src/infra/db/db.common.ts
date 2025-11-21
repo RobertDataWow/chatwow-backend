@@ -44,6 +44,7 @@ export type Strict<T, Shape> = T extends Shape
 export type EB<T extends keyof DB> = ExpressionBuilder<DB, T>;
 export type EX<T> = Expression<T>;
 export type SelectQB<T extends keyof DB> = SelectQueryBuilder<DB, T, object>;
+export type SelectAnyQB<T extends keyof DB> = SelectQueryBuilder<DB, T, any>;
 export type WhereBuilder = OperandExpression<SqlBool>[];
 
 export async function runMigrations(db: CoreDB) {

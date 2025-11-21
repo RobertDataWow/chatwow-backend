@@ -1,11 +1,16 @@
 import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
-import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
+import {
+  addUserGroupActorFilter,
+  userGroupsTableFilter,
+} from '@domain/base/user-group/user-group.utils';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import type z from 'zod';
 
 import type { SelectQB } from '@infra/db/db.common';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
+import { isDefined } from '@shared/common/common.validator';
 import { getIncludesZod } from '@shared/zod/zod.util';
 
 export const projectsV1IncludesZod = getIncludesZod([
@@ -21,6 +26,7 @@ export const projectsV1IncludesZod = getIncludesZod([
 export function projectsV1InclusionQb(
   qb: SelectQB<'projects'>,
   includes: z.infer<typeof projectsV1IncludesZod>,
+  actor?: UserClaims,
 ) {
   return qb
     .$if(includes.has('manageUsers'), (q) =>
@@ -101,6 +107,7 @@ export function projectsV1InclusionQb(
             )
             .whereRef('user_group_projects.project_id', '=', 'projects.id')
             .where(userGroupsTableFilter)
+            .$if(isDefined(actor), (q) => addUserGroupActorFilter(q, actor!))
             .selectAll('user_groups'),
         ).as('userGroups'),
       ),

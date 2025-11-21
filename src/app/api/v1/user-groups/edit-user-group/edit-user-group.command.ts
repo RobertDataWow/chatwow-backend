@@ -43,7 +43,7 @@ export class EditUserGroupCommand implements CommandInterface {
     id: string,
     body: EditUserGroupDto,
   ): Promise<EditUserGroupResponse> {
-    const userGroup = await this.find(id);
+    const userGroup = await this.find(claims, id);
 
     if (body.userGroup) {
       userGroup.edit({
@@ -105,8 +105,8 @@ export class EditUserGroupCommand implements CommandInterface {
     });
   }
 
-  async find(id: string): Promise<UserGroup> {
-    const userGroup = await this.userGroupsService.findOne(id);
+  async find(claims: UserClaims, id: string): Promise<UserGroup> {
+    const userGroup = await this.userGroupsService.findOne(id, claims);
     if (!userGroup) {
       throw new ApiException(404, 'userGroupNotFound');
     }

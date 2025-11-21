@@ -1,7 +1,10 @@
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
 import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
-import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
+import {
+  addProjectDocumentActorFilter,
+  projectDocumentsTableFilter,
+} from '@domain/base/project-document/project-document.util';
 import { Project } from '@domain/base/project/project.domain';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
@@ -46,7 +49,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
     id: string,
     body: EditProjectDocumentDto,
   ): Promise<EditProjectDocumentResponse> {
-    const entity = await this.find(id);
+    const entity = await this.find(claims, id);
 
     if (body.projectDocument) {
       entity.projectDocument.edit({
@@ -79,7 +82,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
     };
   }
 
-  async find(id: string): Promise<Entity> {
+  async find(actor: UserClaims, id: string): Promise<Entity> {
     const projectDocument = await this.readDb
       .selectFrom('project_documents')
       .selectAll()
@@ -96,6 +99,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
       ])
       .where('id', '=', id)
       .where(projectDocumentsTableFilter)
+      .$call((q) => addProjectDocumentActorFilter(q, actor))
       .executeTakeFirst();
 
     if (!projectDocument) {

@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
 import { UserGroup } from './user-group.domain';
 import { UserGroupMapper } from './user-group.mapper';
 import { UserGroupRepo } from './user-group.repo';
 import {
-  UserGroupCountQueryOptions,
+  UserGroupFilterOptions,
   UserGroupQueryOptions,
 } from './user-group.zod';
 
@@ -16,12 +18,12 @@ export class UserGroupService {
     return this.repo.getIds(opts);
   }
 
-  async getCount(opts?: UserGroupCountQueryOptions) {
+  async getCount(opts?: UserGroupFilterOptions) {
     return this.repo.getCount(opts);
   }
 
-  async findOne(id: string) {
-    return this.repo.findOne(id);
+  async findOne(id: string, actor?: UserClaims) {
+    return this.repo.findOne(id, actor);
   }
 
   async save(userGroup: UserGroup) {

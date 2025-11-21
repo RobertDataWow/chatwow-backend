@@ -1,10 +1,15 @@
-import { projectsTableFilter } from '@domain/base/project/project.util';
+import {
+  addProjectActorFilter,
+  projectsTableFilter,
+} from '@domain/base/project/project.util';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import type z from 'zod';
 
 import type { SelectQB } from '@infra/db/db.common';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
+import { isDefined } from '@shared/common/common.validator';
 import { getIncludesZod } from '@shared/zod/zod.util';
 
 export const userGroupsV1IncludesZod = getIncludesZod([
@@ -16,6 +21,7 @@ export const userGroupsV1IncludesZod = getIncludesZod([
 export function userGroupsV1InclusionQb(
   qb: SelectQB<'user_groups'>,
   includes: z.infer<typeof userGroupsV1IncludesZod>,
+  actor?: UserClaims,
 ) {
   return qb
     .$if(includes.has('projects'), (q) =>
@@ -34,6 +40,7 @@ export function userGroupsV1InclusionQb(
               'user_groups.id',
             )
             .where(projectsTableFilter)
+            .$if(isDefined(actor), (q) => addProjectActorFilter(q, actor!))
             .selectAll(),
         ).as('projects'),
       ),

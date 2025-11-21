@@ -1,11 +1,15 @@
 import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
-import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
+import {
+  addProjectDocumentActorFilter,
+  projectDocumentsTableFilter,
+} from '@domain/base/project-document/project-document.util';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -24,10 +28,11 @@ export class GetProjectDocumentQuery implements QueryInterface {
   ) {}
 
   async exec(
+    claims: UserClaims,
     id: string,
     query: GetProjectDocumentDto,
   ): Promise<GetProjectDocumentResponse> {
-    const projectDocument = await this.getRaw(id, query);
+    const projectDocument = await this.getRaw(claims, id, query);
 
     return {
       success: true,
@@ -70,13 +75,15 @@ export class GetProjectDocumentQuery implements QueryInterface {
     };
   }
 
-  async getRaw(id: string, query: GetProjectDocumentDto) {
+  async getRaw(actor: UserClaims, id: string, query: GetProjectDocumentDto) {
     const result = await this.readDb
       .selectFrom('project_documents')
       .$call((q) => projectDocumentsV1InclusionQb(q, query.includes))
       .selectAll('project_documents')
       .where(projectDocumentsTableFilter)
       .where('project_documents.id', '=', id)
+      .$call((q) => addProjectDocumentActorFilter(q, actor))
+      .limit(1)
       .executeTakeFirst();
 
     if (!result) {

@@ -74,8 +74,11 @@ export class ProjectsV1Controller {
   @ApiResponse({
     type: () => ListProjectsResponse,
   })
-  async listUsers(@Query() query: ListProjectsDto) {
-    return this.listProjectsQuery.exec(query);
+  async listUsers(
+    @UserClaims() claims: UserClaims,
+    @Query() query: ListProjectsDto,
+  ) {
+    return this.listProjectsQuery.exec(claims, query);
   }
 
   @Get('presign-upload')
@@ -94,9 +97,10 @@ export class ProjectsV1Controller {
     type: () => GetProjectResponse,
   })
   async getUser(
+    @UserClaims() claims: UserClaims,
     @Param('id', ParseUUIDPipe) id: string,
     @Query() query: GetProjectDto,
   ) {
-    return this.getProjectsQuery.exec(id, query);
+    return this.getProjectsQuery.exec(claims, id, query);
   }
 }

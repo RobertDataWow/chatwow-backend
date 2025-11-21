@@ -36,6 +36,7 @@ export class UserOtpRepo extends BaseRepo {
       .selectFrom('user_otps')
       .selectAll()
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!userOtpPg) {

@@ -81,6 +81,7 @@ export class UserRepo extends BaseRepo {
       .selectAll()
       .where('id', '=', id)
       .where(usersTableFilter)
+      .limit(1)
       .executeTakeFirst();
 
     if (!userPg) {

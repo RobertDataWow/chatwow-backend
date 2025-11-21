@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
 import { Project } from './project.domain';
 import { ProjectMapper } from './project.mapper';
 import { ProjectRepo } from './project.repo';
-import { ProjectCountQueryOptions, ProjectQueryOptions } from './project.zod';
+import { ProjectFilterOptions, ProjectQueryOptions } from './project.zod';
 
 @Injectable()
 export class ProjectService {
@@ -13,12 +15,12 @@ export class ProjectService {
     return this.repo.getIds(query);
   }
 
-  async getCount(query?: ProjectCountQueryOptions) {
+  async getCount(query?: ProjectFilterOptions) {
     return this.repo.getCount(query);
   }
 
-  async findOne(id: string) {
-    return this.repo.findOne(id);
+  async findOne(id: string, actor?: UserClaims) {
+    return this.repo.findOne(id, actor);
   }
 
   async save(project: Project) {

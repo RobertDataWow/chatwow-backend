@@ -35,6 +35,7 @@ export class LineChatLogRepo extends BaseRepo {
       .selectFrom('line_chat_logs')
       .selectAll()
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!userPg) {

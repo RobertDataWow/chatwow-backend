@@ -1,10 +1,14 @@
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
-import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
+import {
+  addUserGroupActorFilter,
+  userGroupsTableFilter,
+} from '@domain/base/user-group/user-group.utils';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -20,10 +24,11 @@ export class GetUserGroupQuery implements QueryInterface {
   ) {}
 
   async exec(
+    claims: UserClaims,
     id: string,
     query: GetUserGroupDto,
   ): Promise<GetUserGroupResponse> {
-    const userGroup = await this.getRaw(id, query);
+    const userGroup = await this.getRaw(claims, id, query);
 
     return {
       success: true,
@@ -58,13 +63,15 @@ export class GetUserGroupQuery implements QueryInterface {
     };
   }
 
-  async getRaw(id: string, query: GetUserGroupDto) {
+  async getRaw(actor: UserClaims, id: string, query: GetUserGroupDto) {
     const result = await this.readDb
       .selectFrom('user_groups')
-      .$call((q) => userGroupsV1InclusionQb(q, query.includes))
+      .$call((q) => userGroupsV1InclusionQb(q, query.includes, actor))
       .selectAll('user_groups')
       .where(userGroupsTableFilter)
       .where('user_groups.id', '=', id)
+      .$call((q) => addUserGroupActorFilter(q, actor))
+      .limit(1)
       .executeTakeFirst();
 
     if (!result) {

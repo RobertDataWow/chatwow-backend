@@ -1,12 +1,16 @@
 import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
-import { projectsTableFilter } from '@domain/base/project/project.util';
+import {
+  addProjectActorFilter,
+  projectsTableFilter,
+} from '@domain/base/project/project.util';
 import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -21,8 +25,12 @@ export class GetProjectQuery implements QueryInterface {
     private readDb: ReadDB,
   ) {}
 
-  async exec(id: string, query: GetProjectDto): Promise<GetProjectResponse> {
-    const project = await this.getRaw(id, query);
+  async exec(
+    claims: UserClaims,
+    id: string,
+    query: GetProjectDto,
+  ): Promise<GetProjectResponse> {
+    const project = await this.getRaw(claims, id, query);
 
     return {
       success: true,
@@ -81,13 +89,15 @@ export class GetProjectQuery implements QueryInterface {
     };
   }
 
-  async getRaw(id: string, query: GetProjectDto) {
+  async getRaw(actor: UserClaims, id: string, query: GetProjectDto) {
     const result = await this.readDb
       .selectFrom('projects')
-      .$call((q) => projectsV1InclusionQb(q, query.includes))
+      .$call((q) => projectsV1InclusionQb(q, query.includes, actor))
       .selectAll('projects')
       .where(projectsTableFilter)
       .where('projects.id', '=', id)
+      .$call((q) => addProjectActorFilter(q, actor))
+      .limit(1)
       .executeTakeFirst();
 
     if (!result) {

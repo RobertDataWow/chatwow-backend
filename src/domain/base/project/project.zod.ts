@@ -1,5 +1,7 @@
 import z from 'zod';
 
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
 import type { PaginationQuery } from '@shared/common/common.pagintaion';
 import { getSortZod } from '@shared/zod/zod.util';
 
@@ -14,9 +16,15 @@ export const projectFilterZod = z
   .optional();
 export const projectSortZod = getSortZod(['id', 'projectName', 'createdAt']);
 
-export type ProjectQueryOptions = {
+export type ProjectFilterOptions = {
   filter?: z.infer<typeof projectFilterZod>;
-  sort?: z.infer<typeof projectSortZod>;
-  pagination?: PaginationQuery;
+  actor?: UserClaims;
 };
-export type ProjectCountQueryOptions = Pick<ProjectQueryOptions, 'filter'>;
+export type ProjectQueryOptions = {
+  actor?: UserClaims;
+  options?: {
+    filter?: z.infer<typeof projectFilterZod>;
+    sort?: z.infer<typeof projectSortZod>;
+    pagination?: PaginationQuery;
+  };
+};

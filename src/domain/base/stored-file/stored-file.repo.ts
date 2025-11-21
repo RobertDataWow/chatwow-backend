@@ -35,6 +35,7 @@ export class StoredFileRepo extends BaseRepo {
       .selectFrom('stored_files')
       .selectAll()
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!storedFilePg) {

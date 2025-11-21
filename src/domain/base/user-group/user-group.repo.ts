@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Except } from 'type-fest';
 
 import { addPagination, queryCount, sortQb } from '@infra/db/db.util';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { diff, getUniqueIds } from '@shared/common/common.func';
 import { BaseRepo } from '@shared/common/common.repo';
@@ -9,22 +9,26 @@ import { isDefined } from '@shared/common/common.validator';
 
 import { UserGroup } from './user-group.domain';
 import { UserGroupMapper } from './user-group.mapper';
-import { userGroupsTableFilter } from './user-group.utils';
 import {
-  UserGroupCountQueryOptions,
+  addUserGroupActorFilter,
+  userGroupsTableFilter,
+} from './user-group.utils';
+import {
+  UserGroupFilterOptions,
   UserGroupQueryOptions,
 } from './user-group.zod';
 
 @Injectable()
 export class UserGroupRepo extends BaseRepo {
   async getIds(opts?: UserGroupQueryOptions) {
-    opts ??= {};
-    const { sort, pagination } = opts;
+    const { sort, pagination, filter } = opts?.options || {};
 
-    const qb = await this._getFilterQb(opts)
-      .select('user_groups.id')
+    const qb = await this._getFilterQb({
+      filter,
+      actor: opts?.actor,
+    })
       .$if(!!sort?.length, (q) =>
-        sortQb(q, opts!.sort, {
+        sortQb(q, sort, {
           id: 'user_groups.id',
           createdAt: 'user_groups.created_at',
           groupName: 'user_groups.group_name',
@@ -36,12 +40,10 @@ export class UserGroupRepo extends BaseRepo {
     return getUniqueIds(qb);
   }
 
-  async getCount(opts?: UserGroupCountQueryOptions) {
+  async getCount(filter?: UserGroupFilterOptions) {
     const totalCount = await this
       //
-      ._getFilterQb({
-        filter: opts?.filter,
-      })
+      ._getFilterQb(filter)
       .$call((q) => queryCount(q));
 
     return totalCount;
@@ -69,10 +71,11 @@ export class UserGroupRepo extends BaseRepo {
       .execute();
   }
 
-  async findOne(id: string): Promise<UserGroup | null> {
+  async findOne(id: string, actor?: UserClaims): Promise<UserGroup | null> {
     const userGroupPg = await this.readDb
       .selectFrom('user_groups')
-      .selectAll()
+      .selectAll('user_groups')
+      .$if(!!actor, (q) => addUserGroupActorFilter(q, actor!))
       .where('id', '=', id)
       .executeTakeFirst();
 
@@ -92,13 +95,14 @@ export class UserGroupRepo extends BaseRepo {
       .execute();
   }
 
-  private _getFilterQb(opts?: Except<UserGroupQueryOptions, 'pagination'>) {
-    const filter = opts?.filter;
+  private _getFilterQb(opts?: UserGroupFilterOptions) {
+    const { filter, actor } = opts || {};
 
     return this.readDb
       .selectFrom('user_groups')
       .select('user_groups.id')
       .where(userGroupsTableFilter)
+      .$if(isDefined(actor), (q) => addUserGroupActorFilter(q, actor!))
       .$if(isDefined(filter?.groupName), (q) =>
         q.where('user_groups.group_name', '=', filter!.groupName!),
       )

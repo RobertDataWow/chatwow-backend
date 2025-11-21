@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Except } from 'type-fest';
 
 import { addPagination, queryCount, sortQb } from '@infra/db/db.util';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { diff, getUniqueIds } from '@shared/common/common.func';
 import { BaseRepo } from '@shared/common/common.repo';
@@ -9,22 +9,27 @@ import { isDefined } from '@shared/common/common.validator';
 
 import { ProjectDocument } from './project-document.domain';
 import { ProjectDocumentMapper } from './project-document.mapper';
-import { projectDocumentsTableFilter } from './project-document.util';
 import {
-  ProjectDocumentCountQueryOptions,
+  addProjectDocumentActorFilter,
+  projectDocumentsTableFilter,
+} from './project-document.util';
+import {
+  ProjectDocumentFilterOptions,
   ProjectDocumentQueryOptions,
 } from './project-document.zod';
 
 @Injectable()
 export class ProjectDocumentRepo extends BaseRepo {
   async getIds(opts?: ProjectDocumentQueryOptions) {
-    opts ??= {};
-    const { sort, pagination } = opts;
+    const { sort, pagination, filter } = opts?.options || {};
 
-    const qb = await this._getFilterQb(opts)
+    const qb = await this._getFilterQb({
+      filter,
+      actor: opts?.actor,
+    })
       .select('project_documents.id')
       .$if(!!sort?.length, (q) =>
-        sortQb(q, opts!.sort, {
+        sortQb(q, sort, {
           id: 'project_documents.id',
           createdAt: 'project_documents.created_at',
           documentStatus: 'project_documents.document_status',
@@ -36,12 +41,10 @@ export class ProjectDocumentRepo extends BaseRepo {
     return getUniqueIds(qb);
   }
 
-  async getCount(opts?: ProjectDocumentCountQueryOptions) {
+  async getCount(opts?: ProjectDocumentFilterOptions) {
     const totalCount = await this
       //
-      ._getFilterQb({
-        filter: opts?.filter,
-      })
+      ._getFilterQb(opts)
       .$call((q) => queryCount(q));
 
     return totalCount;
@@ -72,11 +75,16 @@ export class ProjectDocumentRepo extends BaseRepo {
       .execute();
   }
 
-  async findOne(id: string): Promise<ProjectDocument | null> {
+  async findOne(
+    id: string,
+    actor?: UserClaims,
+  ): Promise<ProjectDocument | null> {
     const projectDocumentPg = await this.readDb
       .selectFrom('project_documents')
-      .selectAll()
+      .selectAll('project_documents')
+      .$if(isDefined(actor), (qb) => addProjectDocumentActorFilter(qb, actor!))
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!projectDocumentPg) {
@@ -96,10 +104,8 @@ export class ProjectDocumentRepo extends BaseRepo {
       .execute();
   }
 
-  private _getFilterQb(
-    opts?: Except<ProjectDocumentQueryOptions, 'pagination'>,
-  ) {
-    const filter = opts?.filter;
+  private _getFilterQb(opts?: ProjectDocumentFilterOptions) {
+    const { filter, actor } = opts || {};
 
     return this.readDb
       .selectFrom('project_documents')
@@ -107,6 +113,7 @@ export class ProjectDocumentRepo extends BaseRepo {
       .$if(isDefined(filter?.documentStatus), (qb) =>
         qb.where('document_status', '=', filter!.documentStatus!),
       )
+      .$if(isDefined(actor), (qb) => addProjectDocumentActorFilter(qb, actor!))
       .$if(isDefined(filter?.projectName), (qb) =>
         qb
           .innerJoin('projects', 'projects.id', 'project_documents.project_id')

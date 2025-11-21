@@ -67,6 +67,7 @@ export class GetUserQuery implements QueryInterface {
       .selectAll('users')
       .where(usersTableFilter)
       .where('users.id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!result) {

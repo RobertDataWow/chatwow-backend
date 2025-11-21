@@ -35,6 +35,7 @@ export class AuditLogRepo extends BaseRepo {
       .selectFrom('audit_logs')
       .selectAll()
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!userPg) {

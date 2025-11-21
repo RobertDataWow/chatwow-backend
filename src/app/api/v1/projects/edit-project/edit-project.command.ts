@@ -23,7 +23,7 @@ export class EditProjectCommand implements CommandInterface {
     id: string,
     body: EditProjectDto,
   ): Promise<EditProjectResponse> {
-    const project = await this.find(id);
+    const project = await this.find(claims, id);
 
     if (body.project) {
       project.edit({
@@ -51,8 +51,8 @@ export class EditProjectCommand implements CommandInterface {
     });
   }
 
-  async find(id: string) {
-    const project = await this.projectService.findOne(id);
+  async find(claims: UserClaims, id: string) {
+    const project = await this.projectService.findOne(id, claims);
 
     if (!project) {
       throw new ApiException(400, 'projectNotFound');

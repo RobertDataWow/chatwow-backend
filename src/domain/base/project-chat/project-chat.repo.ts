@@ -35,6 +35,7 @@ export class ProjectChatRepo extends BaseRepo {
       .selectFrom('project_chats')
       .selectAll()
       .where('id', '=', id)
+      .limit(1)
       .executeTakeFirst();
 
     if (!userPg) {

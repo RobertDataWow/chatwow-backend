@@ -42,7 +42,10 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       actorId: claims.userId,
       data: body.projectDocument,
     });
-    const project = await this.getProject(body.projectDocument.projectId);
+    const project = await this.getProject(
+      claims,
+      body.projectDocument.projectId,
+    );
 
     const storedFile = StoredFile.new({
       ...body.storedFile,
@@ -81,8 +84,8 @@ export class CreateProjectDocumentCommand implements CommandInterface {
     });
   }
 
-  async getProject(projectId: string) {
-    const project = await this.projectService.findOne(projectId);
+  async getProject(claims: UserClaims, projectId: string) {
+    const project = await this.projectService.findOne(projectId, claims);
     if (!project) {
       throw new ApiException(404, 'projectNotFound');
     }
