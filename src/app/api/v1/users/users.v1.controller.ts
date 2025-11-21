@@ -22,6 +22,11 @@ import { ListUsersDto, ListUsersResponse } from './list-users/list-users.dto';
 import { ListUsersQuery } from './list-users/list-users.query';
 import { ResendInviteCommand } from './resend-invite/resend-invite.command';
 import { ResendInviteResponse } from './resend-invite/resend-invite.dto';
+import {
+  UserSummaryDto,
+  UserSummaryResponse,
+} from './user-summary/user-summary.dto';
+import { UserSummaryQuery } from './user-summary/user-summary.query';
 
 @Controller({ path: 'users', version: '1' })
 export class UsersV1Controller {
@@ -32,6 +37,7 @@ export class UsersV1Controller {
     private listUsersQuery: ListUsersQuery,
     private getUserQuery: GetUserQuery,
     private resendInviteCommand: ResendInviteCommand,
+    private userSummaryQuery: UserSummaryQuery,
   ) {}
 
   @Get()
@@ -44,6 +50,14 @@ export class UsersV1Controller {
   @ApiResponse({ type: () => AddUserResponse })
   async addUser(@Body() body: AddUserDto): Promise<AddUserResponse> {
     return this.addUserCommand.exec(body);
+  }
+
+  @Get('summary')
+  @ApiResponse({ type: () => UserSummaryResponse })
+  async getUserSummary(
+    @Query() query: UserSummaryDto,
+  ): Promise<UserSummaryResponse> {
+    return this.userSummaryQuery.exec(query);
   }
 
   @Get('me')
