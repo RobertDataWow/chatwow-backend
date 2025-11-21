@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import myDayjs from '@shared/common/common.dayjs';
 import { diff } from '@shared/common/common.func';
 import { BaseRepo } from '@shared/common/common.repo';
 
@@ -50,6 +51,15 @@ export class UserOtpRepo extends BaseRepo {
       //
       .deleteFrom('user_otps')
       .where('id', '=', id)
+      .execute();
+  }
+
+  async expireAll(userId: string) {
+    await this.db
+      //
+      .updateTable('user_otps')
+      .set({ expire_at: myDayjs().toISOString() })
+      .where('user_id', '=', userId)
       .execute();
   }
 }

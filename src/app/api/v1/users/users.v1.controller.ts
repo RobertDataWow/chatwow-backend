@@ -20,6 +20,8 @@ import { GetUserDto, GetUserResponse } from './get-user/get-user.dto';
 import { GetUserQuery } from './get-user/get-user.query';
 import { ListUsersDto, ListUsersResponse } from './list-users/list-users.dto';
 import { ListUsersQuery } from './list-users/list-users.query';
+import { ResendInviteCommand } from './resend-invite/resend-invite.command';
+import { ResendInviteResponse } from './resend-invite/resend-invite.dto';
 
 @Controller({ path: 'users', version: '1' })
 export class UsersV1Controller {
@@ -29,6 +31,7 @@ export class UsersV1Controller {
     private editUserCommand: EditUserCommand,
     private listUsersQuery: ListUsersQuery,
     private getUserQuery: GetUserQuery,
+    private resendInviteCommand: ResendInviteCommand,
   ) {}
 
   @Get()
@@ -68,5 +71,13 @@ export class UsersV1Controller {
     @Body() body: EditUserDto,
   ): Promise<EditUserResponse> {
     return this.editUserCommand.exec(id, body);
+  }
+
+  @Post(':id/resend-invite')
+  @ApiResponse({ type: () => ResendInviteResponse })
+  async resendInvite(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ResendInviteResponse> {
+    return this.resendInviteCommand.exec(id);
   }
 }

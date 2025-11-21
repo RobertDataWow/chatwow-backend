@@ -7,7 +7,11 @@ import { DomainEventQueue } from './domain-event/domain-event.queue';
 export class EventDispatch {
   constructor(private domainEventQueue: DomainEventQueue) {}
 
-  addUser(user: User) {
+  sendOtp(user: User) {
     this.domainEventQueue.jobSendOtp(user);
+  }
+
+  addUser(user: User) {
+    this.sendOtp(user);
   }
 }

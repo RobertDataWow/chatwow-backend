@@ -21,7 +21,6 @@ export class SendOtpCommand implements CommandInterface {
       userId: user.id,
     });
 
-    await this.userOtpService.sendOtpMail(user, userOtp);
     await this.save(user, userOtp);
 
     return;
@@ -30,9 +29,12 @@ export class SendOtpCommand implements CommandInterface {
   async save(user: User, otp: UserOtp): Promise<void> {
     await this.transactionService.transaction(async () => {
       await this.userService.save(user);
+      await this.userOtpService.expireAll(user.id);
       await this.userOtpService.save(otp);
-    });
 
+      // send otp do in transaction in case failure
+      await this.userOtpService.sendOtpMail(user, otp);
+    });
     return;
   }
 }

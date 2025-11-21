@@ -41,6 +41,10 @@ export class UserOtpService {
     return this.repo.delete(id);
   }
 
+  async expireAll(userId: string) {
+    return this.repo.expireAll(userId);
+  }
+
   async sendOtpMail(user: User, userOtp: UserOtp) {
     const html = await renderHtml(TemplateSendOtp({ userOtp }));
     await this.emailService.send(user.email, 'รหัส Otp', html);
