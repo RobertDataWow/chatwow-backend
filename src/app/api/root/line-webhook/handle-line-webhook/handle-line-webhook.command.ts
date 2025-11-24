@@ -1,3 +1,4 @@
+import { EventDispatch } from '@domain/orchestration/queue/event.dispatch';
 import { Injectable, RawBodyRequest } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FastifyRequest } from 'fastify';
@@ -10,7 +11,10 @@ import { getLineInfoFromReq } from '@shared/common/common.line';
 
 @Injectable()
 export class HandleLineWebhookCommand {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private eventDispatch: EventDispatch,
+  ) {}
 
   async exec(req: RawBodyRequest<FastifyRequest>, body: LineWebHookMessage) {
     const lineConfig = this.configService.getOrThrow<AppConfig['line']>('line');
@@ -21,9 +25,7 @@ export class HandleLineWebhookCommand {
     });
     lineService.validateSignature(getLineInfoFromReq(req));
 
-    console.log('==================================');
-    console.log(body);
-    console.log('==================================');
+    this.eventDispatch.lineMessageReceive(body);
 
     return;
   }
