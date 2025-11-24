@@ -1,4 +1,4 @@
-import { ForgotPasswordDispatchEvent } from '@domain/orchestration/queue/types/event.dispatch.type';
+import { ForgotPasswordDispatchEvent } from '@domain/orchestration/queue/event.dispatch.type';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 

@@ -8,7 +8,7 @@ import { QUEUE } from '@app/worker/worker.queue';
 
 import { BaseQueue } from '@shared/task/task.abstract';
 
-import { ForgotPasswordDispatchEvent } from '../types/event.dispatch.type';
+import { ForgotPasswordDispatchEvent } from '../event.dispatch.type';
 import { SendForgotPasswordJobData } from './domain-event.queue.type';
 
 @Injectable()

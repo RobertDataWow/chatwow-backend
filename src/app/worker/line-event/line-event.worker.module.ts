@@ -4,11 +4,11 @@ import { createBullmqHandler } from '@shared/common/common.worker';
 
 import { QUEUE } from '../worker.queue';
 import { LineEventBullmq } from './line-event.bullmq';
-import { ProcessRawLineCommand } from './process-raw-line/process-raw-line.command';
+import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
 
 @Module({
   providers: [
-    ProcessRawLineCommand,
+    LineProcessRawCommand,
 
     //
     createBullmqHandler(QUEUE.LINE_EVENT, LineEventBullmq),

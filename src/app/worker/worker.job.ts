@@ -5,6 +5,7 @@ export const DOMAIN_EVENT_JOBS = {
 
 export const LINE_EVENT_JOBS = {
   PROCESS_RAW: 'PROCESS_RAW',
+  SEND_MESSAGE: 'SEND_MESSAGE',
 } as const;
 
 export const CRON_JOBS = {

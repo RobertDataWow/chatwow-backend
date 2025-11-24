@@ -11,6 +11,6 @@ import { LineEventQueue } from './line-event/line-event.queue';
     EventDispatch,
     LineEventQueue,
   ],
-  exports: [EventDispatch],
+  exports: [EventDispatch, LineEventQueue],
 })
 export class QueueModule {}

@@ -1,4 +1,4 @@
-import { EventDispatch } from '@domain/orchestration/queue/event.dispatch';
+import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
 import { Injectable, RawBodyRequest } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FastifyRequest } from 'fastify';
@@ -13,19 +13,27 @@ import { getLineInfoFromReq } from '@shared/common/common.line';
 export class HandleLineWebhookCommand {
   constructor(
     private configService: ConfigService,
-    private eventDispatch: EventDispatch,
+    private lineEventQueue: LineEventQueue,
   ) {}
 
-  async exec(req: RawBodyRequest<FastifyRequest>, body: LineWebHookMessage) {
+  async exec(req: RawBodyRequest<FastifyRequest>, data: LineWebHookMessage) {
     const lineConfig = this.configService.getOrThrow<AppConfig['line']>('line');
 
+    const channelAccessToken = lineConfig.defaultAccessToken;
+    const channelSecret = lineConfig.defaultSecret;
     const lineService = new LineService({
-      channelAccessToken: lineConfig.defaultAccessToken,
-      channelSecret: lineConfig.defaultSecret,
+      channelAccessToken,
+      channelSecret,
     });
     lineService.validateSignature(getLineInfoFromReq(req));
 
-    this.eventDispatch.lineMessageReceive(body);
+    this.lineEventQueue.jobProcessRaw({
+      config: {
+        channelAccessToken,
+        channelSecret,
+      },
+      data,
+    });
 
     return;
   }

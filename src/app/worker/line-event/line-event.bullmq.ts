@@ -1,22 +1,32 @@
+import {
+  LineProcessRawJobData,
+  LineSendMessageJobData,
+} from '@domain/orchestration/queue/line-event/line-event.queue.type';
 import { Injectable } from '@nestjs/common';
-
-import { LineWebHookMessage } from '@infra/global/line/line.type';
 
 import { LINE_EVENT_JOBS } from '@app/worker/worker.job';
 
 import { BaseTaskHandler } from '@shared/task/task.abstract';
 import { QueueTask } from '@shared/task/task.decorator';
 
-import { ProcessRawLineCommand } from './process-raw-line/process-raw-line.command';
+import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
+import { LineSendMessageCommand } from './line-send-message/line-send-message.command';
 
 @Injectable()
 export class LineEventBullmq extends BaseTaskHandler {
-  constructor(private processRawLineCommand: ProcessRawLineCommand) {
+  constructor(
+    private lineProcessRawCommand: LineProcessRawCommand,
+    private lineSendMessageCommand: LineSendMessageCommand,
+  ) {
     super();
   }
 
   @QueueTask(LINE_EVENT_JOBS.PROCESS_RAW)
-  async processRawLine(data: LineWebHookMessage) {
-    return this.processRawLineCommand.exec(data);
+  async processRaw(data: LineProcessRawJobData) {
+    return this.lineProcessRawCommand.exec(data);
+  }
+
+  async sendMessage(data: LineSendMessageJobData) {
+    return this.lineSendMessageCommand.exec(data);
   }
 }

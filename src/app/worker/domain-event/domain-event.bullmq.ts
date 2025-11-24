@@ -4,7 +4,7 @@ import type {
   SendForgotPasswordJobData,
   SendOtpJobData,
 } from '@domain/orchestration/queue/domain-event/domain-event.queue.type';
-import { ForgotPasswordDispatchEvent } from '@domain/orchestration/queue/types/event.dispatch.type';
+import { ForgotPasswordDispatchEvent } from '@domain/orchestration/queue/event.dispatch.type';
 import { Injectable } from '@nestjs/common';
 
 import { DOMAIN_EVENT_JOBS } from '@app/worker/worker.job';
