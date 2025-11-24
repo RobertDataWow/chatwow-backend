@@ -22,26 +22,32 @@ import { CoreZodValidationPipe } from './validation/zod-validation.pipe';
     }),
   ],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-
+    // interceptors
     {
       provide: APP_INTERCEPTOR,
       useClass: ReqStorageInterceptor,
     },
+
+    // guards
     {
-      provide: APP_PIPE,
-      useClass: CoreZodValidationPipe,
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
+
+    // filters
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+
+    // pipes
+    {
+      provide: APP_PIPE,
+      useClass: CoreZodValidationPipe,
     },
   ],
 })

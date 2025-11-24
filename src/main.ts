@@ -20,6 +20,7 @@ async function bootstrap() {
       querystringParser: (str) => qs.parse(str),
     }),
     {
+      rawBody: true,
       logger: coreLogger(appConfig),
       cors: {
         origin: appConfig.corsOrigin,

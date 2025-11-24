@@ -49,6 +49,10 @@ export type AppConfig = {
   crypto: {
     aesKey: string;
   };
+  line: {
+    defaultAccessToken: string;
+    defaultSecret: string;
+  };
 };
 
 export const config = (): AppConfig => ({
@@ -101,5 +105,9 @@ export const config = (): AppConfig => ({
   },
   crypto: {
     aesKey: get('AES_KEY').required().asString(),
+  },
+  line: {
+    defaultAccessToken: get('LINE_DEFAULT_ACCESS_TOKEN').default('').asString(),
+    defaultSecret: get('LINE_DEFAULT_SECRET').default('').asString(),
   },
 });

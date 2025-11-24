@@ -1,0 +1,22 @@
+meta {
+  name: line-webhook
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/line-webhook
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "test": ""
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

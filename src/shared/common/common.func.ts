@@ -124,3 +124,7 @@ export function getUniqueIds(objs: { id: string }[]) {
 export function renderHtml(template: React.JSX.Element) {
   return render(template);
 }
+
+export function prettyPrintJson(obj: object) {
+  return JSON.stringify(obj, null, 2);
+}
