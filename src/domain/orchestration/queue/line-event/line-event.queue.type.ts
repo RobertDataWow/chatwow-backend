@@ -13,3 +13,8 @@ export type LineSendMessageJobData = LineJobData<{
   replyToken: string;
   text: string;
 }>;
+
+// TODO give type
+export type LineProcessSelectionMenuJobData = LineJobData<any>;
+export type LineProcessVerificationJobData = LineJobData<any>;
+export type LineProcessAiChatJobData = LineJobData<any>;
