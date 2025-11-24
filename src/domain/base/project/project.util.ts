@@ -15,7 +15,7 @@ export function addProjectActorFilter<T extends SelectAnyQB<'projects'>>(
   }
 
   return q
-    .innerJoin(
+    .leftJoin(
       'user_manage_projects',
       'user_manage_projects.project_id',
       'projects.id',

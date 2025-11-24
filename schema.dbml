@@ -203,6 +203,10 @@ Table "audit_logs" {
   "owner_table" text [not null]
   "owner_id" uuid [not null]
   "raw_data" jsonb [not null]
+
+  Indexes {
+    owner_id [type: btree, name: "audit_logs_owner_id_idx"]
+  }
 }
 
 Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"

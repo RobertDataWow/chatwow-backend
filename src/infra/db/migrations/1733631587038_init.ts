@@ -367,6 +367,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('owner_id', 'uuid', (col) => col.notNull())
     .addColumn('raw_data', 'jsonb', (col) => col.notNull())
     .execute();
+
+  await db.schema
+    .createIndex('audit_logs_owner_id_idx')
+    .on('audit_logs')
+    .column('owner_id')
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {

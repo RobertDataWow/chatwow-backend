@@ -15,7 +15,7 @@ export function addUserGroupActorFilter<T extends SelectAnyQB<'user_groups'>>(
   }
 
   return q
-    .innerJoin(
+    .leftJoin(
       'user_group_users',
       'user_group_users.user_group_id',
       'user_groups.id',

@@ -14,8 +14,8 @@ export function addProjectDocumentActorFilter<
   }
 
   return q
-    .innerJoin('projects', 'projects.id', 'project_documents.project_id')
-    .innerJoin(
+    .leftJoin('projects', 'projects.id', 'project_documents.project_id')
+    .leftJoin(
       'user_manage_projects',
       'user_manage_projects.project_id',
       'projects.id',
