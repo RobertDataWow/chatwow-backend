@@ -10,6 +10,10 @@ post {
   auth: inherit
 }
 
+headers {
+  x-device: bruno
+}
+
 body:json {
   {
     "email": "superadmin@example.com",
@@ -18,5 +22,5 @@ body:json {
 }
 
 script:post-response {
-  bru.setEnvVar('token',res.body?.meta?.token)
+  bru.setEnvVar('token',res.body?.data.token)
 }

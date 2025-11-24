@@ -11,6 +11,7 @@ import { Test } from '@nestjs/testing';
 import type { Dayjs } from 'dayjs';
 import type { ControlledTransaction } from 'kysely';
 
+import { config } from '@infra/config';
 import type { DB } from '@infra/db/db';
 import type { CoreDB } from '@infra/db/db.common';
 import { KYSELY, runMigrations } from '@infra/db/db.common';
@@ -27,16 +28,6 @@ import { setupApp } from '@shared/http/http.setup';
 import { InitialsCliSeed } from '../../../app/cli/initials/initials.cli.seed';
 import { MockTransactionService } from '../mock/mock.trasaction.service';
 import { getTestState, updateTestState } from './test-state.common';
-
-export async function setupAppForTest(testModule: TestingModule) {
-  const app = testModule.createNestApplication();
-
-  setupApp(app);
-
-  await app.init();
-
-  return app;
-}
 
 export async function createRepoTestingModule(repo: Provider) {
   const module = await Test.createTestingModule({
@@ -90,7 +81,9 @@ export function freezeTestTime(current: Dayjs) {
 
 export async function startE2e(module: TestingModule) {
   const app = module.createNestApplication();
-  setupApp(app);
+  const appConfig = config().app;
+
+  setupApp(app, appConfig);
   await app.init();
 
   const { requireDbSetup } = getTestState();

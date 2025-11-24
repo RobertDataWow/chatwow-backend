@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
+import geoip from 'geoip-lite';
 
 import { ApiException } from '@shared/http/http.exception';
 
-import type { ReqData } from './req-storage.common';
+import type { ReqData, ReqInfo } from './req-storage.common';
 
 @Injectable()
 export class ReqStorage {
@@ -20,5 +21,23 @@ export class ReqStorage {
     }
 
     return ctx;
+  }
+
+  getReqInfo(): ReqInfo {
+    const ctx = this.get();
+
+    let device = ctx.device.toString();
+    if (!device || device === 'undefined') {
+      device = 'unknown';
+    }
+
+    return {
+      ua: {
+        device,
+        ip: ctx.ip,
+        browser: ctx.browser,
+      },
+      geoIp: geoip.lookup(ctx.ip),
+    };
   }
 }

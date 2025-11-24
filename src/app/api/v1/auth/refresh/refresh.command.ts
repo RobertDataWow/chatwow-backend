@@ -1,43 +1,42 @@
 import { Session } from '@domain/base/session/session.domain';
 import { SessionService } from '@domain/base/session/session.service';
+import { sessionsTableFilter } from '@domain/base/session/session.util';
 import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
-import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
-import { getAccessToken, signIn } from '@domain/orchestration/auth/auth.util';
+import { getAccessToken } from '@domain/orchestration/auth/auth.util';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
 
+import { shaHashstring } from '@shared/common/common.crypto';
+import myDayjs from '@shared/common/common.dayjs';
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
 import { HttpResponseMapper } from '@shared/http/http.mapper';
 
-import { SignInDto, SignInResponse } from './sign-in.dto';
+import { RefreshResponse } from './refresh.dto';
 
 type Entity = {
-  session: Session;
   user: User;
+  session: Session;
 };
 
 @Injectable()
-export class SignInCommand implements CommandInterface {
+export class RefreshCommand implements CommandInterface {
   constructor(
     @Inject(READ_DB)
     private readDb: ReadDB,
 
-    private userService: UserService,
     private sessionService: SessionService,
     private transactionService: TransactionService,
   ) {}
 
   async exec(
-    body: SignInDto,
-  ): Promise<{ plainToken: string; response: SignInResponse }> {
-    const user = await this.find(body);
-
-    signIn({ user, password: body.password });
+    plainToken: string,
+  ): Promise<{ plainToken: string; response: RefreshResponse }> {
+    const user = await this.find(plainToken);
     const { session, token } = this.sessionService.newSession(user.id);
 
     await this.save({
@@ -58,26 +57,29 @@ export class SignInCommand implements CommandInterface {
     };
   }
 
-  async find(body: SignInDto): Promise<User> {
-    const domain = await this.readDb
-      .selectFrom('users')
-      .selectAll()
-      .where('email', '=', body.email)
-      .where(usersTableFilter)
-      .executeTakeFirst();
-
-    if (!domain) {
-      throw new ApiException(404, 'invalidCredentials');
-    }
-
-    return UserMapper.fromPgWithState(domain);
+  async save(entity: Entity): Promise<void> {
+    await this.transactionService.transaction(async () => {
+      await this.sessionService.save(entity.session);
+      await this.sessionService.revokeAllOtherSession(entity.session);
+    });
   }
 
-  async save({ user, session }: Entity): Promise<void> {
-    await this.transactionService.transaction(async () => {
-      await this.userService.save(user);
-      await this.sessionService.save(session);
-      await this.sessionService.revokeAllOtherSession(session);
-    });
+  async find(plainToken: string): Promise<User> {
+    const user = await this.readDb
+      .selectFrom('sessions')
+      .innerJoin('users', 'users.id', 'sessions.user_id')
+      .selectAll('users')
+      .where('token_hash', '=', shaHashstring(plainToken))
+      .where(usersTableFilter)
+      .where(sessionsTableFilter)
+      .where('sessions.expire_at', '>', myDayjs().toISOString())
+      .where('revoke_at', 'is', null)
+      .executeTakeFirst();
+
+    if (!user) {
+      throw new ApiException(403, 'invalidSessionToken');
+    }
+
+    return UserMapper.fromPgWithState(user);
   }
 }

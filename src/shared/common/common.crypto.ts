@@ -1,6 +1,11 @@
 import { User } from '@domain/base/user/user.domain';
 import * as bcrypt from 'bcrypt';
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  randomBytes,
+} from 'crypto';
 import { TokenExpiredError, sign, verify } from 'jsonwebtoken';
 import { customAlphabet } from 'nanoid';
 import type { Tagged } from 'type-fest';
@@ -61,6 +66,14 @@ export function generateOTP() {
 export function hashString(data: string) {
   const hashed = bcrypt.hashSync(data, 10);
   return hashed;
+}
+
+export function randHex() {
+  return randomBytes(32).toString('hex');
+}
+export function shaHashstring(message?: string) {
+  message ??= randHex();
+  return createHash('sha256').update(message).digest('hex');
 }
 
 export function isMatchedHash(raw: string, hashed: string) {

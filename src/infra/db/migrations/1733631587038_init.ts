@@ -325,9 +325,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.references('line_sessions.id').notNull().onDelete('cascade'),
     )
     .addColumn('chat_sender', sql`chat_sender`, (col) => col.notNull())
-    .addColumn('parent_id', 'uuid', (col) =>
-      col.references('line_chat_logs.id').onDelete('set null'),
-    )
+    .addColumn('parent_id', 'uuid')
     .addColumn('message', 'text', (col) => col.notNull())
     .execute();
 
@@ -348,7 +346,6 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   // AUDIT LOGS
   //
-
   await db.schema
     .createTable('audit_logs')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
@@ -372,6 +369,54 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createIndex('audit_logs_owner_id_idx')
     .on('audit_logs')
     .column('owner_id')
+    .execute();
+
+  //
+  // Sessions
+  //
+  await db.schema
+    .createTable('sessions')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('user_id', 'uuid', (col) =>
+      col.references('users.id').notNull().onDelete('cascade'),
+    )
+    .addColumn('token_hash', 'text', (col) => col.notNull())
+    .addColumn('device_uid', 'text', (col) => col.notNull())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
+    .addColumn('revoke_at', 'timestamptz')
+    .addColumn('info', 'jsonb', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createIndex('sessions_token_hash')
+    .on('sessions')
+    .column('token_hash')
+    .execute();
+
+  //
+  // Password reset tokens
+  //
+  await db.schema
+    .createTable('password_reset_tokens')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('user_id', 'uuid', (col) =>
+      col.references('users.id').notNull().onDelete('cascade'),
+    )
+    .addColumn('token_hash', 'text', (col) => col.notNull())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
+    .addColumn('used_at', 'timestamptz')
+    .execute();
+
+  await db.schema
+    .createIndex('password_reset_tokens_token_hash')
+    .on('password_reset_tokens')
+    .column('token_hash')
     .execute();
 }
 

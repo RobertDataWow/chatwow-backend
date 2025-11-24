@@ -1,9 +1,20 @@
+import cookie from '@fastify/cookie';
 import type { INestApplication } from '@nestjs/common';
 import { VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
 
-export function setupApp(app: INestApplication): void {
+import { AppConfig } from '@infra/config';
+
+export function setupApp(
+  app: INestApplication,
+  appConfig: AppConfig['app'],
+): void {
+  // Set cookie
+  app.getHttpAdapter().getInstance().register(cookie, {
+    secret: appConfig.cookieSecret,
+  });
+
   // Set versioning
   app.enableVersioning({
     type: VersioningType.URI,

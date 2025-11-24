@@ -5,6 +5,7 @@ import '../shared/common/common.dotenv';
 export type AppConfig = {
   app: {
     nodeEnv: string;
+    cookieSecret: string;
     apiPort: number;
     workerPort: number;
     memThreshold: number;
@@ -13,6 +14,7 @@ export type AppConfig = {
     enableJsonLog: boolean;
     enableCache: boolean;
     enableErrorDetails: boolean;
+    corsOrigin: string[];
   };
   database: {
     url: string;
@@ -51,6 +53,8 @@ export type AppConfig = {
 export const config = (): AppConfig => ({
   app: {
     nodeEnv: get('NODE_ENV').default('local').asString(),
+    corsOrigin: get('CORS_ORIGIN').required().asString().split(','),
+    cookieSecret: get('COOKIE_SECRET').required().asString(),
     apiPort: get('API_PORT').default(3000).asPortNumber(),
     workerPort: get('WORKER_PORT').default(3001).asPortNumber(),
     enableSwagger: get('ENABLE_SWAGGER').default('true').asBool(),

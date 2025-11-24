@@ -24,13 +24,16 @@ export class ReqStorageInterceptor implements NestInterceptor {
     const request = ctx.getRequest<FastifyRequest>();
     const uaData = UAParser(request.headers['user-agent']);
 
+    const traceId = request.headers['trace-id'] as string;
+    const deviceUid = request.headers['x-device'] as string;
     const coreCtx: ReqData = {
-      traceId: generateUID(),
+      traceId: traceId || generateUID(),
       requestTime: myDayjs().toISOString(),
       agent: uaData.ua,
       device: uaData.device,
+      deviceUid: deviceUid || null,
       os: uaData.os?.name || '',
-      ip: request.ip || '',
+      ip: (request.headers['x-forwarded-for'] as string) || request.ip || '',
       browser: uaData.browser?.name || '',
       lang: (request.headers[LANG_HEADER] as any) || null,
     };

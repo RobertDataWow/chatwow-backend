@@ -71,6 +71,15 @@ export interface LineSessions {
   updated_at: Generated<string>;
 }
 
+export interface PasswordResetTokens {
+  created_at: Generated<string>;
+  expire_at: string;
+  id: string;
+  token_hash: string;
+  used_at: string | null;
+  user_id: string;
+}
+
 export interface ProjectChats {
   chat_sender: ChatSender;
   created_at: Generated<string>;
@@ -104,6 +113,17 @@ export interface Projects {
   project_status: ProjectStatus;
   updated_at: Generated<string>;
   updated_by_id: string | null;
+}
+
+export interface Sessions {
+  created_at: Generated<string>;
+  device_uid: string;
+  expire_at: string;
+  id: string;
+  info: Json;
+  revoke_at: string | null;
+  token_hash: string;
+  user_id: string;
 }
 
 export interface StoredFiles {
@@ -179,9 +199,11 @@ export interface DB {
   line_accounts: LineAccounts;
   line_chat_logs: LineChatLogs;
   line_sessions: LineSessions;
+  password_reset_tokens: PasswordResetTokens;
   project_chats: ProjectChats;
   project_documents: ProjectDocuments;
   projects: Projects;
+  sessions: Sessions;
   stored_files: StoredFiles;
   user_group_projects: UserGroupProjects;
   user_group_users: UserGroupUsers;

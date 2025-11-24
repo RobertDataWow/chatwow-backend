@@ -21,11 +21,19 @@ async function bootstrap() {
     }),
     {
       logger: coreLogger(appConfig),
-      cors: { origin: ['http://localhost:8081'] },
+      cors: {
+        origin: appConfig.corsOrigin,
+        allowedHeaders: [
+          'x-device',
+          'content-type',
+          'authorization',
+          'trace-id',
+        ],
+      },
     },
   );
 
-  setupApp(app);
+  setupApp(app, appConfig);
 
   if (appConfig.enableSwagger) {
     setupSwagger(app);
