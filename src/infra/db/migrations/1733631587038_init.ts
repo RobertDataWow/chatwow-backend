@@ -410,7 +410,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
     .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
-    .addColumn('used_at', 'timestamptz')
+    .addColumn('revoke_at', 'timestamptz')
     .execute();
 
   await db.schema

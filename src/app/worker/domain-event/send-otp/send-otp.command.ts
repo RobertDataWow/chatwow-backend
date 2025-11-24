@@ -9,7 +9,7 @@ import { TransactionService } from '@infra/global/transaction/transaction.servic
 import type { CommandInterface } from '@shared/common/common.type';
 
 @Injectable()
-export class SendOtpCommand implements CommandInterface {
+export class SendOtpQueueCommand implements CommandInterface {
   constructor(
     private userOtpService: UserOtpService,
     private userService: UserService,

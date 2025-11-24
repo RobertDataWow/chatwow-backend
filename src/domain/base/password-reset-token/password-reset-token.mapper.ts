@@ -3,6 +3,7 @@ import {
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
+import { WithPgState } from '@shared/common/common.type';
 
 import { PasswordResetToken } from './password-reset-token.domain';
 import { PasswordResetTokenResponse } from './password-reset-token.response';
@@ -20,7 +21,7 @@ export class PasswordResetTokenMapper {
       tokenHash: pg.token_hash,
       createdAt: toDate(pg.created_at),
       expireAt: toDate(pg.expire_at),
-      usedAt: toDate(pg.used_at),
+      revokeAt: toDate(pg.revoke_at),
     };
 
     return new PasswordResetToken(plain);
@@ -37,10 +38,31 @@ export class PasswordResetTokenMapper {
       tokenHash: plainData.tokenHash,
       createdAt: plainData.createdAt,
       expireAt: plainData.expireAt,
-      usedAt: plainData.usedAt,
+      revokeAt: plainData.revokeAt,
     };
 
     return new PasswordResetToken(plain);
+  }
+
+  static fromJson(json: PasswordResetTokenJson): PasswordResetToken {
+    const plain: PasswordResetTokenPlain = {
+      id: json.id,
+      userId: json.userId,
+      tokenHash: json.tokenHash,
+      createdAt: toDate(json.createdAt),
+      expireAt: toDate(json.expireAt),
+      revokeAt: toDate(json.revokeAt),
+    };
+
+    return new PasswordResetToken(plain);
+  }
+  static fromJsonState(
+    jsonState: WithPgState<PasswordResetTokenJson, PasswordResetTokenPg>,
+  ) {
+    const domain = PasswordResetTokenMapper.fromJson(jsonState.data);
+    domain.setPgState(jsonState.state);
+
+    return domain;
   }
 
   static toPg(t: PasswordResetToken): PasswordResetTokenPg {
@@ -50,8 +72,8 @@ export class PasswordResetTokenMapper {
       token_hash: t.tokenHash,
       created_at: toISO(t.createdAt),
       expire_at: toISO(t.expireAt),
-      used_at: toISO(t.usedAt),
-    } as unknown as PasswordResetTokenPg;
+      revoke_at: toISO(t.revokeAt),
+    };
   }
 
   static toPlain(t: PasswordResetToken): PasswordResetTokenPlain {
@@ -61,7 +83,7 @@ export class PasswordResetTokenMapper {
       tokenHash: t.tokenHash,
       createdAt: t.createdAt,
       expireAt: t.expireAt,
-      usedAt: t.usedAt,
+      revokeAt: t.revokeAt,
     };
   }
 
@@ -72,17 +94,24 @@ export class PasswordResetTokenMapper {
       tokenHash: t.tokenHash,
       createdAt: toISO(t.createdAt),
       expireAt: toISO(t.expireAt),
-      usedAt: toISO(t.usedAt),
-    } as unknown as PasswordResetTokenJson;
+      revokeAt: toISO(t.revokeAt),
+    };
+  }
+  static toJsonState(
+    t: PasswordResetToken,
+  ): WithPgState<PasswordResetTokenJson, PasswordResetTokenPg> {
+    return {
+      state: t.pgState,
+      data: PasswordResetTokenMapper.toJson(t),
+    };
   }
 
   static toResponse(t: PasswordResetToken): PasswordResetTokenResponse {
     return {
       id: t.id,
-      userId: t.userId,
       createdAt: toResponseDate(t.createdAt),
       expireAt: toResponseDate(t.expireAt),
-      usedAt: toResponseDate(t.usedAt),
+      revokedAt: toResponseDate(t.revokeAt),
     };
   }
 }

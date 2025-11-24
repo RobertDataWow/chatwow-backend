@@ -16,5 +16,5 @@ export type PasswordResetTokenNewData = {
 };
 
 export type PasswordResetTokenUpdateData = {
-  usedAt?: Date | null;
+  revokeAt?: Date | null;
 };

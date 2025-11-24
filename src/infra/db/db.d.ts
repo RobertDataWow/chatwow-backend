@@ -75,8 +75,8 @@ export interface PasswordResetTokens {
   created_at: Generated<string>;
   expire_at: string;
   id: string;
+  revoke_at: string | null;
   token_hash: string;
-  used_at: string | null;
   user_id: string;
 }
 

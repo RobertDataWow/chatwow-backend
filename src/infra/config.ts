@@ -5,6 +5,7 @@ import '../shared/common/common.dotenv';
 export type AppConfig = {
   app: {
     nodeEnv: string;
+    frontendUrl: string;
     cookieSecret: string;
     apiPort: number;
     workerPort: number;
@@ -53,6 +54,7 @@ export type AppConfig = {
 export const config = (): AppConfig => ({
   app: {
     nodeEnv: get('NODE_ENV').default('local').asString(),
+    frontendUrl: get('FRONTEND_URL').required().asString(),
     corsOrigin: get('CORS_ORIGIN').required().asString().split(','),
     cookieSecret: get('COOKIE_SECRET').required().asString(),
     apiPort: get('API_PORT').default(3000).asPortNumber(),

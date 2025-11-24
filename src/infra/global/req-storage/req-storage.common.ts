@@ -3,6 +3,7 @@ import type { Lookup } from 'geoip-lite';
 import type { Locales } from '@infra/i18n/i18n-types';
 
 export type ReqData = {
+  idempotencyKey: string | null;
   traceId: string;
   requestTime: string;
   agent: string;

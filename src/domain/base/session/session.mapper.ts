@@ -86,7 +86,7 @@ export class SessionMapper {
       expireAt: toISO(s.expireAt),
       revokeAt: toISO(s.revokeAt),
       info: s.info,
-    } as unknown as SessionJson;
+    };
   }
 
   static toResponse(s: Session): SessionResponse {

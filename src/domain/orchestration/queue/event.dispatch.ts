@@ -2,6 +2,7 @@ import { User } from '@domain/base/user/user.domain';
 import { Injectable } from '@nestjs/common';
 
 import { DomainEventQueue } from './domain-event/domain-event.queue';
+import { ForgotPasswordDispatchEvent } from './types/event.dispatch.type';
 
 @Injectable()
 export class EventDispatch {
@@ -13,5 +14,9 @@ export class EventDispatch {
 
   addUser(user: User) {
     this.sendOtp(user);
+  }
+
+  resetPassword(data: ForgotPasswordDispatchEvent) {
+    this.domainEventQueue.jobResetPassword(data);
   }
 }

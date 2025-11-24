@@ -26,7 +26,9 @@ export class ReqStorageInterceptor implements NestInterceptor {
 
     const traceId = request.headers['trace-id'] as string;
     const deviceUid = request.headers['x-device'] as string;
+    const idempotencyKey = request.headers['idempotency-key'] as string;
     const coreCtx: ReqData = {
+      idempotencyKey: idempotencyKey || null,
       traceId: traceId || generateUID(),
       requestTime: myDayjs().toISOString(),
       agent: uaData.ua,

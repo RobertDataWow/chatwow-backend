@@ -28,6 +28,7 @@ async function bootstrap() {
           'content-type',
           'authorization',
           'trace-id',
+          'idempotency-key',
         ],
       },
     },

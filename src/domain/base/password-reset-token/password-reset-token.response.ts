@@ -12,9 +12,6 @@ export class PasswordResetTokenResponse {
   @ApiProperty({ example: DATE_EXAMPLE })
   expireAt: string;
 
-  @ApiProperty({ example: UUID_EXAMPLE })
-  userId: string;
-
   @ApiProperty({ example: DATE_EXAMPLE, nullable: true })
-  usedAt: string | null;
+  revokedAt: string | null;
 }

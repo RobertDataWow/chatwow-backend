@@ -32,6 +32,10 @@ export class PasswordResetTokenService {
     return this.repo.delete(id);
   }
 
+  async revokeAllOtherToken(passwordResetToken: PasswordResetToken) {
+    return this.repo.revokeAllOtherToken(passwordResetToken);
+  }
+
   private _validate(_token: PasswordResetToken) {
     // validation rules
   }

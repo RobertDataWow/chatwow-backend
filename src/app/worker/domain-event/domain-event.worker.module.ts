@@ -4,11 +4,13 @@ import { createBullmqHandler } from '@shared/common/common.worker';
 
 import { QUEUE } from '../worker.queue';
 import { DomainEventBullmq } from './domain-event.bullmq';
-import { SendOtpCommand } from './send-otp/send-otp.command';
+import { ForgotPasswordQueueCommand } from './forgot-password/forgot-password.command';
+import { SendOtpQueueCommand } from './send-otp/send-otp.command';
 
 @Module({
   providers: [
-    SendOtpCommand,
+    SendOtpQueueCommand,
+    ForgotPasswordQueueCommand,
 
     //
     createBullmqHandler(QUEUE.DOMAIN_EVENT, DomainEventBullmq),

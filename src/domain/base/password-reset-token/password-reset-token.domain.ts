@@ -18,7 +18,7 @@ export class PasswordResetToken extends DomainEntity<PasswordResetTokenPg> {
   readonly tokenHash: string;
   readonly createdAt: Date;
   readonly expireAt: Date;
-  readonly usedAt: Date | null;
+  readonly revokeAt: Date | null;
 
   constructor(plain: PasswordResetTokenPlain) {
     super();
@@ -36,7 +36,7 @@ export class PasswordResetToken extends DomainEntity<PasswordResetTokenPg> {
         : myDayjs()
             .add(PASSWORD_RESET_DEFAULT_EXPIRY_SECONDS, 'seconds')
             .toDate(),
-      usedAt: null,
+      revokeAt: null,
     });
   }
 
@@ -51,7 +51,7 @@ export class PasswordResetToken extends DomainEntity<PasswordResetTokenPg> {
       tokenHash: this.tokenHash,
       createdAt: this.createdAt,
       expireAt: this.expireAt,
-      usedAt: isDefined(data.usedAt) ? data.usedAt : this.usedAt,
+      revokeAt: isDefined(data.revokeAt) ? data.revokeAt : this.revokeAt,
     };
 
     Object.assign(this, plain);

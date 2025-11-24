@@ -218,6 +218,10 @@ Table "sessions" {
   "expire_at" timestamptz [not null]
   "revoke_at" timestamptz
   "info" jsonb [not null]
+
+  Indexes {
+    token_hash [type: btree, name: "sessions_token_hash"]
+  }
 }
 
 Table "password_reset_tokens" {
@@ -226,7 +230,7 @@ Table "password_reset_tokens" {
   "token_hash" text [not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "expire_at" timestamptz [not null]
-  "used_at" timestamptz
+  "revoke_at" timestamptz
 
   Indexes {
     token_hash [type: btree, name: "password_reset_tokens_token_hash"]

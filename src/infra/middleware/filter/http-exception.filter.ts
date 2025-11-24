@@ -5,6 +5,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ThrottlerException } from '@nestjs/throttler';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import { AppConfig } from '@infra/config';
@@ -50,6 +51,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         // Not exposing prod files
         delete context['stack'];
       }
+    }
+
+    if (exception instanceof ThrottlerException) {
+      key = 'rateLimit';
     }
 
     const resp: IStandardErrorResonse = {

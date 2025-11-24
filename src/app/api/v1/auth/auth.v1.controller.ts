@@ -1,5 +1,6 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import { UsePublic } from '@infra/middleware/jwt/jwt.common';
@@ -8,10 +9,26 @@ import {
   getRefreshCookie,
   setRefreshCookie,
 } from '@shared/common/common.cookie';
+import myDayjs from '@shared/common/common.dayjs';
 import { ApiException } from '@shared/http/http.exception';
 
+import { CheckResetPasswordQuery } from './check-reset-password/check-reset-password.command';
+import {
+  CheckResetPasswordDto,
+  CheckResetPasswordResponse,
+} from './check-reset-password/check-reset-password.dto';
+import { ForgotPasswordCommand } from './forgot-password/forgot-password.command';
+import {
+  ForgotPasswordDto,
+  ForgotPasswordResponse,
+} from './forgot-password/forgot-password.dto';
 import { RefreshCommand } from './refresh/refresh.command';
 import { RefreshResponse } from './refresh/refresh.dto';
+import { ResetPasswordCommand } from './reset-password/reset-password.command';
+import {
+  ResetPasswordDto,
+  ResetPasswordResponse,
+} from './reset-password/reset-password.dto';
 import { SignInCommand } from './sign-in/sign-in.command';
 import { SignInDto, SignInResponse } from './sign-in/sign-in.dto';
 
@@ -20,11 +37,14 @@ export class AuthV1Controller {
   constructor(
     private signInCommand: SignInCommand,
     private refreshCommand: RefreshCommand,
+    private forgotPasswordCommand: ForgotPasswordCommand,
+    private resetPasswordCommand: ResetPasswordCommand,
+    private checkResetPasswordCommand: CheckResetPasswordQuery,
   ) {}
 
   @Post('sign-in')
   @UsePublic()
-  @ApiResponse({ type: SignInResponse })
+  @ApiResponse({ type: () => SignInResponse })
   async signIn(
     @Body() body: SignInDto,
     @Res({ passthrough: true }) res: FastifyReply,
@@ -37,7 +57,7 @@ export class AuthV1Controller {
 
   @Post('refresh')
   @UsePublic()
-  @ApiResponse({ type: RefreshResponse })
+  @ApiResponse({ type: () => RefreshResponse })
   async refresh(
     @Req() req: FastifyRequest,
     @Res({ passthrough: true }) res: FastifyReply,
@@ -51,5 +71,38 @@ export class AuthV1Controller {
     setRefreshCookie(res, plainToken);
 
     return response;
+  }
+
+  @Post('forgot-password')
+  @UsePublic()
+  @ApiResponse({ type: () => ForgotPasswordResponse })
+  async forgotPassword(
+    @Body() body: ForgotPasswordDto,
+  ): Promise<ForgotPasswordResponse> {
+    return this.forgotPasswordCommand.exec(body);
+  }
+
+  @Post('reset-password')
+  @UsePublic()
+  @ApiResponse({ type: () => ResetPasswordResponse })
+  async resetPassword(
+    @Body() body: ResetPasswordDto,
+  ): Promise<ResetPasswordResponse> {
+    return this.resetPasswordCommand.exec(body);
+  }
+
+  @Get('reset-password')
+  @UsePublic()
+  @Throttle({
+    default: {
+      limit: 5,
+      ttl: myDayjs.duration({ hours: 1 }).asMilliseconds(),
+    },
+  })
+  @ApiResponse({ type: () => CheckResetPasswordResponse })
+  async checkResetPassword(
+    @Query() query: CheckResetPasswordDto,
+  ): Promise<CheckResetPasswordResponse> {
+    return this.checkResetPasswordCommand.exec(query);
   }
 }

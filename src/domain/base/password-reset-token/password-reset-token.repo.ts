@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import myDayjs from '@shared/common/common.dayjs';
 import { diff } from '@shared/common/common.func';
 import { BaseRepo } from '@shared/common/common.repo';
 
@@ -42,6 +43,15 @@ export class PasswordResetTokenRepo extends BaseRepo {
     await this.db
       .deleteFrom('password_reset_tokens')
       .where('id', '=', id)
+      .execute();
+  }
+
+  async revokeAllOtherToken(passwordResetToken: PasswordResetToken) {
+    await this.db
+      .updateTable('password_reset_tokens')
+      .set('revoke_at', myDayjs().toISOString())
+      .where('user_id', '=', passwordResetToken.userId)
+      .where('id', '!=', passwordResetToken.id)
       .execute();
   }
 }
