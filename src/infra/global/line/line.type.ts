@@ -1,7 +1,7 @@
-type LineEvent = {
+export type LineWebhookEvent = {
   type: string;
   message: {
-    type: string;
+    type: 'text' | 'image' | 'sticker' | 'location' | 'audio' | 'file';
     id: string;
     quoteToken: string;
     markAsReadToken: string;
@@ -22,7 +22,7 @@ type LineEvent = {
 
 export type LineWebHookMessage = {
   destination: string;
-  events: LineEvent[];
+  events: LineWebhookEvent[];
 };
 
 export type ValidateSignatureOpts = {
