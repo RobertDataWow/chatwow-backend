@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { Html } from '@react-email/components';
-import type { UserOtp } from '@domain/base/user-otp/user-otp.domain';
-import { UserOtpFactory } from '@domain/base/user-otp/user-otp.factory';
+import type { UserVerification } from '@domain/base/user-verification/user-verification.domain';
+import { UserVerificationFactory } from '@domain/base/user-verification/user-verification.factory';
 
 type DefaultProps = {
-  userOtp: UserOtp;
+  userVerification: UserVerification;
 };
 
-export default function TemplateSendOtp({ userOtp }: DefaultProps) {
-  userOtp ??= UserOtpFactory.mock({})
+export default function TemplateSendVerificationCode({ userVerification }: DefaultProps) {
+  userVerification ??= UserVerificationFactory.mock({})
 
   return (
     <Html lang="en">
-      <h1>{userOtp.id}</h1>
+      <h1>{userVerification.id}</h1>
     </Html>
   );
 }

@@ -9,7 +9,7 @@ import type {
 
 import type { WithPgState } from '@shared/common/common.type';
 
-export type SendOtpJobData = WithPgState<UserJson, UserPg>;
+export type SendVerificationJobData = WithPgState<UserJson, UserPg>;
 export type SendForgotPasswordJobData = {
   user: WithPgState<UserJson, UserPg>;
   passwordResetToken: WithPgState<PasswordResetTokenJson, PasswordResetTokenPg>;

@@ -68,7 +68,7 @@ Table "users" {
   "line_account_id" text [unique]
 }
 
-Table "user_otps" {
+Table "user_verifications" {
   "id" text [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "user_id" uuid [not null]
@@ -285,7 +285,7 @@ Ref "user_manage_projects_project_id_fkey":"projects"."id" < "user_manage_projec
 
 Ref "user_manage_projects_user_id_fkey":"users"."id" < "user_manage_projects"."user_id" [delete: cascade]
 
-Ref "user_otps_user_id_fkey":"users"."id" < "user_otps"."user_id" [delete: cascade]
+Ref "user_verifications_user_id_fkey":"users"."id" < "user_verifications"."user_id" [delete: cascade]
 
 Ref "users_created_by_id_fkey":"users"."id" < "users"."created_by_id" [delete: set null]
 

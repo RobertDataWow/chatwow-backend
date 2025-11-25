@@ -13,7 +13,7 @@ export class ResendInviteCommand {
 
   async exec(userId: string): Promise<ResendInviteResponse> {
     const user = await this.find(userId);
-    this.eventDispatch.sendOtp(user);
+    this.eventDispatch.sendVerification(user);
 
     return {
       success: true,

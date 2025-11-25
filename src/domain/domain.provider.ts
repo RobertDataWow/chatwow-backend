@@ -12,7 +12,7 @@ import { UserGroupProjectModule } from './base/user-group-project/user-group-pro
 import { UserGroupUserModule } from './base/user-group-user/user-group-user.module';
 import { UserGroupModule } from './base/user-group/user-group.module';
 import { UserManageProjectModule } from './base/user-manage-project/user-manage-project.module';
-import { UserOtpModule } from './base/user-otp/user-otp.module';
+import { UserVerificationModule } from './base/user-verification/user-verification.module';
 import { UserModule } from './base/user/user.module';
 import { PgModule } from './orchestration/pg/pg.module';
 import { QueueModule } from './orchestration/queue/queue.module';
@@ -31,7 +31,7 @@ export const DOMAIN_PROVIDER = [
   UserGroupProjectModule,
   UserGroupUserModule,
   UserManageProjectModule,
-  UserOtpModule,
+  UserVerificationModule,
   ProjectChatModule,
   SessionModule,
   PasswordResetTokenModule,

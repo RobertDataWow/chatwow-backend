@@ -171,13 +171,6 @@ export interface UserManageProjects {
   user_id: string;
 }
 
-export interface UserOtps {
-  created_at: Generated<string>;
-  expire_at: string;
-  id: string;
-  user_id: string;
-}
-
 export interface Users {
   created_at: Generated<string>;
   created_by_id: string | null;
@@ -192,6 +185,13 @@ export interface Users {
   updated_at: Generated<string>;
   updated_by_id: string | null;
   user_status: UserStatus;
+}
+
+export interface UserVerifications {
+  created_at: Generated<string>;
+  expire_at: string;
+  id: string;
+  user_id: string;
 }
 
 export interface DB {
@@ -209,6 +209,6 @@ export interface DB {
   user_group_users: UserGroupUsers;
   user_groups: UserGroups;
   user_manage_projects: UserManageProjects;
-  user_otps: UserOtps;
+  user_verifications: UserVerifications;
   users: Users;
 }

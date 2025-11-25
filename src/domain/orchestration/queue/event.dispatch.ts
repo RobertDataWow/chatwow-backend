@@ -8,12 +8,12 @@ import { ForgotPasswordDispatchEvent } from './event.dispatch.type';
 export class EventDispatch {
   constructor(private domainEventQueue: DomainEventQueue) {}
 
-  sendOtp(user: User) {
-    this.domainEventQueue.jobSendOtp(user);
+  sendVerification(user: User) {
+    this.domainEventQueue.jobSendVerification(user);
   }
 
   addUser(user: User) {
-    this.sendOtp(user);
+    this.sendVerification(user);
   }
 
   resetPassword(data: ForgotPasswordDispatchEvent) {

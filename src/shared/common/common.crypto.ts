@@ -58,8 +58,8 @@ function decodeJwt<T>(token: string, salt: string): DecodedJwt<T>['data'] {
   }
 }
 
-export function generateOTP() {
-  const nanoGen = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 10);
+export function generateVerificationCode() {
+  const nanoGen = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
   return nanoGen();
 }
 

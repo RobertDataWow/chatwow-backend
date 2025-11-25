@@ -15,8 +15,11 @@ import { SendForgotPasswordJobData } from './domain-event.queue.type';
 export class DomainEventQueue extends BaseQueue {
   queueName = QUEUE.DOMAIN_EVENT;
 
-  jobSendOtp(user: User) {
-    this.addJob(DOMAIN_EVENT_JOBS.SEND_OTP, UserMapper.toJsonState(user));
+  jobSendVerification(user: User) {
+    this.addJob(
+      DOMAIN_EVENT_JOBS.SEND_VERIFICATION,
+      UserMapper.toJsonState(user),
+    );
   }
 
   jobResetPassword(data: ForgotPasswordDispatchEvent) {

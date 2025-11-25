@@ -84,10 +84,10 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   //
-  // USERS_OTP
+  // USERS_VERIFICATION
   //
   await db.schema
-    .createTable('user_otps')
+    .createTable('user_verifications')
     .addColumn('id', 'text', (col) => col.primaryKey())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -437,7 +437,7 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('projects').execute();
   await db.schema.dropTable('user_group_users').execute();
   await db.schema.dropTable('user_groups').execute();
-  await db.schema.dropTable('user_otps').execute();
+  await db.schema.dropTable('user_verifications').execute();
   await db.schema.dropTable('users').execute();
   await db.schema.dropTable('line_accounts').execute();
 
