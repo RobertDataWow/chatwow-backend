@@ -36,6 +36,7 @@ export class DomainEventBullmq extends BaseTaskHandler {
       passwordResetToken: PasswordResetTokenMapper.fromJsonState(
         data.passwordResetToken,
       ),
+      action: data.action,
       plainToken: data.plainToken,
     };
 

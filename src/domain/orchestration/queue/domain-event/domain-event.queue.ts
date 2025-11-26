@@ -28,6 +28,7 @@ export class DomainEventQueue extends BaseQueue {
         data.passwordResetToken,
       ),
       plainToken: data.plainToken,
+      action: data.action,
     };
 
     this.addJob(DOMAIN_EVENT_JOBS.FORGOT_PASSWORD, jobData);

@@ -11,14 +11,17 @@ import type { User } from '@domain/base/user/user.domain';
 
 import type { WithPgState } from '@shared/common/common.type';
 
+type Action = 'newUser' | 'resetPassword';
 export type ForgotPasswordJobData = {
   user: User;
   passwordResetToken: PasswordResetToken;
   plainToken: string;
+  action: Action;
 };
 
 export type ForgotPasswordJobInput = {
   user: WithPgState<UserJson, UserPg>;
   passwordResetToken: WithPgState<PasswordResetTokenJson, PasswordResetTokenPg>;
   plainToken: string;
+  action: Action;
 };

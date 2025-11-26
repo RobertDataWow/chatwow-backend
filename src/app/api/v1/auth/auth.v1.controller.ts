@@ -96,7 +96,7 @@ export class AuthV1Controller {
   @Throttle({
     default: {
       limit: 5,
-      ttl: myDayjs.duration({ hours: 1 }).asMilliseconds(),
+      ttl: myDayjs.duration({ minutes: 5 }).asMilliseconds(),
     },
   })
   @ApiResponse({ type: () => CheckResetPasswordResponse })

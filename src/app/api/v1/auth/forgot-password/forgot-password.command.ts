@@ -44,6 +44,16 @@ export class ForgotPasswordCommand implements CommandInterface {
       });
     }
 
+    if (user.userStatus === 'PENDING_REGISTRATION') {
+      // if new account set to active
+      user.edit({
+        actorId: user.id,
+        data: {
+          userStatus: 'ACTIVE',
+        },
+      });
+    }
+
     const token = shaHashstring();
     const passwordResetToken = PasswordResetToken.new({
       userId: user.id,
@@ -59,6 +69,7 @@ export class ForgotPasswordCommand implements CommandInterface {
       user,
       passwordResetToken,
       plainToken: token,
+      action: 'resetPassword',
     });
 
     // for security always success
@@ -83,6 +94,7 @@ export class ForgotPasswordCommand implements CommandInterface {
       .selectAll()
       .where('email', '=', body.user.email)
       .where('user_status', '=', 'ACTIVE')
+      .where('role', '!=', 'USER')
       .where(usersTableFilter)
       .executeTakeFirst();
 

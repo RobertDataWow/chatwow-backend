@@ -1,3 +1,5 @@
+import { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
+import { PasswordResetTokenService } from '@domain/base/password-reset-token/password-reset-token.service';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
@@ -12,6 +14,7 @@ import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
+import { shaHashstring } from '@shared/common/common.crypto';
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
 import { HttpResponseMapper } from '@shared/http/http.mapper';
@@ -21,6 +24,7 @@ import { AddUserDto, AddUserResponse } from './add-user.dto';
 type Entity = {
   user: User;
   userGroups: UserGroup[];
+  passwordResetToken?: PasswordResetToken;
 };
 
 @Injectable()
@@ -31,6 +35,7 @@ export class AddUserCommand implements CommandInterface {
     private transactionService: TransactionService,
     private userService: UserService,
     private userGroupUserService: UserGroupUserService,
+    private passwordResetTokenService: PasswordResetTokenService,
     private domainEventQueue: DomainEventQueue,
   ) {}
 
@@ -52,9 +57,32 @@ export class AddUserCommand implements CommandInterface {
       userGroups,
     };
 
+    const token = shaHashstring();
+    if (user.role !== 'USER') {
+      entity.passwordResetToken = PasswordResetToken.new({
+        userId: user.id,
+        token,
+      });
+    }
+
     await this.save(entity);
 
     this.domainEventQueue.jobSendVerification(user);
+
+    if (user.role !== 'USER') {
+      if (!entity.passwordResetToken) {
+        // shouldn't happen
+        throw new ApiException(500, 'internal');
+      }
+
+      // send reset email
+      this.domainEventQueue.jobResetPassword({
+        user: entity.user,
+        plainToken: token,
+        passwordResetToken: entity.passwordResetToken,
+        action: 'newUser',
+      });
+    }
 
     return HttpResponseMapper.toSuccess({
       data: {
@@ -70,10 +98,7 @@ export class AddUserCommand implements CommandInterface {
     });
   }
 
-  async save(entity: Entity): Promise<void> {
-    const user = entity.user;
-    const userGroups = entity.userGroups;
-
+  async save({ user, userGroups, passwordResetToken }: Entity): Promise<void> {
     await this.transactionService.transaction(async () => {
       await this.userService.save(user);
 
@@ -82,6 +107,10 @@ export class AddUserCommand implements CommandInterface {
           user.id,
           userGroups.map((g) => g.id),
         );
+      }
+
+      if (passwordResetToken) {
+        await this.passwordResetTokenService.save(passwordResetToken);
       }
     });
   }

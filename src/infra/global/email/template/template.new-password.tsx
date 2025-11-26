@@ -8,7 +8,7 @@ type DefaultProps = {
   url: string;
 };
 
-export default function TemplateForgotPassword({ user, url }: DefaultProps) {
+export default function TemplateNewPassword({ user, url }: DefaultProps) {
   user ??= UserFactory.mock({});
   url ??= 'http://localhost:8001';
 
