@@ -1,11 +1,9 @@
 import { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
-import { PasswordResetTokenMapper } from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { PasswordResetTokenService } from '@domain/base/password-reset-token/password-reset-token.service';
 import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
-import { getAccessToken } from '@domain/orchestration/auth/auth.util';
 import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -14,7 +12,6 @@ import { TransactionService } from '@infra/global/transaction/transaction.servic
 
 import { shaHashstring } from '@shared/common/common.crypto';
 import { CommandInterface } from '@shared/common/common.type';
-import { ApiException } from '@shared/http/http.exception';
 import { HttpResponseMapper } from '@shared/http/http.mapper';
 
 import {
@@ -41,6 +38,11 @@ export class ForgotPasswordCommand implements CommandInterface {
 
   async exec(body: ForgotPasswordDto): Promise<ForgotPasswordResponse> {
     const user = await this.find(body);
+    if (!user) {
+      return HttpResponseMapper.toSuccess({
+        data: {},
+      });
+    }
 
     const token = shaHashstring();
     const passwordResetToken = PasswordResetToken.new({
@@ -59,19 +61,9 @@ export class ForgotPasswordCommand implements CommandInterface {
       plainToken: token,
     });
 
+    // for security always success
     return HttpResponseMapper.toSuccess({
-      data: {
-        user: {
-          attributes: UserMapper.toResponse(user),
-          relations: {
-            passwordResetToken: {
-              attributes:
-                PasswordResetTokenMapper.toResponse(passwordResetToken),
-            },
-          },
-        },
-        token: getAccessToken(user),
-      },
+      data: {},
     });
   }
 
@@ -85,7 +77,7 @@ export class ForgotPasswordCommand implements CommandInterface {
     });
   }
 
-  async find(body: ForgotPasswordDto): Promise<User> {
+  async find(body: ForgotPasswordDto): Promise<User | null> {
     const user = await this.readDb
       .selectFrom('users')
       .selectAll()
@@ -95,7 +87,7 @@ export class ForgotPasswordCommand implements CommandInterface {
       .executeTakeFirst();
 
     if (!user) {
-      throw new ApiException(403, 'invalidEmail');
+      return null;
     }
 
     return UserMapper.fromPgWithState(user);
