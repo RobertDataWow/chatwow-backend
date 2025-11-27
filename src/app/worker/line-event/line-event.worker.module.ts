@@ -8,13 +8,13 @@ import { LineProcessAiChatCommand } from './line-process-ai-chat/line-process-ai
 import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
 import { LineProcessSelectionMenuCommand } from './line-process-selection-menu/line-process-selection-menu.command';
 import { LineProcessVerificationCommand } from './line-process-verification/line-process-verification.command';
-import { LineSendMessageCommand } from './line-send-message/line-send-message.command';
+import { LineShowSelectionMenuCommand } from './line-show-selection-menu/line-show-selection-menu.command';
 
 @Module({
   providers: [
     LineProcessRawCommand,
-    LineSendMessageCommand,
     LineProcessSelectionMenuCommand,
+    LineShowSelectionMenuCommand,
     LineProcessVerificationCommand,
     LineProcessAiChatCommand,
 

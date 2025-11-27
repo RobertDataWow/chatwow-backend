@@ -12,6 +12,8 @@ export const projectFilterZod = z
     projectName: z.string().optional(),
     projectStatus: z.enum(PROJECT_STATUS).optional(),
     search: z.string().optional(),
+    userId: z.string().optional(),
+    lineAccountId: z.string().optional(),
   })
   .optional();
 export const projectSortZod = getSortZod(['id', 'projectName', 'createdAt']);

@@ -52,7 +52,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     //
     .createType('line_session_status')
-    .asEnum(['ACTIVE', 'INACTIVE'])
+    .asEnum(['ACTIVE', 'PROJECT_SELECTION', 'INIT', 'INACTIVE'])
     .execute();
 
   //

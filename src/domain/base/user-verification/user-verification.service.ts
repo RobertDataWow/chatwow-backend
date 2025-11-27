@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { EmailService } from '@infra/global/email/email.service';
-import TemplateSendVerificationCode from '@infra/global/email/template/template.send-otp';
+import TemplateSendVerificationCode from '@infra/global/email/template/template.send-verification';
 
 import { renderHtml } from '@shared/common/common.func';
 

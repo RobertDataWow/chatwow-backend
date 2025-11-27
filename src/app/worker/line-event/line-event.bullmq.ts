@@ -15,6 +15,8 @@ import { LineProcessSelectionMenuCommand } from './line-process-selection-menu/l
 import { LineProcessSelectionMenuJobInput } from './line-process-selection-menu/line-process-selection-menu.type';
 import { LineProcessVerificationCommand } from './line-process-verification/line-process-verification.command';
 import { LineProcessVerificationJobInput } from './line-process-verification/line-process-verification.type';
+import { LineShowSelectionMenuCommand } from './line-show-selection-menu/line-show-selection-menu.command';
+import { LineShowSelectionMenuJobInput } from './line-show-selection-menu/line-show-selection-menu.type';
 
 @Injectable()
 export class LineEventBullmq extends BaseTaskHandler {
@@ -22,6 +24,7 @@ export class LineEventBullmq extends BaseTaskHandler {
     private lineProcessRawCommand: LineProcessRawCommand,
     private lineProcessVerificationCommand: LineProcessVerificationCommand,
     private lineProcessSelectionMenuCommand: LineProcessSelectionMenuCommand,
+    private lineShowSelectionMenuCommand: LineShowSelectionMenuCommand,
     private lineProcessAiChatCommand: LineProcessAiChatCommand,
   ) {
     super();
@@ -46,6 +49,17 @@ export class LineEventBullmq extends BaseTaskHandler {
   @QueueTask(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU)
   async processSelectionMenu(input: LineProcessSelectionMenuJobInput) {
     return this.lineProcessSelectionMenuCommand.exec({
+      lineBot: LineBotMapper.fromJsonWithState(input.lineBotJsonState),
+      lineSession: LineSessionMapper.fromJsonWithState(
+        input.lineSessionJsonState,
+      ),
+      data: input.data,
+    });
+  }
+
+  @QueueTask(LINE_EVENT_JOBS.SHOW_SELECTION_MENU)
+  async showSelectionMenu(input: LineShowSelectionMenuJobInput) {
+    return this.lineShowSelectionMenuCommand.exec({
       lineBot: LineBotMapper.fromJsonWithState(input.lineBotJsonState),
       lineSession: LineSessionMapper.fromJsonWithState(
         input.lineSessionJsonState,

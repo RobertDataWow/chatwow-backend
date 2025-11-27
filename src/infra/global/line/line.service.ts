@@ -1,5 +1,8 @@
+import { Project } from '@domain/base/project/project.domain';
 import { messagingApi } from '@line/bot-sdk';
 import { createHmac } from 'crypto';
+
+import { LINE_NO_PROJECT_REPLY } from '@app/worker/line-event/line-event.constant';
 
 import { ApiException } from '@shared/http/http.exception';
 
@@ -50,6 +53,53 @@ export class LineService {
         },
       ],
       replyToken,
+    });
+  }
+
+  async replyProjectSelection(replyToken: string, projects: Project[]) {
+    if (!projects.length) {
+      await this.reply(replyToken, LINE_NO_PROJECT_REPLY);
+      return;
+    }
+
+    await this.lineApi.replyMessage({
+      replyToken,
+      messages: [
+        {
+          type: 'flex',
+          altText: 'Select a project',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'text',
+                  text: 'Select a project',
+                  weight: 'bold',
+                  size: 'lg',
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  margin: 'md',
+                  spacing: 'sm',
+                  contents: projects.map((p) => ({
+                    type: 'button',
+                    action: {
+                      type: 'message',
+                      label: p.projectName,
+                      text: p.id,
+                    },
+                    style: 'primary',
+                  })),
+                },
+              ],
+            },
+          },
+        },
+      ],
     });
   }
 }

@@ -41,7 +41,7 @@ export class LineSession extends DomainEntity<LineSessionPg> {
       projectId: isDefined(data.projectId) ? data.projectId : null,
       lineSessionStatus: isDefined(data.lineSessionStatus)
         ? data.lineSessionStatus
-        : 'ACTIVE',
+        : 'INIT',
     });
   }
 

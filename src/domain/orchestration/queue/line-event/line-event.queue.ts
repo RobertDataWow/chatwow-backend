@@ -15,7 +15,10 @@ import {
   LineProcessVerificationJobData,
   LineProcessVerificationJobInput,
 } from '@app/worker/line-event/line-process-verification/line-process-verification.type';
-import { LineSendMessageJobData } from '@app/worker/line-event/line-send-message/line-send-message.type';
+import {
+  LineShowSelectionMenuJobData,
+  LineShowSelectionMenuJobInput,
+} from '@app/worker/line-event/line-show-selection-menu/line-show-selection-menu.type';
 import { LINE_EVENT_JOBS } from '@app/worker/worker.job';
 import { QUEUE } from '@app/worker/worker.queue';
 
@@ -53,6 +56,18 @@ export class LineEventQueue extends BaseQueue {
     this.addJob(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU, input);
   }
 
+  jobShowSelectionMenu(domainData: LineShowSelectionMenuJobData) {
+    const input: LineShowSelectionMenuJobInput = {
+      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
+      lineSessionJsonState: LineSessionMapper.toJsonWithState(
+        domainData.lineSession,
+      ),
+      data: domainData.data,
+    };
+
+    this.addJob(LINE_EVENT_JOBS.SHOW_SELECTION_MENU, input);
+  }
+
   jobProcessAiChat(domainData: LineProcessAiChatJobData) {
     const input: LineProcessAiChatJobInput = {
       lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
@@ -63,9 +78,5 @@ export class LineEventQueue extends BaseQueue {
     };
 
     this.addJob(LINE_EVENT_JOBS.PROCESS_AI_CHAT, input);
-  }
-
-  jobSendMessage(data: LineSendMessageJobData) {
-    this.addJob(LINE_EVENT_JOBS.SEND_MESSAGE, data);
   }
 }

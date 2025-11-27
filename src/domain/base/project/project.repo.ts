@@ -106,6 +106,35 @@ export class ProjectRepo extends BaseRepo {
       .$if(isDefined(filter?.projectStatus), (q) =>
         q.where('projects.project_status', '=', filter!.projectStatus!),
       )
+      .$if(isDefined(filter?.userId), (q) =>
+        q
+          .leftJoin(
+            'user_group_projects',
+            'user_group_projects.project_id',
+            'projects.id',
+          )
+          .leftJoin(
+            'user_group_users',
+            'user_group_users.user_group_id',
+            'user_group_users.user_group_id',
+          )
+          .where('user_group_users.user_id', '=', filter!.userId!),
+      )
+      .$if(isDefined(filter?.lineAccountId), (q) =>
+        q
+          .leftJoin(
+            'user_group_projects',
+            'user_group_projects.project_id',
+            'projects.id',
+          )
+          .leftJoin(
+            'user_group_users',
+            'user_group_users.user_group_id',
+            'user_group_users.user_group_id',
+          )
+          .leftJoin('users', 'users.id', 'user_group_users.user_id')
+          .where('users.line_account_id', '=', filter!.lineAccountId!),
+      )
       .$if(isDefined(filter?.search), (q) => {
         const search = `%${filter!.search!}%`;
 

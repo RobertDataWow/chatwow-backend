@@ -5,7 +5,6 @@ import { LineBotService } from '@domain/base/line-bot/line-bot.service';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
 import { lineSessionsTableFilter } from '@domain/base/line-session/line-session.util';
-import { isVerificationCode } from '@domain/base/user-verification/user-verification.util';
 import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
 import { Inject, Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
@@ -78,11 +77,7 @@ export class LineProcessRawCommand {
         lineAccountId: event.source.userId,
       });
 
-    if (
-      isVerificationCode(message) ||
-      !entity.lineData ||
-      !lineSession.projectId
-    ) {
+    if (!entity.lineData || lineSession.lineSessionStatus === 'INIT') {
       return this.lineEventQueue.jobProcessVerification({
         lineSession,
         lineBot,
@@ -93,12 +88,25 @@ export class LineProcessRawCommand {
       });
     }
 
-    if (message === LINE_SELECTION_MENU_KEYWORD) {
+    if (lineSession.lineSessionStatus === 'PROJECT_SELECTION') {
       return this.lineEventQueue.jobProcessSelectionMenu({
         lineBot,
         lineSession,
         data: {
+          message,
           replyToken: event.replyToken,
+          lineAccountId: lineSession.lineAccountId,
+        },
+      });
+    }
+
+    if (message === LINE_SELECTION_MENU_KEYWORD || !lineSession.projectId) {
+      return this.lineEventQueue.jobShowSelectionMenu({
+        lineBot,
+        lineSession,
+        data: {
+          replyToken: event.replyToken,
+          lineAccountId: lineSession.lineAccountId,
         },
       });
     }
@@ -108,6 +116,7 @@ export class LineProcessRawCommand {
       lineSession,
       data: {
         message,
+        replyToken: event.replyToken,
       },
     });
   }
@@ -128,7 +137,7 @@ export class LineProcessRawCommand {
             .selectFrom('line_sessions')
             .selectAll()
             .where(lineSessionsTableFilter)
-            .where('line_sessions.line_session_status', '=', 'ACTIVE'),
+            .where('line_sessions.line_session_status', '!=', 'INACTIVE'),
         ).as('activeSession'),
       ])
       .where('id', '=', lineId)

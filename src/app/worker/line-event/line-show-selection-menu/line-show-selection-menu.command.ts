@@ -7,14 +7,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { LineService } from '@infra/global/line/line.service';
 
-import {
-  LINE_INVALID_PROJECT_SELECTION_REPLY,
-  LINE_SUCCESS_PROJECT_SELECTION_REPLY,
-} from '../line-event.constant';
-import { LineProcessSelectionMenuJobData } from './line-process-selection-menu.type';
+import { LineShowSelectionMenuJobData } from './line-show-selection-menu.type';
 
 @Injectable()
-export class LineProcessSelectionMenuCommand {
+export class LineShowSelectionMenuCommand {
   constructor(
     @Inject(READ_DB)
     private readDb: ReadDB,
@@ -23,32 +19,14 @@ export class LineProcessSelectionMenuCommand {
     private projectService: ProjectService,
   ) {}
 
-  async exec({ lineBot, lineSession, data }: LineProcessSelectionMenuJobData) {
+  async exec({ lineBot, lineSession, data }: LineShowSelectionMenuJobData) {
     const lineService = new LineService(lineBot);
     lineSession.edit({
       lineSessionStatus: 'PROJECT_SELECTION',
     });
 
     const projects = await this.getUserProjects(data.lineAccountId);
-
-    const selectedProject = projects.find((p) => p.id === data.message);
-    if (!selectedProject) {
-      await lineService.reply(
-        data.replyToken,
-        LINE_INVALID_PROJECT_SELECTION_REPLY,
-      );
-      return;
-    }
-
-    lineSession.edit({
-      projectId: selectedProject.id,
-    });
-    await this.save(lineSession);
-
-    await lineService.reply(
-      data.replyToken,
-      LINE_SUCCESS_PROJECT_SELECTION_REPLY(selectedProject.projectName),
-    );
+    await lineService.replyProjectSelection(data.replyToken, projects);
   }
 
   async save(lineSession: LineSession) {

@@ -21,6 +21,8 @@ Enum "document_status" {
 
 Enum "line_session_status" {
   "ACTIVE"
+  "PROJECT_SELECTION"
+  "INIT"
   "INACTIVE"
 }
 
