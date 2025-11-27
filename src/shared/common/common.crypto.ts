@@ -58,11 +58,6 @@ function decodeJwt<T>(token: string, salt: string): DecodedJwt<T>['data'] {
   }
 }
 
-export function generateVerificationCode() {
-  const nanoGen = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
-  return nanoGen();
-}
-
 export function hashString(data: string) {
   const hashed = bcrypt.hashSync(data, 10);
   return hashed;

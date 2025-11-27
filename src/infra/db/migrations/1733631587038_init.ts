@@ -1,5 +1,12 @@
 import { type Kysely, sql } from 'kysely';
 
+import { config } from '@infra/config';
+
+import { uuidV7 } from '@shared/common/common.crypto';
+import myDayjs from '@shared/common/common.dayjs';
+
+const lineConfig = config().line;
+
 export async function up(db: Kysely<any>): Promise<void> {
   //
   // ENUMS
@@ -40,6 +47,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     //
     .createType('action_type')
     .asEnum(['CREATE', 'UPDATE', 'DELETE'])
+    .execute();
+
+  await db.schema
+    //
+    .createType('line_session_status')
+    .asEnum(['ACTIVE', 'INACTIVE'])
     .execute();
 
   //
@@ -285,11 +298,41 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   //
+  // LINE BOT
+  //
+  await db.schema
+    .createTable('line_bots')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('updated_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('channel_access_token', 'text', (col) => col.notNull())
+    .addColumn('channel_secret', 'text', (col) => col.notNull())
+    .execute();
+
+  await db
+    .insertInto('line_bots')
+    .values({
+      id: uuidV7(),
+      created_at: myDayjs().toISOString(),
+      updated_at: myDayjs().toISOString(),
+      channel_access_token: lineConfig.defaultAccessToken,
+      channel_secret: lineConfig.defaultSecret,
+    })
+    .execute();
+
+  //
   // LINE SESSION
   //
   await db.schema
     .createTable('line_sessions')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('line_session_status', sql`line_session_status`, (col) =>
+      col.notNull().defaultTo('ACTIVE'),
+    )
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
@@ -302,13 +345,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('project_id', 'uuid', (col) =>
       col.references('projects.id').notNull().onDelete('cascade'),
     )
-    .execute();
-
-  // add active session
-  await db.schema
-    .alterTable('line_accounts')
-    .addColumn('active_line_session_id', 'uuid', (col) =>
-      col.references('line_sessions.id').onDelete('set null'),
+    .addColumn('line_bot_id', 'uuid', (col) =>
+      col.references('line_bots.id').notNull().onDelete('cascade'),
     )
     .execute();
 

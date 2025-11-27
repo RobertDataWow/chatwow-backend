@@ -34,9 +34,9 @@ export class LineService {
     }
   }
 
-  async showLoading(userId: string) {
+  async showLoading(lineId: string) {
     await this.lineApi.showLoadingAnimation({
-      chatId: userId,
+      chatId: lineId,
       loadingSeconds: 60,
     });
   }

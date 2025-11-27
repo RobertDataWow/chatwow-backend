@@ -1,4 +1,3 @@
-import { generateVerificationCode } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
@@ -10,6 +9,7 @@ import type {
   UserVerificationUpdateData,
 } from './types/user-verification.domain.type';
 import { UserVerificationMapper } from './user-verification.mapper';
+import { generateVerificationCode } from './user-verification.util';
 
 export class UserVerification extends DomainEntity<UserVerificationPg> {
   readonly id: string;

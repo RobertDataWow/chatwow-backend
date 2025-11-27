@@ -1,4 +1,4 @@
-import type { LineSessions } from '@infra/db/db';
+import type { LineSessionStatus, LineSessions } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
@@ -10,11 +10,14 @@ export type LineSessionPlain = Plain<LineSession>;
 export type LineSessionJson = Serialized<LineSessionPlain>;
 
 export type LineSessionNewData = {
-  lineAccountId: string;
   projectId: string;
+  lineAccountId: string;
+  lineBotId: string;
   latestChatLogId?: string | null;
+  lineSessionStatus?: LineSessionStatus;
 };
 
 export type LineSessionUpdateData = {
   latestChatLogId?: string | null;
+  lineSessionStatus?: LineSessionStatus;
 };

@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
+import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { LineService } from '@infra/global/line/line.service';
 import {
   LineWebHookMessage,
@@ -13,11 +15,18 @@ type MessageType = 'verification' | 'selectionMenu' | 'aiChat';
 
 @Injectable()
 export class LineProcessRawCommand {
+  constructor(
+    @Inject(READ_DB)
+    private readDb: ReadDB,
+  ) {}
+
   async exec(body: LineProcessRawJobData) {
     const lineService = new LineService(body.config);
 
     const event = body.data.events[0];
-    await lineService.showLoading(event.source.userId);
+    const lineId = event.source.userId;
+
+    await lineService.showLoading(lineId);
 
     const isMessageValid = this.checkValidMessage(event);
     if (!isMessageValid) {
@@ -37,6 +46,18 @@ export class LineProcessRawCommand {
   processVerification() {}
   processSelectionMenu() {}
   processAiChat() {}
+
+  async find(lineId: string) {
+    this.readDb
+      //
+      .selectFrom('line_accounts')
+      .selectAll()
+      .select((eb) => [
+        jsonObjectFrom(eb.selectFrom('line_sessions')).as('activeSession'),
+      ])
+      .where('id', '=', lineId)
+      .execute();
+  }
 
   checkValidMessage(event: LineWebhookEvent) {
     if (!event) {

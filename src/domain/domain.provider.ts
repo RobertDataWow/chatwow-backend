@@ -1,5 +1,6 @@
 import { AuditLogModule } from './base/audit-log/audit-log.module';
 import { LineAccountModule } from './base/line-account/line-account.module';
+import { LineBotModule } from './base/line-bot/line-bot.module';
 import { LineChatLogModule } from './base/line-chat-log/line-chat-log.module';
 import { LineSessionModule } from './base/line-session/line-chat-log.module';
 import { PasswordResetTokenModule } from './base/password-reset-token/password-reset-token.module';
@@ -35,6 +36,7 @@ export const DOMAIN_PROVIDER = [
   ProjectChatModule,
   SessionModule,
   PasswordResetTokenModule,
+  LineBotModule,
 
   QueueModule,
   PgModule,

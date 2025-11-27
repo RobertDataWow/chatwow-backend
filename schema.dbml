@@ -19,6 +19,11 @@ Enum "document_status" {
   "INACTIVE"
 }
 
+Enum "line_session_status" {
+  "ACTIVE"
+  "INACTIVE"
+}
+
 Enum "project_status" {
   "ACTIVE"
   "INACTIVE"
@@ -49,7 +54,6 @@ Table "kysely_migration_lock" {
 Table "line_accounts" {
   "id" text [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "active_line_session_id" uuid
 }
 
 Table "users" {
@@ -171,12 +175,22 @@ Table "stored_files" {
   }
 }
 
+Table "line_bots" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "channel_access_token" text [not null]
+  "channel_secret" text [not null]
+}
+
 Table "line_sessions" {
   "id" uuid [pk, not null]
+  "line_session_status" line_session_status [not null, default: 'ACTIVE']
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "line_account_id" text [not null]
   "project_id" uuid [not null]
+  "line_bot_id" uuid [not null]
   "latest_chat_log_id" uuid
 }
 
@@ -239,13 +253,13 @@ Table "password_reset_tokens" {
 
 Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"
 
-Ref "line_accounts_active_line_session_id_fkey":"line_sessions"."id" < "line_accounts"."active_line_session_id" [delete: set null]
-
 Ref "line_chat_logs_line_session_id_fkey":"line_sessions"."id" < "line_chat_logs"."line_session_id" [delete: cascade]
 
 Ref "line_sessions_latest_chat_log_id_fkey":"line_chat_logs"."id" < "line_sessions"."latest_chat_log_id" [delete: set null]
 
 Ref "line_sessions_line_account_id_fkey":"line_accounts"."id" < "line_sessions"."line_account_id" [delete: cascade]
+
+Ref "line_sessions_line_bot_id_fkey":"line_bots"."id" < "line_sessions"."line_bot_id" [delete: cascade]
 
 Ref "line_sessions_project_id_fkey":"projects"."id" < "line_sessions"."project_id" [delete: cascade]
 

@@ -1,8 +1,9 @@
-import { generateVerificationCode, uuidV7 } from '@shared/common/common.crypto';
+import { uuidV7 } from '@shared/common/common.crypto';
 import { isDefined } from '@shared/common/common.validator';
 
 import type { UserVerificationPlain } from './types/user-verification.domain.type';
 import { UserVerificationMapper } from './user-verification.mapper';
+import { generateVerificationCode } from './user-verification.util';
 
 export class UserVerificationFactory {
   static mock(data: Partial<UserVerificationPlain>) {

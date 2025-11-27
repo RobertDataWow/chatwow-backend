@@ -1,3 +1,5 @@
+import { LineSessionStatus } from '@infra/db/db';
+
 import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
@@ -17,6 +19,8 @@ export class LineSession extends DomainEntity<LineSessionPg> {
   readonly updatedAt: Date;
   readonly lineAccountId: string;
   readonly projectId: string;
+  readonly lineSessionStatus: LineSessionStatus;
+  readonly lineBotId: string;
   readonly latestChatLogId: string | null;
 
   constructor(plain: LineSessionPlain) {
@@ -29,11 +33,15 @@ export class LineSession extends DomainEntity<LineSessionPg> {
       id: uuidV7(),
       createdAt: myDayjs().toDate(),
       updatedAt: myDayjs().toDate(),
+      lineBotId: data.lineBotId,
       latestChatLogId: isDefined(data.latestChatLogId)
         ? data.latestChatLogId
         : null,
       lineAccountId: data.lineAccountId,
       projectId: data.projectId,
+      lineSessionStatus: isDefined(data.lineSessionStatus)
+        ? data.lineSessionStatus
+        : 'ACTIVE',
     });
   }
 
@@ -48,7 +56,11 @@ export class LineSession extends DomainEntity<LineSessionPg> {
       lineAccountId: this.lineAccountId,
       updatedAt: myDayjs().toDate(),
       projectId: this.projectId,
+      lineBotId: this.lineBotId,
 
+      lineSessionStatus: isDefined(data.lineSessionStatus)
+        ? data.lineSessionStatus
+        : this.lineSessionStatus,
       latestChatLogId: isDefined(data.latestChatLogId)
         ? data.latestChatLogId
         : this.latestChatLogId,
