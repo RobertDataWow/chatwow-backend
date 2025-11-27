@@ -1,4 +1,4 @@
-import { UserVerifications } from '@infra/db/db';
+import type { UserVerifications } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain } from '@shared/common/common.type';

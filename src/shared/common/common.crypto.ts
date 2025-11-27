@@ -1,5 +1,5 @@
 import { User } from '@domain/base/user/user.domain';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import {
   createCipheriv,
   createDecipheriv,

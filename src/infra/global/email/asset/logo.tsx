@@ -1,0 +1,26 @@
+import * as React from 'react';
+
+export function Logo({ width = 120, height = 40 }: { width?: number; height?: number }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 120 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="120" height="40" rx="8" fill="#4F46E5" />
+      <text
+        x="60"
+        y="25"
+        fontFamily="Arial, sans-serif"
+        fontSize="18"
+        fontWeight="bold"
+        fill="white"
+        textAnchor="middle"
+      >
+        ChatWow
+      </text>
+    </svg>
+  );
+}

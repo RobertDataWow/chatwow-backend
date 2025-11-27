@@ -1,5 +1,5 @@
+import type { UserGroupUsers } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
-import type { UserGroupUsers } from '@infra/db/db.d';
 
 import type { Plain } from '@shared/common/common.type';
 

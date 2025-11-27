@@ -1,7 +1,7 @@
 import type { ExecutionContext } from '@nestjs/common';
 import { SetMetadata, createParamDecorator } from '@nestjs/common';
 
-import { UserRole } from '@infra/db/db';
+import type { UserRole } from '@infra/db/db';
 
 export const USER_CONTEXT = 'user';
 

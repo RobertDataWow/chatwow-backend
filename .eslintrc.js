@@ -51,7 +51,7 @@ module.exports = {
   overrides: [
     {
       // Prettier plugin clash with react email
-      files: ['src/infra/global/email/template/**/*.tsx'],
+      files: ['src/infra/global/email/**/*.tsx'],
       rules: {
         'prettier/prettier': 'off',
       },

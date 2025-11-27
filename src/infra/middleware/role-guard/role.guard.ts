@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 
-import { UserRole } from '@infra/db/db';
+import type { UserRole } from '@infra/db/db';
 
 import { ApiException } from '@shared/http/http.exception';
 

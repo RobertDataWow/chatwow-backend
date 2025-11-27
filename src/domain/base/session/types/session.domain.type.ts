@@ -1,4 +1,4 @@
-import { Sessions } from '@infra/db/db';
+import type { Sessions } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 import { ReqInfo } from '@infra/global/req-storage/req-storage.common';
 

@@ -29,7 +29,7 @@ function cli() {
 }
 
 function db:type() {
-  kysely-codegen --out-file ./src/infra/db/db.d.ts
+  kysely-codegen --out-file ./src/infra/db/db.ts
 }
 
 function db:make() {

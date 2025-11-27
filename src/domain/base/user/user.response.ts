@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import type { UserRole, UserStatus } from '@infra/db/db.d';
+import type { UserRole, UserStatus } from '@infra/db/db';
 
 import { DATE_EXAMPLE, UUID_EXAMPLE } from '@shared/common/common.constant';
 

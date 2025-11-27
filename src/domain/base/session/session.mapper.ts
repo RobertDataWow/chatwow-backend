@@ -1,4 +1,4 @@
-import { JsonValue } from '@infra/db/db';
+import type { JsonValue } from '@infra/db/db';
 import { ReqInfo } from '@infra/global/req-storage/req-storage.common';
 
 import {

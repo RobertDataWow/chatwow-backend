@@ -1,5 +1,5 @@
+import type { UserGroupProjects } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
-import type { UserGroupProjects } from '@infra/db/db.d';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 

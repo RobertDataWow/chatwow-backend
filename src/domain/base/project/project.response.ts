@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { ProjectStatus } from '@infra/db/db';
+import type { ProjectStatus } from '@infra/db/db';
 
 import { DATE_EXAMPLE, UUID_EXAMPLE } from '@shared/common/common.constant';
 
