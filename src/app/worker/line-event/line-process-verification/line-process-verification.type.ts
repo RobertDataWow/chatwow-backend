@@ -1,3 +1,9 @@
-import { LineBaseJobData } from '../line-event.type';
+import { LineMessageMetaData, LineMessageMetaInput } from '../line-event.type';
 
-export type LineProcessVerificationJobData = LineBaseJobData<any>;
+type Data = {
+  replyToken: string;
+  verificationCode: string;
+};
+
+export type LineProcessVerificationJobData = LineMessageMetaData<Data>;
+export type LineProcessVerificationJobInput = LineMessageMetaInput<Data>;

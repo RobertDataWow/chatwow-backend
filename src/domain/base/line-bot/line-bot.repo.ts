@@ -5,6 +5,7 @@ import { BaseRepo } from '@shared/common/common.repo';
 
 import { LineBot } from './line-bot.domain';
 import { LineBotMapper } from './line-bot.mapper';
+import { lineBotsTableFilter } from './line-bot.util';
 
 @Injectable()
 export class LineBotRepo extends BaseRepo {
@@ -30,6 +31,7 @@ export class LineBotRepo extends BaseRepo {
       .selectFrom('line_bots')
       .selectAll()
       .where('id', '=', id)
+      .where(lineBotsTableFilter)
       .limit(1)
       .executeTakeFirst();
 

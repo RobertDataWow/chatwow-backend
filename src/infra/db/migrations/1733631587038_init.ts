@@ -2,7 +2,7 @@ import { type Kysely, sql } from 'kysely';
 
 import { config } from '@infra/config';
 
-import { uuidV7 } from '@shared/common/common.crypto';
+import { DEFAULT_LINEBOT_ID } from '@shared/common/common.constant';
 import myDayjs from '@shared/common/common.dayjs';
 
 const lineConfig = config().line;
@@ -316,7 +316,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db
     .insertInto('line_bots')
     .values({
-      id: uuidV7(),
+      id: DEFAULT_LINEBOT_ID,
       created_at: myDayjs().toISOString(),
       updated_at: myDayjs().toISOString(),
       channel_access_token: lineConfig.defaultAccessToken,
@@ -343,7 +343,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.references('line_accounts.id').notNull().onDelete('cascade'),
     )
     .addColumn('project_id', 'uuid', (col) =>
-      col.references('projects.id').notNull().onDelete('cascade'),
+      col.references('projects.id').onDelete('set null'),
     )
     .addColumn('line_bot_id', 'uuid', (col) =>
       col.references('line_bots.id').notNull().onDelete('cascade'),

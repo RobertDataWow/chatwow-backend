@@ -16,7 +16,11 @@ export class HandleLineWebhookCommand {
     private lineEventQueue: LineEventQueue,
   ) {}
 
-  async exec(req: RawBodyRequest<FastifyRequest>, data: LineWebHookMessage) {
+  async exec(
+    req: RawBodyRequest<FastifyRequest>,
+    lineBotId: string,
+    data: LineWebHookMessage,
+  ) {
     const lineConfig = this.configService.getOrThrow<AppConfig['line']>('line');
 
     const channelAccessToken = lineConfig.defaultAccessToken;
@@ -28,6 +32,7 @@ export class HandleLineWebhookCommand {
     lineService.validateSignature(getLineInfoFromReq(req));
 
     this.lineEventQueue.jobProcessRaw({
+      lineBotId,
       config: {
         channelAccessToken,
         channelSecret,

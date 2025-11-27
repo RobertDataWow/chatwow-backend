@@ -78,7 +78,7 @@ export interface LineSessions {
   line_account_id: string;
   line_bot_id: string;
   line_session_status: Generated<LineSessionStatus>;
-  project_id: string;
+  project_id: string | null;
   updated_at: Generated<string>;
 }
 

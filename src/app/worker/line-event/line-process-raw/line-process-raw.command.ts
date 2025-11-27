@@ -1,28 +1,48 @@
+import { LineAccount } from '@domain/base/line-account/line-account.domain';
+import { LineAccountMapper } from '@domain/base/line-account/line-account.mapper';
+import { LineBot } from '@domain/base/line-bot/line-bot.domain';
+import { LineBotService } from '@domain/base/line-bot/line-bot.service';
+import { LineSession } from '@domain/base/line-session/line-session.domain';
+import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
+import { lineSessionsTableFilter } from '@domain/base/line-session/line-session.util';
+import { isVerificationCode } from '@domain/base/user-verification/user-verification.util';
+import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
 import { Inject, Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { LineService } from '@infra/global/line/line.service';
+import { LineWebhookEvent } from '@infra/global/line/line.type';
+
 import {
-  LineWebHookMessage,
-  LineWebhookEvent,
-} from '@infra/global/line/line.type';
+  LINE_INVALID_MESSAGE_REPLY,
+  LINE_SELECTION_MENU_KEYWORD,
+} from '../line-event.constant';
+import {
+  LineProcessRawJobData,
+  ProcessByMessageTypeOpts,
+} from './line-process-raw.type';
 
-import { LINE_INVALID_MESSAGE_REPLY } from '../line-event.constant';
-import { LineProcessRawJobData } from './line-process-raw.type';
-
-type MessageType = 'verification' | 'selectionMenu' | 'aiChat';
+type Entity = {
+  lineBot: LineBot;
+  lineData: {
+    lineAccount: LineAccount;
+    lineSession: LineSession | null;
+  } | null;
+};
 
 @Injectable()
 export class LineProcessRawCommand {
   constructor(
     @Inject(READ_DB)
     private readDb: ReadDB,
+
+    private lineEventQueue: LineEventQueue,
+    private lineBotService: LineBotService,
   ) {}
 
   async exec(body: LineProcessRawJobData) {
     const lineService = new LineService(body.config);
-
     const event = body.data.events[0];
     const lineId = event.source.userId;
 
@@ -34,29 +54,102 @@ export class LineProcessRawCommand {
       return;
     }
 
-    await lineService.reply(event.replyToken, 'สวัสดีครับ');
+    const entity = await this.find(body.lineBotId, lineId);
+    if (!entity) {
+      // shouldn't happen
+      await lineService.reply(event.replyToken, 'ไม่พบเจอบิทในระบบ');
+      return;
+    }
+
+    this.processByMessageType(entity, { event, config: body.config });
+
+    await lineService.reply(event.replyToken, LINE_INVALID_MESSAGE_REPLY);
   }
 
-  async getMessageType(data: LineWebHookMessage): Promise<MessageType> {
-    const _event = data.events[0];
+  processByMessageType(entity: Entity, opts: ProcessByMessageTypeOpts) {
+    const event = opts.event;
+    const message = event.message.text;
 
-    return 'verification';
+    const lineBot = entity.lineBot;
+    const lineSession =
+      entity.lineData?.lineSession ||
+      LineSession.new({
+        lineBotId: entity.lineBot.id,
+        lineAccountId: event.source.userId,
+      });
+
+    if (
+      isVerificationCode(message) ||
+      !entity.lineData ||
+      !lineSession.projectId
+    ) {
+      return this.lineEventQueue.jobProcessVerification({
+        lineSession,
+        lineBot,
+        data: {
+          replyToken: event.replyToken,
+          verificationCode: message,
+        },
+      });
+    }
+
+    if (message === LINE_SELECTION_MENU_KEYWORD) {
+      return this.lineEventQueue.jobProcessSelectionMenu({
+        lineBot,
+        lineSession,
+        data: {
+          replyToken: event.replyToken,
+        },
+      });
+    }
+
+    return this.lineEventQueue.jobProcessAiChat({
+      lineBot,
+      lineSession,
+      data: {
+        message,
+      },
+    });
   }
 
-  processVerification() {}
-  processSelectionMenu() {}
-  processAiChat() {}
+  async find(lineBotId: string, lineId: string): Promise<Entity | null> {
+    const lineBot = await this.lineBotService.findOne(lineBotId);
+    if (!lineBot) {
+      return null;
+    }
 
-  async find(lineId: string) {
-    this.readDb
+    const raw = await this.readDb
       //
       .selectFrom('line_accounts')
       .selectAll()
       .select((eb) => [
-        jsonObjectFrom(eb.selectFrom('line_sessions')).as('activeSession'),
+        jsonObjectFrom(
+          eb
+            .selectFrom('line_sessions')
+            .selectAll()
+            .where(lineSessionsTableFilter)
+            .where('line_sessions.line_session_status', '=', 'ACTIVE'),
+        ).as('activeSession'),
       ])
       .where('id', '=', lineId)
-      .execute();
+      .executeTakeFirst();
+
+    if (!raw) {
+      return {
+        lineBot,
+        lineData: null,
+      };
+    }
+
+    return {
+      lineBot,
+      lineData: {
+        lineAccount: LineAccountMapper.fromPgWithState(raw),
+        lineSession: raw.activeSession
+          ? LineSessionMapper.fromPgWithState(raw.activeSession)
+          : null,
+      },
+    };
   }
 
   checkValidMessage(event: LineWebhookEvent) {

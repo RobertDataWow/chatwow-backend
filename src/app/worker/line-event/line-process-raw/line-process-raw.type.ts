@@ -1,5 +1,16 @@
-import { LineWebHookMessage } from '@infra/global/line/line.type';
+import {
+  LineWebHookMessage,
+  LineWebhookEvent,
+} from '@infra/global/line/line.type';
 
-import { LineBaseJobData } from '../line-event.type';
+import { LineBaseJobConfig } from '../line-event.type';
 
-export type LineProcessRawJobData = LineBaseJobData<LineWebHookMessage>;
+export type LineProcessRawJobData = {
+  lineBotId: string;
+  config: LineBaseJobConfig;
+  data: LineWebHookMessage;
+};
+export type ProcessByMessageTypeOpts = {
+  config: LineBaseJobConfig;
+  event: LineWebhookEvent;
+};

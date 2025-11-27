@@ -2,7 +2,12 @@ import { toDate, toISO } from '@shared/common/common.transformer';
 
 import { LineBot } from './line-bot.domain';
 import type { LineBotResponse } from './line-bot.response';
-import type { LineBotPg, LineBotPlain } from './types/line-bot.domain.type';
+import type {
+  LineBotJson,
+  LineBotJsonState,
+  LineBotPg,
+  LineBotPlain,
+} from './types/line-bot.domain.type';
 
 export class LineBotMapper {
   static fromPg(pg: LineBotPg): LineBot {
@@ -30,6 +35,23 @@ export class LineBotMapper {
     });
   }
 
+  static fromJson(json: LineBotJson): LineBot {
+    const plain: LineBotPlain = {
+      id: json.id,
+      createdAt: toDate(json.createdAt),
+      updatedAt: toDate(json.updatedAt),
+      channelAccessToken: json.channelAccessToken,
+      channelSecret: json.channelSecret,
+    };
+
+    return new LineBot(plain);
+  }
+  static fromJsonWithState(data: LineBotJsonState): LineBot {
+    const lineBot = this.fromJson(data.data);
+    lineBot.setPgState(data.state);
+    return lineBot;
+  }
+
   static toPg(lineBot: LineBot): LineBotPg {
     return {
       id: lineBot.id,
@@ -55,6 +77,22 @@ export class LineBotMapper {
       id: lineBot.id,
       createdAt: toISO(lineBot.createdAt),
       updatedAt: toISO(lineBot.updatedAt),
+    };
+  }
+
+  static toJson(lineBot: LineBot): LineBotJson {
+    return {
+      id: lineBot.id,
+      createdAt: toISO(lineBot.createdAt),
+      updatedAt: toISO(lineBot.updatedAt),
+      channelAccessToken: lineBot.channelAccessToken,
+      channelSecret: lineBot.channelSecret,
+    };
+  }
+  static toJsonWithState(lineBot: LineBot): LineBotJsonState {
+    return {
+      data: this.toJson(lineBot),
+      state: lineBot.pgState,
     };
   }
 

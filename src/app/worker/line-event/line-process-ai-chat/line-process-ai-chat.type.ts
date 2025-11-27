@@ -1,3 +1,8 @@
-import { LineBaseJobData } from '../line-event.type';
+import { LineMessageMetaData, LineMessageMetaInput } from '../line-event.type';
 
-export type LineProcessAiChatJobData = LineBaseJobData<any>;
+type Data = {
+  message: string;
+};
+
+export type LineProcessAiChatJobData = LineMessageMetaData<Data>;
+export type LineProcessAiChatJobInput = LineMessageMetaInput<Data>;

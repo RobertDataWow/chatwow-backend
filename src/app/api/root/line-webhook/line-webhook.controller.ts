@@ -1,4 +1,12 @@
-import { Body, Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  RawBodyRequest,
+  Req,
+} from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 
@@ -16,14 +24,15 @@ export class LineWebhookController {
     private handleWebhookCommand: HandleLineWebhookCommand,
   ) {}
 
-  @Post()
+  @Post(':lineBotId')
   @UsePublic()
   @ApiResponse({ type: () => HandleLineWebHookResponse })
   async handleWebhook(
+    @Param('lineBotId', ParseUUIDPipe) lineBotId: string,
     @Req() req: RawBodyRequest<FastifyRequest>,
     @Body() body: LineWebHookMessage,
   ): Promise<HandleLineWebHookResponse> {
-    await this.handleWebhookCommand.exec(req, body);
+    await this.handleWebhookCommand.exec(req, lineBotId, body);
 
     return {
       success: true,

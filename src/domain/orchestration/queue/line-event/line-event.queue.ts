@@ -1,9 +1,20 @@
+import { LineBotMapper } from '@domain/base/line-bot/line-bot.mapper';
+import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
 import { Injectable } from '@nestjs/common';
 
-import { LineProcessAiChatJobData } from '@app/worker/line-event/line-process-ai-chat/line-process-ai-chat.type';
+import {
+  LineProcessAiChatJobData,
+  LineProcessAiChatJobInput,
+} from '@app/worker/line-event/line-process-ai-chat/line-process-ai-chat.type';
 import { LineProcessRawJobData } from '@app/worker/line-event/line-process-raw/line-process-raw.type';
-import { LineProcessSelectionMenuJobData } from '@app/worker/line-event/line-process-selection-menu/line-process-selection-menu.type';
-import { LineProcessVerificationJobData } from '@app/worker/line-event/line-process-verification/line-process-verification.type';
+import {
+  LineProcessSelectionMenuJobData,
+  LineProcessSelectionMenuJobInput,
+} from '@app/worker/line-event/line-process-selection-menu/line-process-selection-menu.type';
+import {
+  LineProcessVerificationJobData,
+  LineProcessVerificationJobInput,
+} from '@app/worker/line-event/line-process-verification/line-process-verification.type';
 import { LineSendMessageJobData } from '@app/worker/line-event/line-send-message/line-send-message.type';
 import { LINE_EVENT_JOBS } from '@app/worker/worker.job';
 import { QUEUE } from '@app/worker/worker.queue';
@@ -18,16 +29,40 @@ export class LineEventQueue extends BaseQueue {
     this.addJob(LINE_EVENT_JOBS.PROCESS_RAW, data);
   }
 
-  jobProcessVerification(data: LineProcessVerificationJobData) {
-    this.addJob(LINE_EVENT_JOBS.PROCESS_VERIFICATION, data);
+  jobProcessVerification(domainData: LineProcessVerificationJobData) {
+    const input: LineProcessVerificationJobInput = {
+      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
+      lineSessionJsonState: LineSessionMapper.toJsonWithState(
+        domainData.lineSession,
+      ),
+      data: domainData.data,
+    };
+
+    this.addJob(LINE_EVENT_JOBS.PROCESS_VERIFICATION, input);
   }
 
-  jobProcessSelectionMenu(data: LineProcessSelectionMenuJobData) {
-    this.addJob(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU, data);
+  jobProcessSelectionMenu(domainData: LineProcessSelectionMenuJobData) {
+    const input: LineProcessSelectionMenuJobInput = {
+      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
+      lineSessionJsonState: LineSessionMapper.toJsonWithState(
+        domainData.lineSession,
+      ),
+      data: domainData.data,
+    };
+
+    this.addJob(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU, input);
   }
 
-  jobProcessAiChat(data: LineProcessAiChatJobData) {
-    this.addJob(LINE_EVENT_JOBS.PROCESS_AI_CHAT, data);
+  jobProcessAiChat(domainData: LineProcessAiChatJobData) {
+    const input: LineProcessAiChatJobInput = {
+      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
+      lineSessionJsonState: LineSessionMapper.toJsonWithState(
+        domainData.lineSession,
+      ),
+      data: domainData.data,
+    };
+
+    this.addJob(LINE_EVENT_JOBS.PROCESS_AI_CHAT, input);
   }
 
   jobSendMessage(data: LineSendMessageJobData) {

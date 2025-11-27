@@ -1,9 +1,9 @@
 import { toDate, toISO } from '@shared/common/common.transformer';
-import { WithPgState } from '@shared/common/common.type';
 
 import { LineSession } from './line-session.domain';
 import type {
   LineSessionJson,
+  LineSessionJsonState,
   LineSessionPg,
   LineSessionPlain,
 } from './types/line-session.domain.type';
@@ -56,9 +56,7 @@ export class LineSessionMapper {
     return new LineSession(plain);
   }
 
-  static fromJsonWithState(
-    data: WithPgState<LineSessionJson, LineSessionPg>,
-  ): LineSession {
+  static fromJsonWithState(data: LineSessionJsonState): LineSession {
     const lineSession = this.fromJson(data.data);
     lineSession.setPgState(data.state);
 
@@ -104,9 +102,7 @@ export class LineSessionMapper {
     };
   }
 
-  static toJsonWithState(
-    lineSession: LineSession,
-  ): WithPgState<LineSessionJson, LineSessionPg> {
+  static toJsonWithState(lineSession: LineSession): LineSessionJsonState {
     return {
       data: LineSessionMapper.toJson(lineSession),
       state: lineSession.pgState,

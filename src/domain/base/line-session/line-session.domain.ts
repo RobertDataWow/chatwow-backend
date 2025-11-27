@@ -18,7 +18,7 @@ export class LineSession extends DomainEntity<LineSessionPg> {
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly lineAccountId: string;
-  readonly projectId: string;
+  readonly projectId: string | null;
   readonly lineSessionStatus: LineSessionStatus;
   readonly lineBotId: string;
   readonly latestChatLogId: string | null;
@@ -38,7 +38,7 @@ export class LineSession extends DomainEntity<LineSessionPg> {
         ? data.latestChatLogId
         : null,
       lineAccountId: data.lineAccountId,
-      projectId: data.projectId,
+      projectId: isDefined(data.projectId) ? data.projectId : null,
       lineSessionStatus: isDefined(data.lineSessionStatus)
         ? data.lineSessionStatus
         : 'ACTIVE',
@@ -55,9 +55,9 @@ export class LineSession extends DomainEntity<LineSessionPg> {
       createdAt: this.createdAt,
       lineAccountId: this.lineAccountId,
       updatedAt: myDayjs().toDate(),
-      projectId: this.projectId,
       lineBotId: this.lineBotId,
 
+      projectId: isDefined(data.projectId) ? data.projectId : this.projectId,
       lineSessionStatus: isDefined(data.lineSessionStatus)
         ? data.lineSessionStatus
         : this.lineSessionStatus,

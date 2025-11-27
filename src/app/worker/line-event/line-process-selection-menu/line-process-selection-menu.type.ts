@@ -1,5 +1,7 @@
-import { LineBaseJobData } from '../line-event.type';
+import { LineMessageMetaData, LineMessageMetaInput } from '../line-event.type';
 
-// TODO give type
-
-export type LineProcessSelectionMenuJobData = LineBaseJobData<any>;
+type Data = {
+  replyToken: string;
+};
+export type LineProcessSelectionMenuJobData = LineMessageMetaData<Data>;
+export type LineProcessSelectionMenuJobInput = LineMessageMetaInput<Data>;
