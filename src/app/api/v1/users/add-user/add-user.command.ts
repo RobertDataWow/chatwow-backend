@@ -1,9 +1,13 @@
 import { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
 import { PasswordResetTokenService } from '@domain/base/password-reset-token/password-reset-token.service';
+import { Project } from '@domain/base/project/project.domain';
+import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { projectsTableFilter } from '@domain/base/project/project.util';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
+import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
 import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
@@ -24,6 +28,7 @@ import { AddUserDto, AddUserResponse } from './add-user.dto';
 type Entity = {
   user: User;
   userGroups: UserGroup[];
+  manageProjects: Project[];
   passwordResetToken?: PasswordResetToken;
 };
 
@@ -36,6 +41,7 @@ export class AddUserCommand implements CommandInterface {
     private userService: UserService,
     private userGroupUserService: UserGroupUserService,
     private passwordResetTokenService: PasswordResetTokenService,
+    private userManageProjectService: UserManageProjectService,
     private domainEventQueue: DomainEventQueue,
   ) {}
 
@@ -52,9 +58,11 @@ export class AddUserCommand implements CommandInterface {
     });
 
     const userGroups = await this.getUserGroups(body.userGroupIds);
+    const manageProjects = await this.getProjects(body.manageProjectIds);
     const entity: Entity = {
       user,
       userGroups,
+      manageProjects,
     };
 
     const token = shaHashstring();
@@ -98,7 +106,12 @@ export class AddUserCommand implements CommandInterface {
     });
   }
 
-  async save({ user, userGroups, passwordResetToken }: Entity): Promise<void> {
+  async save({
+    user,
+    userGroups,
+    passwordResetToken,
+    manageProjects,
+  }: Entity): Promise<void> {
     await this.transactionService.transaction(async () => {
       await this.userService.save(user);
 
@@ -106,6 +119,13 @@ export class AddUserCommand implements CommandInterface {
         await this.userGroupUserService.saveUserRelations(
           user.id,
           userGroups.map((g) => g.id),
+        );
+      }
+
+      if (manageProjects.length) {
+        await this.userManageProjectService.saveUserRelations(
+          user.id,
+          manageProjects.map((p) => p.id),
         );
       }
 
@@ -132,5 +152,24 @@ export class AddUserCommand implements CommandInterface {
     }
 
     return rawGroups.map((g) => UserGroupMapper.fromPgWithState(g));
+  }
+
+  async getProjects(ids?: string[]) {
+    if (!ids?.length) {
+      return [];
+    }
+
+    const rawProjects = await this.readDb
+      .selectFrom('projects')
+      .selectAll()
+      .where('id', 'in', ids)
+      .where(projectsTableFilter)
+      .execute();
+
+    if (rawProjects.length !== ids.length) {
+      throw new ApiException(400, 'invalidProjectId');
+    }
+
+    return rawProjects.map((p) => ProjectMapper.fromPgWithState(p));
   }
 }

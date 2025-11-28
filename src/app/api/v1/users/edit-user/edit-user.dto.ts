@@ -20,6 +20,7 @@ const zod = z.object({
     })
     .optional(),
   userGroupIds: z.array(z.string().uuid()).optional(),
+  manageProjectIds: z.array(z.string().uuid()).optional(),
 });
 
 export class EditUserDto extends zodDto(zod) {}

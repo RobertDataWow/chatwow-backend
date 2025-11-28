@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -15,6 +16,8 @@ import { UseRoleGuard } from '@infra/middleware/role-guard/role.guard';
 
 import { AddUserCommand } from './add-user/add-user.command';
 import { AddUserDto, AddUserResponse } from './add-user/add-user.dto';
+import { DeleteUserCommand } from './delete-user/delete-user.command';
+import { DeleteUserResponse } from './delete-user/delete-user.dto';
 import { EditUserCommand } from './edit-user/edit-user.command';
 import { EditUserDto, EditUserResponse } from './edit-user/edit-user.dto';
 import { GetUserDto, GetUserResponse } from './get-user/get-user.dto';
@@ -39,6 +42,7 @@ export class UsersV1Controller {
     private getUserQuery: GetUserQuery,
     private resendInviteCommand: ResendInviteCommand,
     private userSummaryQuery: UserSummaryQuery,
+    private deleteUserCommand: DeleteUserCommand,
   ) {}
 
   @Get()
@@ -95,6 +99,15 @@ export class UsersV1Controller {
     @Body() body: EditUserDto,
   ): Promise<EditUserResponse> {
     return this.editUserCommand.exec(claims, id, body);
+  }
+
+  @Delete(':id')
+  @UseRoleGuard(['ADMIN'])
+  @ApiResponse({ type: () => DeleteUserResponse })
+  async deleteUser(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<DeleteUserResponse> {
+    return this.deleteUserCommand.exec(id);
   }
 
   @Post(':id/resend-invite')

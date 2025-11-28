@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { AddUserCommand } from './add-user/add-user.command';
+import { DeleteUserCommand } from './delete-user/delete-user.command';
 import { EditUserCommand } from './edit-user/edit-user.command';
 import { GetUserQuery } from './get-user/get-user.query';
 import { ListUsersQuery } from './list-users/list-users.query';
@@ -17,6 +18,7 @@ import { UsersV1Controller } from './users.v1.controller';
     EditUserCommand,
     ResendInviteCommand,
     UserSummaryQuery,
+    DeleteUserCommand,
   ],
   controllers: [UsersV1Controller],
 })

@@ -18,6 +18,7 @@ const zod = z.object({
     role: z.enum(USER_ROLE),
   }),
   userGroupIds: z.array(z.string().uuid()).optional(),
+  manageProjectIds: z.array(z.string().uuid()).optional(),
 });
 
 export class AddUserDto extends zodDto(zod) {}

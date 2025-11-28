@@ -1,0 +1,46 @@
+import { User } from '@domain/base/user/user.domain';
+import { UserMapper } from '@domain/base/user/user.mapper';
+import { UserService } from '@domain/base/user/user.service';
+import { Inject, Injectable } from '@nestjs/common';
+
+import { READ_DB, ReadDB } from '@infra/db/db.common';
+
+import { ApiException } from '@shared/http/http.exception';
+import { HttpResponseMapper } from '@shared/http/http.mapper';
+
+import { DeleteUserResponse } from './delete-user.dto';
+
+@Injectable()
+export class DeleteUserCommand {
+  constructor(
+    @Inject(READ_DB)
+    private readDb: ReadDB,
+    private userService: UserService,
+  ) {}
+
+  async exec(id: string): Promise<DeleteUserResponse> {
+    const user = await this.find(id);
+    if (user.userStatus !== 'PENDING_REGISTRATION') {
+      throw new ApiException(400, 'activeUser');
+    }
+
+    await this.userService.delete(user.id);
+
+    return HttpResponseMapper.toSuccess({
+      data: {
+        user: {
+          attributes: UserMapper.toResponse(user),
+        },
+      },
+    });
+  }
+
+  async find(id: string): Promise<User> {
+    const user = await this.userService.findOne(id);
+    if (!user) {
+      throw new ApiException(404, 'userNotFound');
+    }
+
+    return user;
+  }
+}
