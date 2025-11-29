@@ -1,5 +1,5 @@
 import { LineChatLog } from './line-chat-log.domain';
-import type { LineChatLogNewData } from './types/line-chat-log.domain.type';
+import type { LineChatLogNewData } from './line-chat-log.type';
 
 export class LineChatLogFactory {
   static create(data: LineChatLogNewData): LineChatLog {

@@ -2,7 +2,7 @@ import { uuidV7 } from '@shared/common/common.crypto';
 import { isDefined } from '@shared/common/common.validator';
 
 import { ProjectMapper } from './project.mapper';
-import type { ProjectPlain } from './types/project.domain.type';
+import type { ProjectPlain } from './project.type';
 
 export class ProjectFactory {
   static mock(data: Partial<ProjectPlain>) {

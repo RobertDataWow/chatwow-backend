@@ -13,8 +13,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { LineService } from '@infra/global/line/line.service';
-import { TransactionService } from '@infra/global/transaction/transaction.service';
 
 import myDayjs from '@shared/common/common.dayjs';
 

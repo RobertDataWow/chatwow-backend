@@ -10,7 +10,7 @@ import type {
   ProjectChatNewData,
   ProjectChatPg,
   ProjectChatPlain,
-} from './types/project-chat.domain.type';
+} from './project-chat.type';
 
 export class ProjectChat extends DomainEntity<ProjectChatPg> {
   readonly id: string;

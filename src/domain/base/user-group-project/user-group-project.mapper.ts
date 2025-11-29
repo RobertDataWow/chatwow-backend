@@ -2,7 +2,7 @@ import type {
   UserGroupProjectJson,
   UserGroupProjectPg,
   UserGroupProjectPlain,
-} from './types/user-group-project.domain.type';
+} from './user-group-project.type';
 import { UserGroupProject } from './user-group-project.domain';
 
 export class UserGroupProjectMapper {

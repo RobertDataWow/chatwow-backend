@@ -6,7 +6,7 @@ import type {
   AuditLogJson,
   AuditLogPg,
   AuditLogPlain,
-} from './types/audit-log.domain.type';
+} from './audit-log.type';
 
 export class AuditLogMapper {
   static fromPg(pg: AuditLogPg): AuditLog {

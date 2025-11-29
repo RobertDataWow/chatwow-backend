@@ -2,10 +2,7 @@ import { toDate, toISO } from '@shared/common/common.transformer';
 
 import { LineAccount } from './line-account.domain';
 import type { LineAccountResponse } from './line-account.response';
-import type {
-  LineAccountPg,
-  LineAccountPlain,
-} from './types/line-account.domain.type';
+import type { LineAccountPg, LineAccountPlain } from './line-account.type';
 
 export class LineAccountMapper {
   static fromPg(pg: LineAccountPg): LineAccount {

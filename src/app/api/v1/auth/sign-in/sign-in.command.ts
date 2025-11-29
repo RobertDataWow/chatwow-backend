@@ -8,7 +8,7 @@ import { getAccessToken, signIn } from '@domain/orchestration/auth/auth.util';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
-import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';

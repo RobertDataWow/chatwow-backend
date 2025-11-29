@@ -1,16 +1,58 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserManageProjectRepo } from './user-manage-project.repo';
+import { MainDb } from '@infra/db/db.main';
+
+import myDayjs from '@shared/common/common.dayjs';
+
+import { UserManageProjectMapper } from './user-manage-project.mapper';
 
 @Injectable()
 export class UserManageProjectService {
-  constructor(private readonly repo: UserManageProjectRepo) {}
+  constructor(private readonly db: MainDb) {}
 
-  async saveUserRelations(userGroupId: string, projectIds: string[]) {
-    return this.repo.saveUserRelations(userGroupId, projectIds);
+  async saveUserRelations(userId: string, projectIds: string[]) {
+    await this.db.write
+      .deleteFrom('user_manage_projects')
+      .where('user_manage_projects.user_id', '=', userId)
+      .execute();
+
+    if (!projectIds.length) {
+      return;
+    }
+
+    const insertData = projectIds.map((projectId) =>
+      UserManageProjectMapper.toPg({
+        createdAt: myDayjs().toDate(),
+        userId,
+        projectId,
+      }),
+    );
+    await this.db.write
+      .insertInto('user_manage_projects')
+      .values(insertData)
+      .execute();
   }
 
-  async saveProjectRelations(projectId: string, userGroupIds: string[]) {
-    return this.repo.saveProjectRelations(projectId, userGroupIds);
+  async saveProjectRelations(projectId: string, userIds: string[]) {
+    await this.db.write
+      .deleteFrom('user_manage_projects')
+      .where('user_manage_projects.project_id', '=', projectId)
+      .execute();
+
+    if (!userIds.length) {
+      return;
+    }
+
+    const insertData = userIds.map((userId) =>
+      UserManageProjectMapper.toPg({
+        createdAt: myDayjs().toDate(),
+        userId,
+        projectId,
+      }),
+    );
+    await this.db.write
+      .insertInto('user_manage_projects')
+      .values(insertData)
+      .execute();
   }
 }

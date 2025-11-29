@@ -2,7 +2,7 @@ import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { isDefined } from '@shared/common/common.validator';
 
-import type { UserGroupPlain } from './types/user-group.domain.type';
+import type { UserGroupPlain } from './user-group.type';
 import { UserGroupMapper } from './user-group.mapper';
 
 export class UserGroupFactory {

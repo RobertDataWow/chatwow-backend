@@ -1,16 +1,56 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserGroupUserRepo } from './user-group-user.repo';
+import { MainDb } from '@infra/db/db.main';
+
+import { UserGroupUserMapper } from './user-group-user.mapper';
 
 @Injectable()
 export class UserGroupUserService {
-  constructor(private repo: UserGroupUserRepo) {}
+  constructor(private db: MainDb) {}
 
   async saveUserRelations(userId: string, userGroupIds: string[]) {
-    return this.repo.saveUserRelations(userId, userGroupIds);
+    await this.db.write
+      .deleteFrom('user_group_users')
+      .where('user_group_users.user_id', '=', userId)
+      .execute();
+
+    if (!userGroupIds.length) {
+      return;
+    }
+
+    const insertData = userGroupIds.map((userGroupId) =>
+      UserGroupUserMapper.toPg({
+        userGroupId,
+        userId,
+      }),
+    );
+    await this.db.write
+      //
+      .insertInto('user_group_users')
+      .values(insertData)
+      .execute();
   }
 
   async saveUserGroupRelations(userGroupId: string, userIds: string[]) {
-    return this.repo.saveUserGroupRelations(userGroupId, userIds);
+    await this.db.write
+      .deleteFrom('user_group_users')
+      .where('user_group_users.user_group_id', '=', userGroupId)
+      .execute();
+
+    if (!userIds.length) {
+      return;
+    }
+
+    const insertData = userIds.map((userId) =>
+      UserGroupUserMapper.toPg({
+        userGroupId,
+        userId,
+      }),
+    );
+    await this.db.write
+      //
+      .insertInto('user_group_users')
+      .values(insertData)
+      .execute();
   }
 }

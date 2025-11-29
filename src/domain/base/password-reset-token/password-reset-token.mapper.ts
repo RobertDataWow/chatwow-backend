@@ -11,7 +11,7 @@ import type {
   PasswordResetTokenJson,
   PasswordResetTokenPg,
   PasswordResetTokenPlain,
-} from './types/password-reset-token.domain.type';
+} from './password-reset-token.type';
 
 export class PasswordResetTokenMapper {
   static fromPg(pg: PasswordResetTokenPg): PasswordResetToken {

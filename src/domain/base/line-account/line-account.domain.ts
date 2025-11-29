@@ -6,7 +6,7 @@ import type {
   LineAccountNewData,
   LineAccountPg,
   LineAccountPlain,
-} from './types/line-account.domain.type';
+} from './line-account.type';
 
 export class LineAccount extends DomainEntity<LineAccountPg> {
   readonly id: string;

@@ -10,7 +10,7 @@ import type {
   StoredFilePg,
   StoredFilePlain,
   StoredFileUpdateData,
-} from './types/stored-file.domain.type';
+} from './stored-file.type';
 
 export class StoredFile extends DomainEntity<StoredFilePg> {
   readonly id: string;

@@ -2,7 +2,7 @@ import type {
   UserGroupUserJson,
   UserGroupUserPg,
   UserGroupUserPlain,
-} from './types/user-group-user.domain.type';
+} from './user-group-user.type';
 import { UserGroupUser } from './user-group-user.domain';
 import type { UserGroupUserResponse } from './user-group-user.response';
 

@@ -10,7 +10,7 @@ import type {
   PasswordResetTokenPg,
   PasswordResetTokenPlain,
   PasswordResetTokenUpdateData,
-} from './types/password-reset-token.domain.type';
+} from './password-reset-token.type';
 
 export class PasswordResetToken extends DomainEntity<PasswordResetTokenPg> {
   readonly id: string;

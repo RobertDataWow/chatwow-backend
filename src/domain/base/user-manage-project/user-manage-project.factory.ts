@@ -1,4 +1,4 @@
-import type { UserManageProjectNewData } from './types/user-manage-project.domain.type';
+import type { UserManageProjectNewData } from './user-manage-project.type';
 import { UserManageProject } from './user-manage-project.domain';
 
 export class UserManageProjectFactory {

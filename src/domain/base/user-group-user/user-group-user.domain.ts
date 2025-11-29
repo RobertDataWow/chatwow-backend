@@ -6,7 +6,7 @@ import type {
   UserGroupUserPg,
   UserGroupUserPlain,
   UserGroupUserUpdateData,
-} from './types/user-group-user.domain.type';
+} from './user-group-user.type';
 
 export class UserGroupUser extends DomainEntity<UserGroupUserPg> {
   readonly userId: string;

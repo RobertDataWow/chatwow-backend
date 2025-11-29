@@ -7,7 +7,7 @@ import type {
   ProjectJson,
   ProjectPg,
   ProjectPlain,
-} from './types/project.domain.type';
+} from './project.type';
 
 export class ProjectMapper {
   static fromPg(pg: ProjectPg): Project {

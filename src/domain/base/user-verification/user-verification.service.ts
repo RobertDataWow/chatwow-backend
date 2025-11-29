@@ -1,33 +1,45 @@
 import { Injectable } from '@nestjs/common';
 
+import { MainDb } from '@infra/db/db.main';
 import { EmailService } from '@infra/global/email/email.service';
 import TemplateSendVerificationCode from '@infra/global/email/template/template.send-verification';
 
-import { renderHtml } from '@shared/common/common.func';
+import myDayjs from '@shared/common/common.dayjs';
+import { diff, renderHtml } from '@shared/common/common.func';
 
 import type { User } from '../user/user.domain';
 import type { UserVerification } from './user-verification.domain';
 import { UserVerificationMapper } from './user-verification.mapper';
-import { UserVerificationRepo } from './user-verification.repo';
 
 @Injectable()
 export class UserVerificationService {
   constructor(
-    private repo: UserVerificationRepo,
+    private db: MainDb,
     private emailService: EmailService,
   ) {}
 
   async findOne(id: string) {
-    return this.repo.findOne(id);
+    const userVerificationPg = await this.db.read
+      .selectFrom('user_verifications')
+      .selectAll()
+      .where('id', '=', id)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!userVerificationPg) {
+      return null;
+    }
+
+    return UserVerificationMapper.fromPgWithState(userVerificationPg);
   }
 
   async save(userVerification: UserVerification) {
     this._validate(userVerification);
 
     if (!userVerification.isPersist) {
-      await this.repo.create(userVerification);
+      await this._create(userVerification);
     } else {
-      await this.repo.update(userVerification.id, userVerification);
+      await this._update(userVerification.id, userVerification);
     }
 
     userVerification.setPgState(UserVerificationMapper.toPg);
@@ -38,11 +50,20 @@ export class UserVerificationService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write
+      .deleteFrom('user_verifications')
+      .where('id', '=', id)
+      .execute();
   }
 
   async revokeAll(userId: string) {
-    return this.repo.revokeAll(userId);
+    await this.db.write
+      .updateTable('user_verifications')
+      .set({
+        revoke_at: myDayjs().toISOString(),
+      })
+      .where('user_id', '=', userId)
+      .execute();
   }
 
   async sendVerificationMail(user: User, userVerification: UserVerification) {
@@ -56,5 +77,28 @@ export class UserVerificationService {
 
   private _validate(_userVerification: UserVerification) {
     // validation rules can be added here
+  }
+
+  private async _create(userVerification: UserVerification) {
+    await this.db.write
+      .insertInto('user_verifications')
+      .values(UserVerificationMapper.toPg(userVerification))
+      .execute();
+  }
+
+  private async _update(id: string, userVerification: UserVerification) {
+    const data = diff(
+      userVerification.pgState,
+      UserVerificationMapper.toPg(userVerification),
+    );
+    if (!data) {
+      return;
+    }
+
+    await this.db.write
+      .updateTable('user_verifications')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
   }
 }

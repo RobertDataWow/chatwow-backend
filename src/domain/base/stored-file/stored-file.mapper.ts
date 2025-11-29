@@ -7,7 +7,7 @@ import type {
   StoredFileJson,
   StoredFilePg,
   StoredFilePlain,
-} from './types/stored-file.domain.type';
+} from './stored-file.type';
 
 export class StoredFileMapper {
   static fromPg(pg: StoredFilePg): StoredFile {

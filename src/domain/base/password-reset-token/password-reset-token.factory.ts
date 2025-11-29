@@ -2,7 +2,7 @@ import { isDefined } from '@shared/common/common.validator';
 
 import { PasswordResetToken } from './password-reset-token.domain';
 import { PasswordResetTokenMapper } from './password-reset-token.mapper';
-import type { PasswordResetTokenPlain } from './types/password-reset-token.domain.type';
+import type { PasswordResetTokenPlain } from './password-reset-token.type';
 
 export class PasswordResetTokenFactory {
   static mock(data: Partial<PasswordResetTokenPlain>): PasswordResetToken {

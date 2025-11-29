@@ -5,7 +5,7 @@ import myDayjs from '@shared/common/common.dayjs';
 import { isDefined } from '@shared/common/common.validator';
 
 import { ProjectDocumentMapper } from './project-document.mapper';
-import type { ProjectDocumentPlain } from './types/project-document.domain.type';
+import type { ProjectDocumentPlain } from './project-document.type';
 
 export class ProjectDocumentFactory {
   static mock(data: SetRequired<Partial<ProjectDocumentPlain>, 'projectId'>) {

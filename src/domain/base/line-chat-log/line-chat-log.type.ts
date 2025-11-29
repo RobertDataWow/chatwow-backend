@@ -3,7 +3,7 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { LineChatLog } from '../line-chat-log.domain';
+import { LineChatLog } from './line-chat-log.domain';
 
 export type LineChatLogPg = DBModel<LineChatLogs>;
 export type LineChatLogPlain = Plain<LineChatLog>;

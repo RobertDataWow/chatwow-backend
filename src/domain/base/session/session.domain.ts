@@ -12,7 +12,7 @@ import type {
   SessionPg,
   SessionPlain,
   SessionUpdateData,
-} from './types/session.domain.type';
+} from './session.type';
 
 export class Session extends DomainEntity<SessionPg> {
   readonly id: string;

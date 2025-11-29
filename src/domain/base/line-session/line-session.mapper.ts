@@ -6,7 +6,7 @@ import type {
   LineSessionJsonState,
   LineSessionPg,
   LineSessionPlain,
-} from './types/line-session.domain.type';
+} from './line-session.type';
 
 export class LineSessionMapper {
   static fromPg(pg: LineSessionPg): LineSession {

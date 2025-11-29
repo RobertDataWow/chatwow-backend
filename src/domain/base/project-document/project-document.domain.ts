@@ -11,7 +11,7 @@ import type {
   ProjectDocumentPg,
   ProjectDocumentPlain,
   ProjectDocumentUpdateData,
-} from './types/project-document.domain.type';
+} from './project-document.type';
 
 export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly id: string;

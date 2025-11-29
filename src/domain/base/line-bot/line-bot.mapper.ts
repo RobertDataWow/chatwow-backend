@@ -7,7 +7,7 @@ import type {
   LineBotJsonState,
   LineBotPg,
   LineBotPlain,
-} from './types/line-bot.domain.type';
+} from './line-bot.type';
 
 export class LineBotMapper {
   static fromPg(pg: LineBotPg): LineBot {

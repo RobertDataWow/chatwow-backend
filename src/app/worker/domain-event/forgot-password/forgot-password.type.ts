@@ -3,11 +3,8 @@ import type {
   PasswordResetTokenJson,
   PasswordResetTokenPg,
 } from '@domain/base/password-reset-token/types/password-reset-token.domain.type';
-import type {
-  UserJson,
-  UserPg,
-} from '@domain/base/user/types/user.domain.type';
 import type { User } from '@domain/base/user/user.domain';
+import type { UserJson, UserPg } from '@domain/base/user/user.type';
 
 import type { WithPgState } from '@shared/common/common.type';
 

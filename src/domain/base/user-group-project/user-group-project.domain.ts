@@ -6,7 +6,7 @@ import type {
   UserGroupProjectPg,
   UserGroupProjectPlain,
   UserGroupProjectUpdateData,
-} from './types/user-group-project.domain.type';
+} from './user-group-project.type';
 import { UserGroupProjectMapper } from './user-group-project.mapper';
 
 export class UserGroupProject extends DomainEntity<UserGroupProjectPg> {

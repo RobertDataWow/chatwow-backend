@@ -9,7 +9,7 @@ import type {
   AuditLogNewData,
   AuditLogPg,
   AuditLogPlain,
-} from './types/audit-log.domain.type';
+} from './audit-log.type';
 
 export class AuditLog extends DomainEntity<AuditLogPg> {
   readonly id: string;

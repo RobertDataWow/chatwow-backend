@@ -14,6 +14,7 @@ import type { InsertObject } from 'kysely/dist/cjs/parser/insert-values-parser';
 import type { UpdateObject } from 'kysely/dist/cjs/parser/update-set-parser';
 import * as path from 'path';
 import type { DatabaseError } from 'pg';
+import { Except } from 'type-fest';
 
 import type { DB } from './db';
 
@@ -29,7 +30,7 @@ type writeOperation =
   | 'replaceInto'
   | 'mergeInto';
 export type ReadDB = Omit<CoreDB, writeOperation | 'transaction'>;
-export type WriteDB = Pick<CoreDB, writeOperation>;
+export type WriteDB = Except<CoreDB, 'selectFrom' | 'selectNoFrom'>;
 
 export type TxDB = Transaction<DB>;
 export type DBInsertData<T extends keyof DB> = InsertObject<DB, T>;

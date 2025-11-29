@@ -8,7 +8,7 @@ import type {
   UserGroupPg,
   UserGroupPlain,
   UserGroupUpdateData,
-} from './types/user-group.domain.type';
+} from './user-group.type';
 import { UserGroupMapper } from './user-group.mapper';
 
 export class UserGroup extends DomainEntity<UserGroupPg> {

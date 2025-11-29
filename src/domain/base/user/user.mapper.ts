@@ -5,9 +5,9 @@ import {
 } from '@shared/common/common.transformer';
 import type { WithPgState } from '@shared/common/common.type';
 
-import type { UserJson, UserPg, UserPlain } from './types/user.domain.type';
 import { User } from './user.domain';
 import type { UserResponse } from './user.response';
+import type { UserJson, UserPg, UserPlain } from './user.type';
 
 export class UserMapper {
   static fromPg(pg: UserPg): User {

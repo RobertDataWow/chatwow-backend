@@ -3,7 +3,7 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { PasswordResetToken } from '../password-reset-token.domain';
+import type { PasswordResetToken } from './password-reset-token.domain';
 
 export type PasswordResetTokenPg = DBModel<PasswordResetTokens>;
 export type PasswordResetTokenPlain = Plain<PasswordResetToken>;

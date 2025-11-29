@@ -1,5 +1,5 @@
 import { Session } from './session.domain';
-import type { SessionNewData } from './types/session.domain.type';
+import type { SessionNewData } from './session.type';
 
 export class SessionFactory {
   static create(data: SessionNewData): Session {

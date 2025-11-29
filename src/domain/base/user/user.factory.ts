@@ -2,8 +2,8 @@ import { hashString, uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { isDefined } from '@shared/common/common.validator';
 
-import type { UserPlain } from './types/user.domain.type';
 import { UserMapper } from './user.mapper';
+import type { UserPlain } from './user.type';
 
 export class UserFactory {
   static mock(data: Partial<UserPlain>) {

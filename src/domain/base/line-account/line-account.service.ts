@@ -1,23 +1,39 @@
 import { Injectable } from '@nestjs/common';
 
+import { MainDb } from '@infra/db/db.main';
+
+import { diff } from '@shared/common/common.func';
+
 import { LineAccount } from './line-account.domain';
 import { LineAccountMapper } from './line-account.mapper';
-import { LineAccountRepo } from './line-account.repo';
+import { lineAccountsTableFilter } from './line-account.util';
 
 @Injectable()
 export class LineAccountService {
-  constructor(private repo: LineAccountRepo) {}
+  constructor(private db: MainDb) {}
 
   async findOne(id: string) {
-    return this.repo.findOne(id);
+    const lineAccountPg = await this.db.read
+      .selectFrom('line_accounts')
+      .selectAll()
+      .where('id', '=', id)
+      .where(lineAccountsTableFilter)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!lineAccountPg) {
+      return null;
+    }
+
+    return LineAccountMapper.fromPgWithState(lineAccountPg);
   }
 
   async save(lineAccount: LineAccount) {
     this._validate(lineAccount);
     if (!lineAccount.isPersist) {
-      await this.repo.create(lineAccount);
+      await this._create(lineAccount);
     } else {
-      await this.repo.update(lineAccount.id, lineAccount);
+      await this._update(lineAccount.id, lineAccount);
     }
 
     lineAccount.setPgState(LineAccountMapper.toPg);
@@ -28,10 +44,33 @@ export class LineAccountService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write
+      .deleteFrom('line_accounts')
+      .where('id', '=', id)
+      .execute();
   }
 
   private _validate(_lineAccount: LineAccount) {
     // validation rules can be added here
+  }
+
+  private async _create(lineAccount: LineAccount) {
+    await this.db.write
+      .insertInto('line_accounts')
+      .values(LineAccountMapper.toPg(lineAccount))
+      .execute();
+  }
+
+  private async _update(id: string, lineAccount: LineAccount) {
+    const data = diff(lineAccount.pgState, LineAccountMapper.toPg(lineAccount));
+    if (!data) {
+      return;
+    }
+
+    await this.db.write
+      .updateTable('line_accounts')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
   }
 }

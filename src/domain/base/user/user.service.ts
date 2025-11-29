@@ -1,33 +1,80 @@
 import { Injectable } from '@nestjs/common';
+import { Except } from 'type-fest';
+
+import { getErrorKey } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
+import { addPagination, queryCount, sortQb } from '@infra/db/db.util';
+
+import { diff, getUniqueIds } from '@shared/common/common.func';
+import { isDefined } from '@shared/common/common.validator';
+import { ApiException } from '@shared/http/http.exception';
 
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
-import { UserRepo } from './user.repo';
+import { usersTableFilter } from './user.util';
 import { UserCountQueryOptions, UserQueryOptions } from './user.zod';
 
 @Injectable()
 export class UserService {
-  constructor(private repo: UserRepo) {}
+  constructor(private db: MainDb) {}
 
-  async getIds(query?: UserQueryOptions) {
-    return this.repo.getIds(query);
+  async getIds(opts?: UserQueryOptions) {
+    opts ??= {};
+    const { sort, pagination } = opts;
+
+    const qb = await this._getFilterQb(opts)
+      .select('users.id')
+      .$if(!!sort?.length, (q) =>
+        sortQb(q, opts!.sort, {
+          id: 'users.id',
+          createdAt: 'users.created_at',
+          firstName: 'users.first_name',
+          lastName: 'users.last_name',
+          email: 'users.email',
+          lastSignedInAt: 'users.last_signed_in_at',
+        }),
+      )
+      .$call((q) => addPagination(q, pagination))
+      .execute();
+
+    return getUniqueIds(qb);
   }
 
-  async getCount(query?: UserCountQueryOptions) {
-    return this.repo.getCount(query);
+  async getCount(opts?: UserCountQueryOptions) {
+    const totalCount = await this
+      //
+      ._getFilterQb({
+        filter: opts?.filter,
+      })
+      .$call((q) => queryCount(q));
+
+    return totalCount;
   }
 
   async findOne(id: string) {
-    return this.repo.findOne(id);
+    const userPg = await this.db.read
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', id)
+      .where(usersTableFilter)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!userPg) {
+      return null;
+    }
+
+    const user = UserMapper.fromPgWithState(userPg);
+    return user;
   }
 
   async save(user: User) {
     this._validate(user);
 
     if (!user.isPersist) {
-      await this.repo.create(user);
+      await this._create(user);
     } else {
-      await this.repo.update(user.id, user);
+      await this._update(user.id, user);
     }
 
     user.setPgState(UserMapper.toPg);
@@ -38,10 +85,95 @@ export class UserService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write
+      //
+      .deleteFrom('users')
+      .where('id', '=', id)
+      .execute();
   }
 
   private _validate(_user: User) {
     // validation rules can be added here
+  }
+
+  private async _create(user: User) {
+    await this._tryWrite(async () =>
+      this.db.write
+        //
+        .insertInto('users')
+        .values(UserMapper.toPg(user))
+        .execute(),
+    );
+  }
+
+  private async _update(id: string, user: User) {
+    const data = diff(user.pgState, UserMapper.toPg(user));
+    if (!data) {
+      return;
+    }
+
+    await this._tryWrite(async () =>
+      this.db.write
+        //
+        .updateTable('users')
+        .set(data)
+        .where('id', '=', id)
+        .execute(),
+    );
+  }
+
+  private async _tryWrite<T>(cb: () => Promise<T>) {
+    try {
+      const data = await cb();
+      return data;
+    } catch (e: any) {
+      const errKey = getErrorKey(e);
+      if (errKey === 'exists') {
+        throw new ApiException(409, 'emailExists');
+      }
+
+      throw new ApiException(500, 'internal');
+    }
+  }
+
+  private _getFilterQb(opts?: Except<UserQueryOptions, 'pagination'>) {
+    const filter = opts?.filter;
+
+    return this.db.read
+      .selectFrom('users')
+      .select('users.id')
+      .where(usersTableFilter)
+      .$if(isDefined(filter?.firstName), (q) =>
+        q.where('users.first_name', '=', filter!.firstName!),
+      )
+      .$if(isDefined(filter?.lastName), (q) =>
+        q.where('users.last_name', '=', filter!.lastName!),
+      )
+      .$if(isDefined(filter?.role), (q) =>
+        q.where('users.role', '=', filter!.role!),
+      )
+      .$if(isDefined(filter?.userStatus), (q) =>
+        q.where('users.user_status', '=', filter!.userStatus!),
+      )
+      .$if(isDefined(filter?.email), (q) =>
+        q.where('users.email', '=', filter!.email!),
+      )
+      .$if(!!filter?.userGroupIds?.length, (q) =>
+        q
+          .innerJoin('user_group_users', 'user_group_users.user_id', 'users.id')
+          .where('user_group_users.user_group_id', 'in', filter!.userGroupIds!),
+      )
+      .$if(isDefined(filter?.search), (q) => {
+        const search = `%${filter!.search!}%`;
+
+        return q.where((eb) =>
+          eb.or([
+            //
+            eb('users.first_name', 'ilike', search),
+            eb('users.last_name', 'ilike', search),
+            eb('users.email', 'ilike', search),
+          ]),
+        );
+      });
   }
 }

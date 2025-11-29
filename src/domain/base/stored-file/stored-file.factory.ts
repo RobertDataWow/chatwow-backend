@@ -2,7 +2,7 @@
 // import { isDefined } from '@shared/common/common.validator';
 
 // import { StoredFileMapper } from './stored-file.mapper';
-// import type { StoredFilePlain } from './types/stored-file.domain.type';
+// import type { StoredFilePlain } from './stored-file.type';
 
 // export class StoredFileFactory {
 //   static mock(data: Partial<StoredFilePlain>) {

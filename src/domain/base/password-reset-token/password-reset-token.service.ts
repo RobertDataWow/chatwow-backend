@@ -1,24 +1,36 @@
 import { Injectable } from '@nestjs/common';
 
+import { MainDb } from '@infra/db/db.main';
+
+import myDayjs from '@shared/common/common.dayjs';
+import { diff } from '@shared/common/common.func';
+
 import { PasswordResetToken } from './password-reset-token.domain';
 import { PasswordResetTokenMapper } from './password-reset-token.mapper';
-import { PasswordResetTokenRepo } from './password-reset-token.repo';
 
 @Injectable()
 export class PasswordResetTokenService {
-  constructor(private repo: PasswordResetTokenRepo) {}
+  constructor(private db: MainDb) {}
 
   async findOne(id: string) {
-    return this.repo.findOne(id);
+    const pg = await this.db.read
+      .selectFrom('password_reset_tokens')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
+    if (!pg) return null;
+
+    return PasswordResetTokenMapper.fromPgWithState(pg);
   }
 
   async save(token: PasswordResetToken) {
     this._validate(token);
 
     if (!token.isPersist) {
-      await this.repo.create(token);
+      await this._create(token);
     } else {
-      await this.repo.update(token.id, token);
+      await this._update(token.id, token);
     }
 
     token.setPgState(PasswordResetTokenMapper.toPg);
@@ -29,14 +41,40 @@ export class PasswordResetTokenService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write
+      .deleteFrom('password_reset_tokens')
+      .where('id', '=', id)
+      .execute();
   }
 
   async revokeAllOtherToken(passwordResetToken: PasswordResetToken) {
-    return this.repo.revokeAllOtherToken(passwordResetToken);
+    await this.db.write
+      .updateTable('password_reset_tokens')
+      .set('revoke_at', myDayjs().toISOString())
+      .where('user_id', '=', passwordResetToken.userId)
+      .where('id', '!=', passwordResetToken.id)
+      .execute();
   }
 
   private _validate(_token: PasswordResetToken) {
     // validation rules
+  }
+
+  private async _create(token: PasswordResetToken) {
+    await this.db.write
+      .insertInto('password_reset_tokens')
+      .values(PasswordResetTokenMapper.toPg(token))
+      .execute();
+  }
+
+  private async _update(id: string, token: PasswordResetToken) {
+    const data = diff(token.pgState, PasswordResetTokenMapper.toPg(token));
+
+    if (!data) return;
+    await this.db.write
+      .updateTable('password_reset_tokens')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
   }
 }

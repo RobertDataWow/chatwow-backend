@@ -6,7 +6,7 @@ import type {
   ProjectDocumentJson,
   ProjectDocumentPg,
   ProjectDocumentPlain,
-} from './types/project-document.domain.type';
+} from './project-document.type';
 
 export class ProjectDocumentMapper {
   static fromPg(pg: ProjectDocumentPg): ProjectDocument {

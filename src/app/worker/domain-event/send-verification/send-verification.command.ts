@@ -4,7 +4,7 @@ import type { User } from '@domain/base/user/user.domain';
 import { UserService } from '@domain/base/user/user.service';
 import { Injectable } from '@nestjs/common';
 
-import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import type { CommandInterface } from '@shared/common/common.type';
 

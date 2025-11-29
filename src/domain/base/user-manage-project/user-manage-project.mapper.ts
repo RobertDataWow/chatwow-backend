@@ -3,7 +3,7 @@ import { toDate, toISO } from '@shared/common/common.transformer';
 import type {
   UserManageProjectPg,
   UserManageProjectPlain,
-} from './types/user-manage-project.domain.type';
+} from './user-manage-project.type';
 import { UserManageProject } from './user-manage-project.domain';
 import type { UserManageProjectResponse } from './user-manage-project.response';
 

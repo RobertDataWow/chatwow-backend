@@ -15,7 +15,7 @@ import { User } from '@domain/base/user/user.domain';
 import { UserService } from '@domain/base/user/user.service';
 import { Command, CommandRunner } from 'nest-commander';
 
-import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 @Command({
   name: 'initials:seed',

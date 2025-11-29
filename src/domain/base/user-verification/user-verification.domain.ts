@@ -3,13 +3,13 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { UserVerificationMapper } from './user-verification.mapper';
 import type {
   UserVerificationNewData,
   UserVerificationPg,
   UserVerificationPlain,
   UserVerificationUpdateData,
-} from './types/user-verification.domain.type';
-import { UserVerificationMapper } from './user-verification.mapper';
+} from './user-verification.type';
 import { generateVerificationCode } from './user-verification.util';
 
 export class UserVerification extends DomainEntity<UserVerificationPg> {

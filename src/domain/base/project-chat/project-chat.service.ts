@@ -1,24 +1,39 @@
 import { Injectable } from '@nestjs/common';
 
+import { MainDb } from '@infra/db/db.main';
+
+import { diff } from '@shared/common/common.func';
+
 import { ProjectChat } from './project-chat.domain';
 import { ProjectChatMapper } from './project-chat.mapper';
-import { ProjectChatRepo } from './project-chat.repo';
 
 @Injectable()
 export class ProjectChatService {
-  constructor(private readonly repo: ProjectChatRepo) {}
+  constructor(private readonly db: MainDb) {}
 
-  async findOne(id: string) {
-    return this.repo.findOne(id);
+  async findOne(id: string): Promise<ProjectChat | null> {
+    const userPg = await this.db.read
+      .selectFrom('project_chats')
+      .selectAll()
+      .where('id', '=', id)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!userPg) {
+      return null;
+    }
+
+    const domain = ProjectChatMapper.fromPgWithState(userPg);
+    return domain;
   }
 
   async save(projectChat: ProjectChat) {
     this._validate(projectChat);
 
     if (!projectChat.isPersist) {
-      await this.repo.create(projectChat);
+      await this._create(projectChat);
     } else {
-      await this.repo.update(projectChat.id, projectChat);
+      await this._update(projectChat.id, projectChat);
     }
 
     projectChat.setPgState(ProjectChatMapper.toPg);
@@ -29,7 +44,33 @@ export class ProjectChatService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write
+      //
+      .deleteFrom('project_chats')
+      .where('id', '=', id)
+      .execute();
+  }
+
+  private async _create(domain: ProjectChat): Promise<void> {
+    await this.db.write
+      //
+      .insertInto('project_chats')
+      .values(ProjectChatMapper.toPg(domain))
+      .execute();
+  }
+
+  private async _update(id: string, domain: ProjectChat): Promise<void> {
+    const data = diff(domain.pgState, ProjectChatMapper.toPg(domain));
+    if (!data) {
+      return;
+    }
+
+    await this.db.write
+      //
+      .updateTable('project_chats')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
   }
 
   private _validate(_lineSession: ProjectChat) {

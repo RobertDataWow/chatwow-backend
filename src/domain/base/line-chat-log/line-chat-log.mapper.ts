@@ -6,7 +6,7 @@ import type {
   LineChatLogJson,
   LineChatLogPg,
   LineChatLogPlain,
-} from './types/line-chat-log.domain.type';
+} from './line-chat-log.type';
 
 export class LineChatLogMapper {
   static fromPg(pg: LineChatLogPg): LineChatLog {

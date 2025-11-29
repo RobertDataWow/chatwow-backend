@@ -12,7 +12,7 @@ import { usersTableFilter } from '@domain/base/user/user.util';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
-import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';

@@ -6,7 +6,7 @@ import type {
   ProjectChatJson,
   ProjectChatPg,
   ProjectChatPlain,
-} from './types/project-chat.domain.type';
+} from './project-chat.type';
 
 export class ProjectChatMapper {
   static fromPg(pg: ProjectChatPg): ProjectChat {

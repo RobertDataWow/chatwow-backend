@@ -11,7 +11,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
-import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { shaHashstring } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';

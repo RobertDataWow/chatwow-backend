@@ -1,24 +1,38 @@
 import { Injectable } from '@nestjs/common';
 
+import { MainDb } from '@infra/db/db.main';
+
+import { diff } from '@shared/common/common.func';
+
 import { LineSession } from './line-session.domain';
 import { LineSessionMapper } from './line-session.mapper';
-import { LineSessionRepo } from './line-session.repo';
 
 @Injectable()
 export class LineSessionService {
-  constructor(private repo: LineSessionRepo) {}
+  constructor(private db: MainDb) {}
 
   async findOne(id: string) {
-    return this.repo.findOne(id);
+    const lineSessionPg = await this.db.read
+      .selectFrom('line_sessions')
+      .selectAll()
+      .where('id', '=', id)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!lineSessionPg) {
+      return null;
+    }
+
+    return LineSessionMapper.fromPgWithState(lineSessionPg);
   }
 
   async save(lineSession: LineSession) {
     this._validate(lineSession);
 
     if (!lineSession.isPersist) {
-      await this.repo.create(lineSession);
+      await this._create(lineSession);
     } else {
-      await this.repo.update(lineSession.id, lineSession);
+      await this._update(lineSession.id, lineSession);
     }
 
     lineSession.setPgState(LineSessionMapper.toPg);
@@ -29,14 +43,40 @@ export class LineSessionService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write
+      .deleteFrom('line_sessions')
+      .where('id', '=', id)
+      .execute();
   }
 
   private _validate(_lineSession: LineSession) {
     // validation rules can be added here
   }
 
+  private async _create(lineSession: LineSession) {
+    await this.db.write
+      .insertInto('line_sessions')
+      .values(LineSessionMapper.toPg(lineSession))
+      .execute();
+  }
+
+  private async _update(id: string, lineSession: LineSession) {
+    const data = diff(lineSession.pgState, LineSessionMapper.toPg(lineSession));
+    if (!data) return;
+
+    await this.db.write
+      .updateTable('line_sessions')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
+  }
+
   async inactiveAll(lineAccountId: string, lineBotId: string): Promise<void> {
-    await this.repo.inactiveAll(lineAccountId, lineBotId);
+    await this.db.write
+      .updateTable('line_sessions')
+      .set({ line_session_status: 'INACTIVE' })
+      .where('line_account_id', '=', lineAccountId)
+      .where('line_bot_id', '=', lineBotId)
+      .execute();
   }
 }

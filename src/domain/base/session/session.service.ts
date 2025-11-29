@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 
+import { MainDb } from '@infra/db/db.main';
 import { ReqStorage } from '@infra/global/req-storage/req-storage.service';
 
+import myDayjs from '@shared/common/common.dayjs';
+import { diff } from '@shared/common/common.func';
 import { ApiException } from '@shared/http/http.exception';
 
 import { Session } from './session.domain';
 import { SessionMapper } from './session.mapper';
-import { SessionRepo } from './session.repo';
 
 @Injectable()
 export class SessionService {
   constructor(
-    private repo: SessionRepo,
+    private db: MainDb,
     private reqStorage: ReqStorage,
   ) {}
 
@@ -37,15 +39,21 @@ export class SessionService {
   }
 
   async findOne(id: string) {
-    return this.repo.findOne(id);
+    const pg = await this.db.read
+      .selectFrom('sessions')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+    if (!pg) return null;
+    return SessionMapper.fromPgWithState(pg);
   }
 
   async save(session: Session) {
     this._validate(session);
     if (!session.isPersist) {
-      await this.repo.create(session);
+      await this._create(session);
     } else {
-      await this.repo.update(session.id, session);
+      await this._update(session.id, session);
     }
     session.setPgState(SessionMapper.toPg);
   }
@@ -55,14 +63,37 @@ export class SessionService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write.deleteFrom('sessions').where('id', '=', id).execute();
   }
 
   async revokeAllOtherSession(session: Session) {
-    return this.repo.revokeAllOtherSessions(session);
+    await this.db.write
+      .updateTable('sessions')
+      .set('revoke_at', myDayjs().toISOString())
+      .where('device_uid', '=', session.deviceUid)
+      .where('user_id', '=', session.userId)
+      .where('id', '!=', session.id)
+      .execute();
   }
 
   private _validate(_session: Session) {
     // validation rules
+  }
+
+  private async _create(session: Session) {
+    await this.db.write
+      .insertInto('sessions')
+      .values(SessionMapper.toPg(session))
+      .execute();
+  }
+
+  private async _update(id: string, session: Session) {
+    const data = diff(session.pgState, SessionMapper.toPg(session));
+    if (!data) return;
+    await this.db.write
+      .updateTable('sessions')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
   }
 }

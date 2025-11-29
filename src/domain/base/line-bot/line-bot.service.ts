@@ -1,23 +1,40 @@
 import { Injectable } from '@nestjs/common';
 
+import { MainDb } from '@infra/db/db.main';
+
+import { diff } from '@shared/common/common.func';
+
 import { LineBot } from './line-bot.domain';
 import { LineBotMapper } from './line-bot.mapper';
-import { LineBotRepo } from './line-bot.repo';
+import { lineBotsTableFilter } from './line-bot.util';
 
 @Injectable()
 export class LineBotService {
-  constructor(private repo: LineBotRepo) {}
+  constructor(private db: MainDb) {}
 
   async findOne(id: string) {
-    return this.repo.findOne(id);
+    const lineBotPg = await this.db.read
+      .selectFrom('line_bots')
+      .selectAll()
+      .where('id', '=', id)
+      .where(lineBotsTableFilter)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!lineBotPg) {
+      return null;
+    }
+
+    return LineBotMapper.fromPgWithState(lineBotPg);
   }
 
   async save(lineBot: LineBot) {
     this._validate(lineBot);
+
     if (!lineBot.isPersist) {
-      await this.repo.create(lineBot);
+      await this._create(lineBot);
     } else {
-      await this.repo.update(lineBot.id, lineBot);
+      await this._update(lineBot.id, lineBot);
     }
 
     lineBot.setPgState(LineBotMapper.toPg);
@@ -28,10 +45,30 @@ export class LineBotService {
   }
 
   async delete(id: string) {
-    return this.repo.delete(id);
+    await this.db.write.deleteFrom('line_bots').where('id', '=', id).execute();
   }
 
   private _validate(_lineBot: LineBot) {
     // validation rules can be added here
+  }
+
+  private async _create(lineBot: LineBot) {
+    await this.db.write
+      .insertInto('line_bots')
+      .values(LineBotMapper.toPg(lineBot))
+      .execute();
+  }
+
+  private async _update(id: string, lineBot: LineBot) {
+    const data = diff(lineBot.pgState, LineBotMapper.toPg(lineBot));
+    if (!data) {
+      return;
+    }
+
+    await this.db.write
+      .updateTable('line_bots')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
   }
 }

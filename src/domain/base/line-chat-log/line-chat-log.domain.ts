@@ -10,7 +10,7 @@ import type {
   LineChatLogNewData,
   LineChatLogPg,
   LineChatLogPlain,
-} from './types/line-chat-log.domain.type';
+} from './line-chat-log.type';
 
 export class LineChatLog extends DomainEntity<LineChatLogPg> {
   readonly id: string;

@@ -1,7 +1,7 @@
 import { Global, Module, Provider } from '@nestjs/common';
 
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { LoggerService } from '@infra/global/logger/logger.service';
-import { TransactionService } from '@infra/global/transaction/transaction.service';
 
 const serviceProviders: Provider[] = [TransactionService, LoggerService];
 

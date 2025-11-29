@@ -2,36 +2,49 @@ import { Injectable } from '@nestjs/common';
 import { unique } from 'remeda';
 import { Writable } from 'type-fest';
 
+import { MainDb } from '@infra/db/db.main';
 import { StorageService } from '@infra/global/storage/storage.service';
 
 import { streamToBuffer } from '@shared/common/common.buffer';
 import { uuidV7 } from '@shared/common/common.crypto';
+import { diff } from '@shared/common/common.func';
 import { DayjsDuration } from '@shared/common/common.type';
 
+import { GetPresignUploadUrlOpts } from './stored-file.common.type';
 import { StoredFile } from './stored-file.domain';
 import { StoredFileMapper } from './stored-file.mapper';
-import { StoredFileRepo } from './stored-file.repo';
 import { getStoredFileKey } from './stored-file.util';
-import { GetPresignUploadUrlOpts } from './types/stored-file.common.type';
 
 @Injectable()
 export class StoredFileService {
   constructor(
-    private repo: StoredFileRepo,
+    private db: MainDb,
     private storageService: StorageService,
   ) {}
 
-  async findOne(id: string) {
-    return this.repo.findOne(id);
+  async findOne(id: string): Promise<StoredFile | null> {
+    const storedFilePg = await this.db.read
+      .selectFrom('stored_files')
+      .selectAll()
+      .where('id', '=', id)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!storedFilePg) {
+      return null;
+    }
+
+    const storedFile = StoredFileMapper.fromPgWithState(storedFilePg);
+    return storedFile;
   }
 
   async save(storedFile: StoredFile) {
-    await this.repo.deleteRelated([storedFile.ownerId]);
+    await this._deleteRelated([storedFile.ownerId]);
     await this._create(storedFile);
   }
 
   async saveBulk(storedFiles: StoredFile[]) {
-    await this.repo.deleteRelated(unique(storedFiles.map((s) => s.id)));
+    await this._deleteRelated(unique(storedFiles.map((s) => s.id)));
     return Promise.all(storedFiles.map((s) => this._create(s)));
   }
 
@@ -41,13 +54,43 @@ export class StoredFileService {
     await this.setMetaInfo(storedFile);
 
     // create every time
-    await this.repo.create(storedFile);
+    await this.db.write
+      //
+      .insertInto('stored_files')
+      .values(StoredFileMapper.toPg(storedFile))
+      .execute();
 
     storedFile.setPgState(StoredFileMapper.toPg);
   }
 
+  private async _update(id: string, storedFile: StoredFile): Promise<void> {
+    const data = diff(storedFile.pgState, StoredFileMapper.toPg(storedFile));
+    if (!data) {
+      return;
+    }
+
+    await this.db.write
+      //
+      .updateTable('stored_files')
+      .set(data)
+      .where('id', '=', id)
+      .execute();
+  }
+
   async delete(storedFile: StoredFile) {
-    await this.repo.delete(storedFile.id);
+    await this.db.write
+      //
+      .deleteFrom('stored_files')
+      .where('id', '=', storedFile.id)
+      .execute();
+  }
+
+  private async _deleteRelated(ownerIds: string[]): Promise<void> {
+    await this.db.write
+      //
+      .deleteFrom('stored_files')
+      .where('owner_id', 'in', ownerIds)
+      .execute();
   }
 
   private _validate(_storedFile: StoredFile) {

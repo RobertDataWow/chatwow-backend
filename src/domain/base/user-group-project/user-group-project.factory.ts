@@ -1,7 +1,7 @@
 import { uuidV7 } from '@shared/common/common.crypto';
 import { isDefined } from '@shared/common/common.validator';
 
-import type { UserGroupProjectPlain } from './types/user-group-project.domain.type';
+import type { UserGroupProjectPlain } from './user-group-project.type';
 import { UserGroupProjectMapper } from './user-group-project.mapper';
 
 export class UserGroupProjectFactory {

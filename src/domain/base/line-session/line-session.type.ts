@@ -7,7 +7,7 @@ import type {
   WithPgState,
 } from '@shared/common/common.type';
 
-import type { LineSession } from '../line-session.domain';
+import type { LineSession } from './line-session.domain';
 
 export type LineSessionPg = DBModel<LineSessions>;
 export type LineSessionPlain = Plain<LineSession>;

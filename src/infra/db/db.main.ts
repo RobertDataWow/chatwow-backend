@@ -1,9 +1,10 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { CoreDB, KYSELY, READ_DB, ReadDB } from '@infra/db/db.common';
-import { TransactionService } from '@infra/db/transaction/transaction.service';
+import { CoreDB, KYSELY, READ_DB, ReadDB, WriteDB } from './db.common';
+import { TransactionService } from './transaction/transaction.service';
 
-export abstract class BaseRepo {
+@Injectable()
+export class MainDb {
   constructor(
     @Inject(KYSELY)
     private _coreDb: CoreDB,
@@ -12,7 +13,7 @@ export abstract class BaseRepo {
     private transactionService: TransactionService,
   ) {}
 
-  protected get db(): CoreDB {
+  get write(): WriteDB {
     let mainDb: CoreDB = this._currentTransaction() as unknown as CoreDB;
     if (!mainDb) {
       mainDb = this._coreDb;
@@ -21,7 +22,7 @@ export abstract class BaseRepo {
     return mainDb;
   }
 
-  protected get readDb(): ReadDB {
+  get read(): ReadDB {
     let read: ReadDB = this._currentTransaction() as unknown as CoreDB;
     if (!read) {
       read = this._db;
@@ -32,16 +33,5 @@ export abstract class BaseRepo {
 
   private _currentTransaction() {
     return this.transactionService.$getTransaction();
-  }
-}
-
-export abstract class ReadRepo {
-  constructor(
-    @Inject(READ_DB)
-    private _db: ReadDB,
-  ) {}
-
-  protected get readDb(): ReadDB {
-    return this._db;
   }
 }

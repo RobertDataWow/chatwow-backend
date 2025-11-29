@@ -9,11 +9,7 @@ import {
 
 import { Session } from './session.domain';
 import { SessionResponse } from './session.response';
-import type {
-  SessionJson,
-  SessionPg,
-  SessionPlain,
-} from './types/session.domain.type';
+import type { SessionJson, SessionPg, SessionPlain } from './session.type';
 
 export class SessionMapper {
   static fromPg(pg: SessionPg): Session {

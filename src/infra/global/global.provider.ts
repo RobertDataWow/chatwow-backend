@@ -9,7 +9,6 @@ import { LoggerService } from './logger/logger.service';
 import { ReqStorage } from './req-storage/req-storage.service';
 import { StorageProvider } from './storage/storage.provider';
 import { StorageService } from './storage/storage.service';
-import { TransactionService } from './transaction/transaction.service';
 
 export const GLOBAL_PROVIDER: Provider[] = [
   // Provider
@@ -19,7 +18,6 @@ export const GLOBAL_PROVIDER: Provider[] = [
 
   // Service
   LoggerService,
-  TransactionService,
   CacheService,
   EmailService,
   LangService,

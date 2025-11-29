@@ -5,7 +5,7 @@ import type {
   UserGroupJson,
   UserGroupPg,
   UserGroupPlain,
-} from './types/user-group.domain.type';
+} from './user-group.type';
 import { UserGroup } from './user-group.domain';
 import type { UserGroupResponse } from './user-group.response';
 

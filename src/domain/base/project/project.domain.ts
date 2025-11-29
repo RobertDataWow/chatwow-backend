@@ -10,7 +10,7 @@ import type {
   ProjectPg,
   ProjectPlain,
   ProjectUpdateData,
-} from './types/project.domain.type';
+} from './project.type';
 
 export class Project extends DomainEntity<ProjectPg> {
   readonly id: string;

@@ -9,14 +9,14 @@ import type {
   LineBotPg,
   LineBotPlain,
   LineBotUpdateData,
-} from './types/line-bot.domain.type';
+} from './line-bot.type';
 
 export class LineBot extends DomainEntity<LineBotPg> {
   readonly id: string;
   readonly createdAt: Date;
-  updatedAt: Date;
-  channelAccessToken: string;
-  channelSecret: string;
+  readonly updatedAt: Date;
+  readonly channelAccessToken: string;
+  readonly channelSecret: string;
 
   constructor(plain: LineBotPlain) {
     super();
@@ -34,7 +34,11 @@ export class LineBot extends DomainEntity<LineBotPg> {
     });
   }
 
-  update(data: LineBotUpdateData): void {
+  static newBulk(data: LineBotNewData[]) {
+    return data.map((d) => LineBot.new(d));
+  }
+
+  edit(data: LineBotUpdateData) {
     const plain: LineBotPlain = {
       id: this.id,
       createdAt: this.createdAt,
@@ -49,6 +53,6 @@ export class LineBot extends DomainEntity<LineBotPg> {
         : this.channelSecret,
     };
 
-    Object.assign(this, plain);
+    return LineBotMapper.fromPlain(plain);
   }
 }

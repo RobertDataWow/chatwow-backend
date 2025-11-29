@@ -5,13 +5,13 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { UserMapper } from './user.mapper';
 import type {
   UserNewData,
   UserPg,
   UserPlain,
   UserUpdateData,
-} from './types/user.domain.type';
-import { UserMapper } from './user.mapper';
+} from './user.type';
 
 export class User extends DomainEntity<UserPg> {
   readonly id: string;

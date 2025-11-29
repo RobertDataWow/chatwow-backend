@@ -5,7 +5,7 @@ import type {
   UserManageProjectNewData,
   UserManageProjectPg,
   UserManageProjectPlain,
-} from './types/user-manage-project.domain.type';
+} from './user-manage-project.type';
 import { UserManageProjectMapper } from './user-manage-project.mapper';
 
 export class UserManageProject extends DomainEntity<UserManageProjectPg> {

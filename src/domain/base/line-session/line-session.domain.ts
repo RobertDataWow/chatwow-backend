@@ -11,7 +11,7 @@ import type {
   LineSessionPg,
   LineSessionPlain,
   LineSessionUpdateData,
-} from './types/line-session.domain.type';
+} from './line-session.type';
 
 export class LineSession extends DomainEntity<LineSessionPg> {
   readonly id: string;

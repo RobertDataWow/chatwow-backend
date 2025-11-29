@@ -1,12 +1,12 @@
 import { toDate, toISO } from '@shared/common/common.transformer';
 
+import { UserVerification } from './user-verification.domain';
+import { UserVerificationResponse } from './user-verification.response';
 import type {
   UserVerificationJson,
   UserVerificationPg,
   UserVerificationPlain,
-} from './types/user-verification.domain.type';
-import { UserVerification } from './user-verification.domain';
-import { UserVerificationResponse } from './user-verification.response';
+} from './user-verification.type';
 
 export class UserVerificationMapper {
   static fromPg(pg: UserVerificationPg): UserVerification {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 @Injectable()
 export class MockTransactionService

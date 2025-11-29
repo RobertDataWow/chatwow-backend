@@ -16,8 +16,8 @@ import type { DB } from '@infra/db/db';
 import type { CoreDB } from '@infra/db/db.common';
 import { KYSELY, runMigrations } from '@infra/db/db.common';
 import { DBModule } from '@infra/db/db.module';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { GlobalModule } from '@infra/global/global.module';
-import { TransactionService } from '@infra/global/transaction/transaction.service';
 import { MiddlewareModule } from '@infra/middleware/middleware.module';
 
 import { CliModule } from '@app/cli/cli.module';
