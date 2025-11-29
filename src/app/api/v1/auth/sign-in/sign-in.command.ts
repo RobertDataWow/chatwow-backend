@@ -7,7 +7,7 @@ import {
 } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
-import { getAccessToken, signIn } from '@domain/orchestration/auth/auth.util';
+import { getAccessToken, signIn } from '@domain/logic/auth/auth.util';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';

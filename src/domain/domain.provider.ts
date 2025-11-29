@@ -15,7 +15,7 @@ import { UserGroupModule } from './base/user-group/user-group.module';
 import { UserManageProjectModule } from './base/user-manage-project/user-manage-project.module';
 import { UserVerificationModule } from './base/user-verification/user-verification.module';
 import { UserModule } from './base/user/user.module';
-import { PgModule } from './orchestration/pg/pg.module';
+import { PgModule } from './logic/pg/pg.module';
 import { QueueModule } from './queue/queue.module';
 
 export const DOMAIN_PROVIDER = [

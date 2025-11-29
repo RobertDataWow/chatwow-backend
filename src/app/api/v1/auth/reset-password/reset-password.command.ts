@@ -12,7 +12,7 @@ import {
 } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
-import { getAccessToken } from '@domain/orchestration/auth/auth.util';
+import { getAccessToken } from '@domain/logic/auth/auth.util';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 

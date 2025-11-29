@@ -7,7 +7,7 @@ import {
   userToResponse,
 } from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
-import { getAccessToken } from '@domain/orchestration/auth/auth.util';
+import { getAccessToken } from '@domain/logic/auth/auth.util';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
