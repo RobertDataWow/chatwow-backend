@@ -13,9 +13,9 @@ import { UserGroup } from '@domain/base/user-group/user-group.domain';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
@@ -36,8 +36,7 @@ type Entity = {
 @Injectable()
 export class CreateProjectCommand implements CommandInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private projectService: ProjectService,
     private storedFileService: StoredFileService,
@@ -143,7 +142,7 @@ export class CreateProjectCommand implements CommandInterface {
       return [];
     }
 
-    const rawRes = await this.readDb
+    const rawRes = await this.db.read
       .selectFrom('user_groups')
       .where('id', 'in', userGroupIds)
       .where(userGroupsTableFilter)

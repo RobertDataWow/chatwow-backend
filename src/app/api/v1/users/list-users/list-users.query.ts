@@ -3,9 +3,9 @@ import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
-import { Inject } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+
+import { MainDb } from '@infra/db/db.main';
 import { filterQbIds } from '@infra/db/db.util';
 
 import { getPagination } from '@shared/common/common.pagintaion';
@@ -16,8 +16,7 @@ import { ListUsersDto, ListUsersResponse } from './list-users.dto';
 
 export class ListUsersQuery implements QueryInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private userService: UserService,
   ) {}
@@ -79,7 +78,7 @@ export class ListUsersQuery implements QueryInterface {
       };
     }
 
-    const result = await this.readDb
+    const result = await this.db.read
       .selectFrom('users')
       .$call((q) => usersV1InclusionQb(q, query.includes))
       .selectAll()

@@ -5,9 +5,9 @@ import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken, signIn } from '@domain/orchestration/auth/auth.util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { CommandInterface } from '@shared/common/common.type';
@@ -24,8 +24,7 @@ type Entity = {
 @Injectable()
 export class SignInCommand implements CommandInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private userService: UserService,
     private sessionService: SessionService,
@@ -59,7 +58,7 @@ export class SignInCommand implements CommandInterface {
   }
 
   async find(body: SignInDto): Promise<User> {
-    const domain = await this.readDb
+    const domain = await this.db.read
       .selectFrom('users')
       .selectAll()
       .where('email', '=', body.email)

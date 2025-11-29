@@ -9,10 +9,10 @@ import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { LineService } from '@infra/global/line/line.service';
 
@@ -33,8 +33,7 @@ type Entity = {
 @Injectable()
 export class LineProcessVerificationCommand {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private lineAccountService: LineAccountService,
     private userService: UserService,
@@ -94,7 +93,7 @@ export class LineProcessVerificationCommand {
   }
 
   async findUserFromVerification(verificationCode: string) {
-    const res = await this.readDb
+    const res = await this.db.read
       .selectFrom('user_verifications')
       .where(usersVerificationsTableFilter)
       .where('user_verifications.code', '=', verificationCode.toUpperCase())

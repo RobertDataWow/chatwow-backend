@@ -1,9 +1,9 @@
 import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 
 import { ApiException } from '@shared/http/http.exception';
 import { HttpResponseMapper } from '@shared/http/http.mapper';
@@ -13,8 +13,7 @@ import { DeleteUserResponse } from './delete-user.dto';
 @Injectable()
 export class DeleteUserCommand {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
     private userService: UserService,
   ) {}
 

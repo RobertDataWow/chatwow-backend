@@ -3,9 +3,9 @@ import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { LineService } from '@infra/global/line/line.service';
 
 import {
@@ -20,8 +20,7 @@ import {
 @Injectable()
 export class LineProcessSelectionMenuCommand {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private lineSessionService: LineSessionService,
     private projectService: ProjectService,
@@ -76,7 +75,7 @@ export class LineProcessSelectionMenuCommand {
       return [];
     }
 
-    const projects = await this.readDb
+    const projects = await this.db.read
       .selectFrom('projects')
       .selectAll()
       .where('id', 'in', ids)
@@ -86,7 +85,7 @@ export class LineProcessSelectionMenuCommand {
   }
 
   async getSession({ projectId, lineBotId, lineAccountId }: GetSessionOpts) {
-    const rawSession = await this.readDb
+    const rawSession = await this.db.read
       .selectFrom('line_sessions')
       .selectAll()
       .where('line_account_id', '=', lineAccountId)

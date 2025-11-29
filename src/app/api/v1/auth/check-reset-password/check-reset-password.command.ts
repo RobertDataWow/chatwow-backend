@@ -3,10 +3,10 @@ import { passwordResetTokensTableFilter } from '@domain/base/password-reset-toke
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 
 import { shaHashstring } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
@@ -22,8 +22,7 @@ import {
 @Injectable()
 export class CheckResetPasswordQuery implements QueryInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
   ) {}
 
   async exec(
@@ -52,7 +51,7 @@ export class CheckResetPasswordQuery implements QueryInterface {
   }
 
   async getRaw(body: CheckResetPasswordDto) {
-    const pg = await this.readDb
+    const pg = await this.db.read
       .selectFrom('password_reset_tokens')
       .selectAll('password_reset_tokens')
       .select((eb) =>

@@ -1,16 +1,11 @@
-import { Inject } from '@nestjs/common';
-
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 
 import { QueryInterface } from '@shared/common/common.type';
 
 import { UserSummaryDto, UserSummaryResponse } from './user-summary.dto';
 
 export class UserSummaryQuery implements QueryInterface {
-  constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
-  ) {}
+  constructor(private db: MainDb) {}
 
   async exec(query: UserSummaryDto): Promise<UserSummaryResponse> {
     const data = await this.getRaw(query);
@@ -35,7 +30,7 @@ export class UserSummaryQuery implements QueryInterface {
   }
 
   async getRaw(query: UserSummaryDto) {
-    const data = await this.readDb
+    const data = await this.db.read
       .selectFrom('users')
       .select(({ fn }) => fn.count<string>('users.id').as('totalUsers'))
       .$if(query.includes.has('activeUsers'), (qb) =>

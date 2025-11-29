@@ -6,9 +6,9 @@ import {
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
 import { UserMapper } from '@domain/base/user/user.mapper';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
@@ -23,8 +23,7 @@ import {
 @Injectable()
 export class GetProjectDocumentQuery implements QueryInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
   ) {}
 
   async exec(
@@ -76,7 +75,7 @@ export class GetProjectDocumentQuery implements QueryInterface {
   }
 
   async getRaw(actor: UserClaims, id: string, query: GetProjectDocumentDto) {
-    const result = await this.readDb
+    const result = await this.db.read
       .selectFrom('project_documents')
       .$call((q) => projectDocumentsV1InclusionQb(q, query.includes))
       .selectAll('project_documents')

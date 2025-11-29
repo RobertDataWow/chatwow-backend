@@ -12,9 +12,9 @@ import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
@@ -35,8 +35,7 @@ type Entity = {
 @Injectable()
 export class AddUserCommand implements CommandInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
     private transactionService: TransactionService,
     private userService: UserService,
     private userGroupUserService: UserGroupUserService,
@@ -140,7 +139,7 @@ export class AddUserCommand implements CommandInterface {
       return [];
     }
 
-    const rawGroups = await this.readDb
+    const rawGroups = await this.db.read
       .selectFrom('user_groups')
       .selectAll()
       .where('id', 'in', ids)
@@ -159,7 +158,7 @@ export class AddUserCommand implements CommandInterface {
       return [];
     }
 
-    const rawProjects = await this.readDb
+    const rawProjects = await this.db.read
       .selectFrom('projects')
       .selectAll()
       .where('id', 'in', ids)

@@ -5,9 +5,9 @@ import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { shaHashstring } from '@shared/common/common.crypto';
@@ -26,8 +26,7 @@ type Entity = {
 @Injectable()
 export class RefreshCommand implements CommandInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private sessionService: SessionService,
     private transactionService: TransactionService,
@@ -65,7 +64,7 @@ export class RefreshCommand implements CommandInterface {
   }
 
   async find(plainToken: string): Promise<User> {
-    const user = await this.readDb
+    const user = await this.db.read
       .selectFrom('sessions')
       .innerJoin('users', 'users.id', 'sessions.user_id')
       .selectAll('users')

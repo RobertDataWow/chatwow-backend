@@ -7,10 +7,10 @@ import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { shaHashstring } from '@shared/common/common.crypto';
@@ -29,8 +29,7 @@ type Entity = {
 @Injectable()
 export class ResetPasswordCommand implements CommandInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private userService: UserService,
     private passwordResetTokenService: PasswordResetTokenService,
@@ -93,7 +92,7 @@ export class ResetPasswordCommand implements CommandInterface {
   }
 
   async find(body: ResetPasswordDto): Promise<Entity> {
-    const pg = await this.readDb
+    const pg = await this.db.read
       .selectFrom('password_reset_tokens')
       .selectAll('password_reset_tokens')
       .select((eb) =>

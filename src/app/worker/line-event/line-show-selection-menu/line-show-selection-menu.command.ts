@@ -1,9 +1,9 @@
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { LineService } from '@infra/global/line/line.service';
 
 import { LineShowSelectionMenuJobData } from './line-show-selection-menu.type';
@@ -11,8 +11,7 @@ import { LineShowSelectionMenuJobData } from './line-show-selection-menu.type';
 @Injectable()
 export class LineShowSelectionMenuCommand {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private lineSessionService: LineSessionService,
     private projectService: ProjectService,
@@ -46,7 +45,7 @@ export class LineShowSelectionMenuCommand {
       return [];
     }
 
-    const projects = await this.readDb
+    const projects = await this.db.read
       .selectFrom('projects')
       .selectAll()
       .where('id', 'in', ids)

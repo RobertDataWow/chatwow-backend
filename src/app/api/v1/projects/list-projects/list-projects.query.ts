@@ -4,9 +4,9 @@ import { ProjectService } from '@domain/base/project/project.service';
 import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { UserMapper } from '@domain/base/user/user.mapper';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { filterQbIds } from '@infra/db/db.util';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
@@ -19,8 +19,7 @@ import { ListProjectsDto, ListProjectsResponse } from './list-projects.dto';
 @Injectable()
 export class ListProjectsQuery implements QueryInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
     private projectsService: ProjectService,
   ) {}
 
@@ -106,7 +105,7 @@ export class ListProjectsQuery implements QueryInterface {
       };
     }
 
-    const result = await this.readDb
+    const result = await this.db.read
       .selectFrom('projects')
       .$call((q) => projectsV1InclusionQb(q, query.includes, actor))
       .selectAll()

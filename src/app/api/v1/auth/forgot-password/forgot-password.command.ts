@@ -5,9 +5,9 @@ import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { shaHashstring } from '@shared/common/common.crypto';
@@ -27,8 +27,7 @@ type Entity = {
 @Injectable()
 export class ForgotPasswordCommand implements CommandInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private userService: UserService,
     private passwordResetTokenService: PasswordResetTokenService,
@@ -79,7 +78,7 @@ export class ForgotPasswordCommand implements CommandInterface {
   }
 
   async find(body: ForgotPasswordDto): Promise<User | null> {
-    const user = await this.readDb
+    const user = await this.db.read
       .selectFrom('users')
       .selectAll()
       .where('email', '=', body.user.email)

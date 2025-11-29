@@ -2,9 +2,9 @@ import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { UserMapper } from '@domain/base/user/user.mapper';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { filterQbIds } from '@infra/db/db.util';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
@@ -20,8 +20,7 @@ import {
 @Injectable()
 export class ListUserGroupsQuery implements QueryInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private userGroupsService: UserGroupService,
   ) {}
@@ -84,7 +83,7 @@ export class ListUserGroupsQuery implements QueryInterface {
       };
     }
 
-    const result = await this.readDb
+    const result = await this.db.read
       .selectFrom('user_groups')
       .$call((q) => userGroupsV1InclusionQb(q, query.includes, actor))
       .$call((q) => filterQbIds(ids, q, 'user_groups.id'))

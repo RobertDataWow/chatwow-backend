@@ -12,10 +12,10 @@ import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.co
 import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
 import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
 import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
@@ -36,8 +36,7 @@ type Entity = {
 @Injectable()
 export class EditProjectDocumentCommand implements CommandInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private projectDocumentService: ProjectDocumentService,
     private storedFileService: StoredFileService,
@@ -83,7 +82,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
   }
 
   async find(actor: UserClaims, id: string): Promise<Entity> {
-    const projectDocument = await this.readDb
+    const projectDocument = await this.db.read
       .selectFrom('project_documents')
       .selectAll()
       .select((q) => [

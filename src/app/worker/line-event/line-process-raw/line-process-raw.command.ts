@@ -6,10 +6,10 @@ import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
 import { lineSessionsTableFilter } from '@domain/base/line-session/line-session.util';
 import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { LineService } from '@infra/global/line/line.service';
 import { LineWebhookEvent } from '@infra/global/line/line.type';
 
@@ -33,8 +33,7 @@ type Entity = {
 @Injectable()
 export class LineProcessRawCommand {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
 
     private lineEventQueue: LineEventQueue,
     private lineBotService: LineBotService,
@@ -114,7 +113,7 @@ export class LineProcessRawCommand {
       return null;
     }
 
-    const raw = await this.readDb
+    const raw = await this.db.read
       //
       .selectFrom('line_accounts')
       .selectAll()

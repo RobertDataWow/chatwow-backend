@@ -5,9 +5,9 @@ import {
   userGroupsTableFilter,
 } from '@domain/base/user-group/user-group.utils';
 import { UserMapper } from '@domain/base/user/user.mapper';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
@@ -19,8 +19,7 @@ import { GetUserGroupDto, GetUserGroupResponse } from './get-user-group.dto';
 @Injectable()
 export class GetUserGroupQuery implements QueryInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
   ) {}
 
   async exec(
@@ -64,7 +63,7 @@ export class GetUserGroupQuery implements QueryInterface {
   }
 
   async getRaw(actor: UserClaims, id: string, query: GetUserGroupDto) {
-    const result = await this.readDb
+    const result = await this.db.read
       .selectFrom('user_groups')
       .$call((q) => userGroupsV1InclusionQb(q, query.includes, actor))
       .selectAll('user_groups')

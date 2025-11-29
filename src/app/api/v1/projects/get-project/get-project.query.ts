@@ -7,9 +7,9 @@ import {
 import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
 import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
 import { UserMapper } from '@domain/base/user/user.mapper';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
@@ -21,8 +21,7 @@ import { GetProjectDto, GetProjectResponse } from './get-project.dto';
 @Injectable()
 export class GetProjectQuery implements QueryInterface {
   constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
+    private db: MainDb,
   ) {}
 
   async exec(
@@ -90,7 +89,7 @@ export class GetProjectQuery implements QueryInterface {
   }
 
   async getRaw(actor: UserClaims, id: string, query: GetProjectDto) {
-    const result = await this.readDb
+    const result = await this.db.read
       .selectFrom('projects')
       .$call((q) => projectsV1InclusionQb(q, query.includes, actor))
       .selectAll('projects')
