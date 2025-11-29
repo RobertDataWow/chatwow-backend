@@ -16,7 +16,7 @@ import { User } from '@domain/base/user/user.domain';
 import { newUser } from '@domain/base/user/user.factory';
 import { userToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
-import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
+import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';

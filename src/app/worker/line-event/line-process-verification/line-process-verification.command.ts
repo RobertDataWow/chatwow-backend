@@ -9,7 +9,7 @@ import { User } from '@domain/base/user/user.domain';
 import { userFromPgWithState } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
-import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
+import { LineEventQueue } from '@domain/queue/line-event/line-event.queue';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 

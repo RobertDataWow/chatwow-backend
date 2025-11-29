@@ -1,5 +1,5 @@
 import { UserService } from '@domain/base/user/user.service';
-import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
+import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 
 import { ApiException } from '@shared/http/http.exception';
 import { toHttpSuccess } from '@shared/http/http.mapper';

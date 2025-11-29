@@ -5,7 +5,7 @@ import { User } from '@domain/base/user/user.domain';
 import { userFromPgWithState } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
-import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
+import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';

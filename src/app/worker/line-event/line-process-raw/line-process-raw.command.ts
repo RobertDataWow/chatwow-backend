@@ -5,7 +5,7 @@ import { LineBotService } from '@domain/base/line-bot/line-bot.service';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { lineSessionFromPgWithState } from '@domain/base/line-session/line-session.mapper';
 import { lineSessionsTableFilter } from '@domain/base/line-session/line-session.util';
-import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
+import { LineEventQueue } from '@domain/queue/line-event/line-event.queue';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 

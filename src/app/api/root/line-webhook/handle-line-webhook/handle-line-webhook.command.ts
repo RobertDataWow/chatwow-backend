@@ -1,4 +1,4 @@
-import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
+import { LineEventQueue } from '@domain/queue/line-event/line-event.queue';
 import { Injectable, RawBodyRequest } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FastifyRequest } from 'fastify';
