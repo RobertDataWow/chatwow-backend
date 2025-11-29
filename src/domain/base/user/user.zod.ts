@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import type { PaginationQuery } from '@shared/common/common.pagintaion';
+import type { PaginationQuery } from '@shared/common/common.pagination';
 import { parmUuidsZod } from '@shared/common/common.zod';
 import { getSortZod } from '@shared/zod/zod.util';
 

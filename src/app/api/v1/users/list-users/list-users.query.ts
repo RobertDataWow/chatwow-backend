@@ -7,7 +7,7 @@ import { UserService } from '@domain/base/user/user.service';
 import { MainDb } from '@infra/db/db.main';
 import { filterQbIds } from '@infra/db/db.util';
 
-import { getPagination } from '@shared/common/common.pagintaion';
+import { getPagination } from '@shared/common/common.pagination';
 import { QueryInterface } from '@shared/common/common.type';
 
 import { usersV1InclusionQb } from '../users.v1.util';

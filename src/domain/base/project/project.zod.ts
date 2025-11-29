@@ -2,7 +2,7 @@ import z from 'zod';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
-import type { PaginationQuery } from '@shared/common/common.pagintaion';
+import type { PaginationQuery } from '@shared/common/common.pagination';
 import { getSortZod } from '@shared/zod/zod.util';
 
 import { PROJECT_STATUS } from './project.constant';

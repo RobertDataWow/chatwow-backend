@@ -10,7 +10,7 @@ import { MainDb } from '@infra/db/db.main';
 import { filterQbIds } from '@infra/db/db.util';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
-import { getPagination } from '@shared/common/common.pagintaion';
+import { getPagination } from '@shared/common/common.pagination';
 import { QueryInterface } from '@shared/common/common.type';
 
 import { projectsV1InclusionQb } from '../projects.v1.util';

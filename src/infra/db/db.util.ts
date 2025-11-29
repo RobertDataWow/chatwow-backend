@@ -4,7 +4,7 @@ import { sql } from 'kysely';
 import {
   type PaginationQuery,
   getQueryPagination,
-} from '@shared/common/common.pagintaion';
+} from '@shared/common/common.pagination';
 import type { ParsedSort } from '@shared/common/common.type';
 
 import type { DB } from './db';
