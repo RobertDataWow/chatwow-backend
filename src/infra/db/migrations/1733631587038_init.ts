@@ -470,13 +470,20 @@ export async function up(db: Kysely<any>): Promise<void> {
 
 export async function down(db: Kysely<any>): Promise<void> {
   // Drop indexes
-  await db.schema.dropIndex('stored_files_ref_owner_idx').execute();
+  await db.schema.dropIndex('password_reset_tokens_token_hash').execute();
+  await db.schema.dropIndex('sessions_token_hash').execute();
+  await db.schema.dropIndex('audit_logs_owner_id_idx').execute();
   await db.schema.dropIndex('line_chat_logs_line_session_id_idx').execute();
+  await db.schema.dropIndex('stored_files_owner_id_idx').execute();
+  await db.schema.dropIndex('user_verifications_code_idx').execute();
 
   // Drop tables (reverse order of creation)
+  await db.schema.dropTable('password_reset_tokens').execute();
+  await db.schema.dropTable('sessions').execute();
   await db.schema.dropTable('audit_logs').execute();
   await db.schema.dropTable('line_chat_logs').execute();
   await db.schema.dropTable('line_sessions').execute();
+  await db.schema.dropTable('line_bots').execute();
   await db.schema.dropTable('stored_files').execute();
   await db.schema.dropTable('project_documents').execute();
   await db.schema.dropTable('user_manage_projects').execute();
@@ -490,6 +497,7 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('line_accounts').execute();
 
   // Drop enums/types (reverse order of creation)
+  await db.schema.dropType('line_session_status').execute();
   await db.schema.dropType('action_type').execute();
   await db.schema.dropType('actor_type').execute();
   await db.schema.dropType('chat_sender').execute();
